@@ -1,0 +1,34 @@
+{
+  "name": "monstro-hunt",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "compile": "hardhat compile",
+    "deploy:sepolia": "hardhat run scripts/deploy.js --network baseSepolia",
+    "deploy:mainnet": "hardhat run scripts/deploy.js --network baseMainnet"
+  },
+  "dependencies": {
+    "@coinbase/onchainkit": "^0.2.0",
+    "@farcaster/miniapp-sdk": "^0.1.8",
+    "@tanstack/react-query": "^5.81.5",
+    "next": "15.3.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "wagmi": "^2.16.3",
+    "viem": "^2.31.6"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "hardhat": "^3.1.5",
+    "typescript": "^5.0.0",
+    "eslint": "^8",
+    "eslint-config-next": "15.3.6",
+    "ethers": "^6.0.0"
+  }
+}

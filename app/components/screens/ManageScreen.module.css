@@ -1,0 +1,177 @@
+.container {
+  padding: 24px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  color: white;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.message {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 18px;
+  padding: 40px;
+}
+
+.loading {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 16px;
+  padding: 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.monsterWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.feedSection,
+.sellSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.feedInfo,
+.sellInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.feedLabel,
+.sellLabel {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.feedCost,
+.sellAmount {
+  font-size: 20px;
+  font-weight: 700;
+  color: #4CAF50;
+}
+
+.sellAmount {
+  color: #FFC107;
+}
+
+.feedHint,
+.sellHint {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 4px;
+}
+
+.feedButton {
+  padding: 14px 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(139, 69, 19, 0.5);
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.8) 0%, rgba(101, 50, 50, 0.9) 100%);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(139, 69, 19, 0.3);
+  width: 100%;
+}
+
+.feedButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.9) 0%, rgba(101, 50, 50, 1) 100%);
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.5);
+  transform: translateY(-1px);
+}
+
+.feedButton:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(139, 69, 19, 0.3);
+}
+
+.feedButton.feedButtonUrgent {
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.9) 0%, rgba(185, 28, 28, 1) 100%);
+  border-color: rgba(220, 38, 38, 0.6);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.feedButton.feedButtonUrgent:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(220, 38, 38, 1) 0%, rgba(185, 28, 28, 1) 100%);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.6);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+  }
+  50% {
+    box-shadow: 0 2px 16px rgba(220, 38, 38, 0.7);
+  }
+}
+
+.feedButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+  animation: none;
+}
+
+.sellButton {
+  padding: 14px 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(220, 38, 38, 0.6);
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.9) 0%, rgba(185, 28, 28, 1) 100%);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+  width: 100%;
+}
+
+.sellButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(220, 38, 38, 1) 0%, rgba(185, 28, 28, 1) 100%);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.5);
+  transform: translateY(-1px);
+}
+
+.sellButton:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
+}
+
+.sellButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+}

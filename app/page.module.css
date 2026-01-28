@@ -1,0 +1,14 @@
+.main {
+  min-height: 100vh;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.content {
+  margin-top: 24px;
+  position: relative;
+  z-index: 1;
+}

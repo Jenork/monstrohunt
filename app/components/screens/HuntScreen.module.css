@@ -1,0 +1,130 @@
+.container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  color: white;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.warningBox {
+  display: flex;
+  gap: 16px;
+  padding: 16px 20px;
+  background: rgba(220, 38, 38, 0.15);
+  border: 1px solid rgba(220, 38, 38, 0.4);
+  border-radius: 12px;
+  margin-bottom: 20px;
+  align-items: flex-start;
+}
+
+.warningIcon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.warningContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.warningTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ff6b6b;
+}
+
+.warningText {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.5;
+}
+
+.infoBox {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.infoItem {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.infoLabel {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+.infoValue {
+  font-size: 14px;
+  color: white;
+  font-weight: 600;
+}
+
+.message {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 18px;
+  padding: 40px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.cardWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cooldownBox {
+  display: flex;
+  gap: 16px;
+  padding: 16px 20px;
+  background: rgba(255, 193, 7, 0.15);
+  border: 1px solid rgba(255, 193, 7, 0.4);
+  border-radius: 12px;
+  margin-bottom: 20px;
+  align-items: flex-start;
+}
+
+.cooldownIcon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.cooldownContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cooldownTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #FFC107;
+}
+
+.cooldownText {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+}

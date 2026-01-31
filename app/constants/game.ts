@@ -1,7 +1,10 @@
-// FINAL ECONOMY v1.3 Constants
+// FINAL TESTNET BUILD (Base Sepolia) - Economy LOCKED
+// Testnet: NEXT_PUBLIC_HUNGER_DAYS=1 (accelerated); Mainnet: 7
+export const HUNGER_DAYS = Number(process.env.NEXT_PUBLIC_HUNGER_DAYS || 1);
+
 export type Tier = 0 | 1 | 2; // Scout, Hunter, Leviathan
 
-export const HUNGER_WINDOW = 7 * 24 * 60 * 60; // 7 days in seconds
+export const HUNGER_WINDOW = HUNGER_DAYS * 24 * 60 * 60; // in seconds
 export const HUNT_COOLDOWN = 20 * 60; // 20 minutes in seconds
 
 export const TIERS = {
@@ -22,20 +25,20 @@ export const TIER_PRICES = {
   2: TIERS.LEVIATHAN,
 } as const;
 
-// Feed formula: 5% initialWeight + 5% currentWeight
-export const FEED_INITIAL_BP = 500;  // 5%
-export const FEED_CURRENT_BP = 500;  // 5%
-
-// Distribution shares
-export const HUNTER_SHARE_BP = 2000;  // 20%
-export const ALIVE_SHARE_BP = 7500;    // 75%
+// Distribution shares (LOCKED)
+export const HUNTER_SHARE_BP = 3000;   // 30%
+export const ALIVE_SHARE_BP = 6500;    // 65%
 export const PROTOCOL_SHARE_BP = 500;  // 5%
 
-// Sell fee
+// Sell fee (LOCKED)
 export const SELL_FEE_BP = 100;  // 1%
 
+// Status colors for visual hunger display
 export const STATUS_COLORS = {
-  fed: '#4CAF50',
-  hungry: '#FFC107',
-  starved: '#F44336',
+  calm: '#4CAF50',     // Green - well fed
+  hungry: '#FFC107',   // Yellow - getting hungry
+  critical: '#FF5722', // Orange - urgent
+  starved: '#F44336',  // Red - can be hunted
 } as const;
+
+export type HungerStatus = 'calm' | 'hungry' | 'critical' | 'starved';

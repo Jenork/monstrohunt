@@ -1,4 +1,6 @@
-export type Tier = 0 | 1 | 2; // Scout, Hunter, Leviathan
+import type { Tier } from '../constants/game';
+
+export type { Tier };
 
 export interface Monster {
   id: number;
@@ -15,9 +17,8 @@ export interface Monster {
 }
 
 export interface MonsterStatus {
-  status: 'fed' | 'hungry' | 'starved';
+  status: 'calm' | 'hungry' | 'critical' | 'starved';
   timeToStarve: bigint;
-  timeToHunt?: bigint;
   canHunt?: boolean;
 }
 

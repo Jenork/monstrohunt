@@ -96,7 +96,7 @@ export const monstroHuntABI = [
   },
   {
     type: 'function',
-    name: 'HUNGER_WINDOW',
+    name: 'HUNGER_DURATION',
     inputs: [],
     outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
     stateMutability: 'view',

@@ -1,0 +1,19 @@
+{
+  "name": "monstro-hunt-subgraph",
+  "version": "1.0.0",
+  "description": "Subgraph for Monstro Hunt on Base Sepolia",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy:studio": "graph deploy --studio monstro-hunt",
+    "deploy:goldsky": "goldsky subgraph deploy monstro-hunt/1.0.0 --path .",
+    "create-local": "graph create --node http://localhost:8020/ monstro-hunt",
+    "remove-local": "graph remove --node http://localhost:8020/ monstro-hunt",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 monstro-hunt"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "^0.71.0",
+    "@graphprotocol/graph-ts": "^0.32.0"
+  },
+  "devDependencies": {}
+}

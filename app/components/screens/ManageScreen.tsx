@@ -8,7 +8,9 @@ import { useFeedMonster } from '../../hooks/useFeedMonster';
 import { useSellMonster } from '../../hooks/useSellMonster';
 import { useToast } from '../../hooks/useToast';
 import { MonsterCard } from '../ui/MonsterCard';
-import { formatETH } from '../../utils/format';
+import { formatETH, formatAddress } from '../../utils/format';
+import { getSellAmount } from '../../utils/monster';
+import { isMockMode, getMockProfile } from '../../utils/mockData';
 import styles from './ManageScreen.module.css';
 
 export function ManageScreen() {
@@ -33,28 +35,68 @@ export function ManageScreen() {
     );
   }
 
-  if (monsterIds.length === 0) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.message}>You don't have a monster yet. Create one!</div>
-      </div>
-    );
-  }
+  const mockMode = isMockMode();
+  const profile = getMockProfile(address);
+  const hasMonsters = monsterIds.length > 0;
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>My Monster</h2>
-      <div className={styles.grid}>
-        {monsterIds.map((id) => (
-          <MonsterManager key={id.toString()} monsterId={Number(id)} />
-        ))}
+      <h2 className={styles.title}>Profile</h2>
+
+      <div className={styles.profileCard}>
+        <div className={styles.profileAvatar}>👤</div>
+        <div className={styles.profileInfo}>
+          <div className={styles.profileName}>{profile.displayName}</div>
+          <div className={styles.profileAddress}>
+            {address ? formatAddress(address) : '—'}
+          </div>
+          <div className={styles.profileStats}>
+            <span className={styles.profileStat}>
+              <strong>Monsters:</strong> {monsterIds.length}
+            </span>
+            <span className={styles.profileStat}>
+              <strong>Hunts won:</strong> {profile.huntsWon}
+            </span>
+            <span className={styles.profileStat}>
+              <strong>Total rewards:</strong> {formatETH(profile.totalRewardsEarned)} ETH
+            </span>
+            <span className={styles.profileStat}>
+              <strong>Member since:</strong> {profile.memberSince}
+            </span>
+          </div>
+        </div>
       </div>
+
+      {mockMode && (
+        <div className={styles.mockNotice}>
+          <div className={styles.mockIcon}>🎮</div>
+          <div className={styles.mockContent}>
+            <div className={styles.mockTitle}>Demo Mode</div>
+            <div className={styles.mockText}>
+              Showing mock monster data. Connect to a deployed contract to manage your real monster.
+            </div>
+          </div>
+        </div>
+      )}
+
+      {!hasMonsters ? (
+        <div className={styles.message}>You don&apos;t have a monster yet. Create one!</div>
+      ) : (
+        <>
+          <h3 className={styles.sectionTitle}>My Monster</h3>
+          <div className={styles.grid}>
+            {monsterIds.map((id) => (
+              <MonsterManager key={id.toString()} monsterId={Number(id)} />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
 
 function MonsterManager({ monsterId }: { monsterId: number }) {
-  const { monster, refetch } = useMonsterInfo(monsterId);
+  const { monster, refetch } = useMonsterInfo(monsterId, { fetchCanHunt: false });
   const { feedMonster, isPending: isFeeding } = useFeedMonster();
   const { sellMonster, isPending: isSelling } = useSellMonster();
   const { addToast } = useToast();
@@ -93,7 +135,7 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
       return;
     }
     
-    const sellAmount = monster.weight - (monster.weight * BigInt(100) / BigInt(10000)); // 99% after 1% fee
+    const sellAmount = getSellAmount(monster.weight);
     if (!confirm(`Sell your monster for ${formatETH(sellAmount)} ETH? (1% fee applies)`)) return;
     
     try {
@@ -121,7 +163,7 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
             <div className={styles.feedHint}>
               {isStarved 
                 ? '⚠️ Your monster is starved! Feed now to save it.'
-                : 'Feed every 7 days to keep your monster alive'}
+                : 'Feed regularly to keep your monster alive'}
             </div>
           </div>
           <button
@@ -137,9 +179,9 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
           <div className={styles.sellInfo}>
             <div className={styles.sellLabel}>Sell Amount</div>
             <div className={styles.sellAmount}>
-              {monster.weight ? formatETH(monster.weight - (monster.weight * BigInt(100) / BigInt(10000))) : '...'} ETH
+              {monster.weight ? formatETH(getSellAmount(monster.weight)) : '...'} ETH
             </div>
-            <div className={styles.sellHint}>1% protocol fee applies</div>
+            <div className={styles.sellHint}>Protocol fee applies</div>
           </div>
           <button
             className={styles.sellButton}

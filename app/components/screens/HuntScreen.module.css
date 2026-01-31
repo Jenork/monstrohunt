@@ -85,8 +85,9 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 24px;
+  justify-items: center;
 }
 
 .cardWrapper {
@@ -127,4 +128,39 @@
 .cooldownText {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.9);
+}
+
+.mockNotice {
+  display: flex;
+  gap: 16px;
+  padding: 16px 20px;
+  background: rgba(33, 150, 243, 0.15);
+  border: 1px solid rgba(33, 150, 243, 0.4);
+  border-radius: 12px;
+  margin-bottom: 20px;
+  align-items: flex-start;
+}
+
+.mockIcon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.mockContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mockTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2196F3;
+}
+
+.mockText {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.5;
 }

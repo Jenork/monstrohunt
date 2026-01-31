@@ -1,9 +1,9 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AVATARS, AvatarId } from '../../constants/avatars';
-import { TIERS, TIER_NAMES, Tier } from '../../constants/game';
+import { TIER_PRICES, TIER_NAMES, Tier } from '../../constants/game';
 import { useCreateMonster } from '../../hooks/useCreateMonster';
 import { useToast } from '../../hooks/useToast';
 import { formatETH } from '../../utils/format';
@@ -17,6 +17,13 @@ export function CreateScreen() {
   const { createMonster, isPending, isSuccess } = useCreateMonster();
   const { addToast } = useToast();
 
+  useEffect(() => {
+    if (isSuccess) {
+      addToast('Monster created successfully!', 'success');
+      setName('');
+    }
+  }, [isSuccess, addToast]);
+
   const handlePreviousAvatar = () => {
     const currentIndex = AVATARS.findIndex(a => a.id === selectedAvatar);
     const previousIndex = currentIndex <= 0 ? AVATARS.length - 1 : currentIndex - 1;
@@ -29,7 +36,7 @@ export function CreateScreen() {
     setSelectedAvatar(AVATARS[nextIndex].id);
   };
 
-  const handleCreate = async () => {
+  const handleCreate = () => {
     if (!name.trim()) {
       addToast('Please enter a name', 'error');
       return;
@@ -38,19 +45,10 @@ export function CreateScreen() {
       addToast('Name must be 31 characters or less', 'error');
       return;
     }
-
-    try {
-      await createMonster(name, selectedAvatar, selectedTier);
-      if (isSuccess) {
-        addToast('Monster created successfully!', 'success');
-        setName('');
-      }
-    } catch (error: any) {
-      addToast(error.message || 'Failed to create monster', 'error');
-    }
+    createMonster(name, selectedAvatar, selectedTier);
   };
 
-  const selectedTierPrice = TIERS[selectedTier === 0 ? 'SCOUT' : selectedTier === 1 ? 'HUNTER' : 'LEVIATHAN'];
+  const selectedTierPrice = TIER_PRICES[selectedTier];
 
   return (
     <div className={styles.container}>
@@ -105,8 +103,7 @@ export function CreateScreen() {
           <label className={styles.label}>Select Tier</label>
           <div className={styles.tierGroup}>
             {([0, 1, 2] as Tier[]).map((tier) => {
-              const tierKey = tier === 0 ? 'SCOUT' : tier === 1 ? 'HUNTER' : 'LEVIATHAN';
-              const tierPrice = TIERS[tierKey];
+              const tierPrice = TIER_PRICES[tier];
               const isSelected = selectedTier === tier;
               
               return (

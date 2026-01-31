@@ -1,82 +1,105 @@
 'use client';
 
+import { HUNGER_DAYS } from '../../constants/game';
 import styles from './FAQScreen.module.css';
+
+const isTestnet = HUNGER_DAYS === 1;
 
 export function FAQScreen() {
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>Frequently Asked Questions</h2>
       
+      {isTestnet && (
+        <div className={styles.testnetNotice}>
+          <strong>Testnet Mode:</strong> This is Base Sepolia with accelerated timing for testing.
+        </div>
+      )}
+      
       <div className={styles.faqList}>
         <div className={styles.faqItem}>
           <h3 className={styles.question}>How do I create a monster?</h3>
           <p className={styles.answer}>
-            Go to the Create tab, choose an avatar, enter a name (max 31 characters), 
-            set your deposit amount (minimum 0.0005 ETH), select a feed rate (5% or 10%), 
-            and click "Create Monster".
+            Go to the Create tab, choose an avatar, enter a name, and select a tier: 
+            Scout (0.001 ETH), Hunter (0.005 ETH), or Leviathan (0.01 ETH). Then click &quot;Create Monster&quot;.
           </p>
         </div>
 
         <div className={styles.faqItem}>
           <h3 className={styles.question}>What happens if I forget to feed my monster?</h3>
           <p className={styles.answer}>
-            If you don't feed your monster within 7 days, it becomes huntable. 
-            After 7 days + 2 hours grace period, other players can hunt your monster 
-            and you may lose it along with your deposit.
+            You must feed your monster regularly to keep it alive. If you don&apos;t feed in time, 
+            it becomes starved and other players can hunt it. If hunted, you lose your monster.
+          </p>
+        </div>
+
+        <div className={styles.faqItem}>
+          <h3 className={styles.question}>How much does feeding cost?</h3>
+          <p className={styles.answer}>
+            The feed cost is shown in your Profile. Feed on time to keep your monster alive and earning.
+            The cost grows as your monster gains weight from rewards.
           </p>
         </div>
 
         <div className={styles.faqItem}>
           <h3 className={styles.question}>How do I earn rewards?</h3>
           <p className={styles.answer}>
-            You earn ETH rewards from fees proportional to your monster's weight. 
-            The heavier your monster, the more rewards you receive. Rewards accumulate 
-            over time and can be claimed from your Profile.
-          </p>
-        </div>
-
-        <div className={styles.faqItem}>
-          <h3 className={styles.question}>What's the difference between 5% and 10% feed rate?</h3>
-          <p className={styles.answer}>
-            The feed rate determines how much ETH you need to feed your monster. 
-            5% feed rate costs less but your monster grows slower. 10% feed rate 
-            costs more but your monster grows faster, potentially earning more rewards.
+            When someone&apos;s monster is hunted, rewards are distributed proportionally among 
+            all alive monsters by weight. The heavier your monster, the larger your share.
           </p>
         </div>
 
         <div className={styles.faqItem}>
           <h3 className={styles.question}>How do I hunt other monsters?</h3>
           <p className={styles.answer}>
-            Go to the Hunt tab to see monsters that haven't been fed in 7+ days. 
-            Click "Hunt" on any available monster. If successful, you may receive 
-            rewards or the monster itself.
+            Go to the Hunt tab to see starved monsters. Click &quot;Hunt&quot; to claim a reward. 
+            Warning: hunting is a race — gas may be lost if someone else hunts first or the owner feeds.
           </p>
         </div>
 
         <div className={styles.faqItem}>
           <h3 className={styles.question}>Can I sell my monster?</h3>
           <p className={styles.answer}>
-            Yes! In your Profile tab, you can sell any of your monsters. 
-            Selling returns your deposit and any accumulated rewards.
+            Yes. In the Profile tab you can sell any monster that is not starved. 
+            You receive your monster&apos;s weight in ETH (minus a small protocol fee).
           </p>
         </div>
 
         <div className={styles.faqItem}>
           <h3 className={styles.question}>What is monster weight?</h3>
           <p className={styles.answer}>
-            Monster weight represents the total ETH value associated with your monster, 
-            including your deposit and accumulated rewards. Heavier monsters earn 
-            proportionally more from fees.
+            Weight is the ETH value of your monster: initial deposit plus accumulated rewards.
+            Heavier monsters get a larger share of reward distributions.
           </p>
         </div>
 
         <div className={styles.faqItem}>
-          <h3 className={styles.question}>Is there a minimum deposit?</h3>
+          <h3 className={styles.question}>What are the tiers?</h3>
           <p className={styles.answer}>
-            Yes, the minimum deposit is 0.0005 ETH. You can deposit more if you want 
-            to increase your monster's initial weight and potential rewards.
+            Tier sets the initial cost and weight: Scout 0.001 ETH, Hunter 0.005 ETH, Leviathan 0.01 ETH. 
+            Higher tier means higher initial weight and larger reward share, but also higher feed costs.
           </p>
         </div>
+
+        {isTestnet && (
+          <>
+            <div className={styles.faqItem}>
+              <h3 className={styles.question}>Why is feeding so frequent on testnet?</h3>
+              <p className={styles.answer}>
+                Testnet uses accelerated time so players can experience the full lifecycle quickly. 
+                Mainnet will use a longer hunger cycle.
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h3 className={styles.question}>Can the rules change?</h3>
+              <p className={styles.answer}>
+                No. Economic rules are locked forever. Only timing is accelerated on testnet.
+                There is no admin control or upgradeability.
+              </p>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

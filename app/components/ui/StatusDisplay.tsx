@@ -1,8 +1,7 @@
 'use client';
 
 import { MonsterStatus } from '../../types/monster';
-import { STATUS_COLORS } from '../../constants/game';
-import { formatTime } from '../../utils/format';
+import { STATUS_COLORS, HUNGER_WINDOW } from '../../constants/game';
 import styles from './StatusDisplay.module.css';
 
 interface StatusDisplayProps {
@@ -11,28 +10,19 @@ interface StatusDisplayProps {
 
 export function StatusDisplay({ status }: StatusDisplayProps) {
   const color = STATUS_COLORS[status.status];
+  const totalTime = HUNGER_WINDOW;
+  const remaining = Number(status.timeToStarve);
+  const progress = Math.max(0, Math.min(100, (remaining / totalTime) * 100));
   
-  let label: string;
-  let timeText: string;
-  let progress: number = 100;
+  // Visual labels only - no exact timers per spec
+  const labels: Record<string, { label: string; hint: string }> = {
+    calm: { label: 'Calm', hint: 'Well fed' },
+    hungry: { label: 'Hungry', hint: 'Feed soon' },
+    critical: { label: 'Critical', hint: 'Feed now!' },
+    starved: { label: 'Starved', hint: 'Can be hunted' },
+  };
   
-  if (status.status === 'fed') {
-    label = 'Fed';
-    const totalTime = 7 * 24 * 60 * 60; // 7 days
-    const remaining = Number(status.timeToStarve);
-    progress = Math.max(0, Math.min(100, (remaining / totalTime) * 100));
-    timeText = `Starves in ${formatTime(status.timeToStarve)}`;
-  } else if (status.status === 'hungry') {
-    label = 'Hungry';
-    const totalTime = 7 * 24 * 60 * 60;
-    const remaining = Number(status.timeToStarve);
-    progress = Math.max(0, Math.min(100, (remaining / totalTime) * 100));
-    timeText = `Starves in ${formatTime(status.timeToStarve)}`;
-  } else {
-    label = 'Starved';
-    progress = 0;
-    timeText = 'Can be hunted';
-  }
+  const { label, hint } = labels[status.status] || labels.starved;
 
   return (
     <div className={styles.container}>
@@ -40,7 +30,7 @@ export function StatusDisplay({ status }: StatusDisplayProps) {
         <div className={styles.status} style={{ backgroundColor: color }}>
           {label}
         </div>
-        <div className={styles.time}>{timeText}</div>
+        <div className={styles.time}>{hint}</div>
       </div>
       {status.status !== 'starved' && (
         <div className={styles.progressBar}>

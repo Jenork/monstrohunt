@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useReadContract, useAccount } from 'wagmi';
 import { CONTRACT_ADDRESS, monstroHuntABI } from '../../utils/contract';
 import { useMonsterInfo } from '../../hooks/useMonsterInfo';
@@ -8,7 +8,7 @@ import { useHuntMonster } from '../../hooks/useHuntMonster';
 import { useToast } from '../../hooks/useToast';
 import { HuntCard } from '../ui/HuntCard';
 import { getHuntCooldownRemaining } from '../../utils/monster';
-import { formatTime } from '../../utils/format';
+import { generateMockMonsters, isMockMode } from '../../utils/mockData';
 import styles from './HuntScreen.module.css';
 
 export function HuntScreen() {
@@ -16,11 +16,15 @@ export function HuntScreen() {
   const { addToast } = useToast();
   const { huntMonster, isSuccess } = useHuntMonster();
   const { address } = useAccount();
+  const mockMode = isMockMode();
 
   const { data: totalMonsters } = useReadContract({
     address: CONTRACT_ADDRESS,
     abi: monstroHuntABI,
     functionName: 'getTotalMonsters',
+    query: {
+      enabled: !mockMode,
+    },
   });
 
   const { data: hunterMonsterId } = useReadContract({
@@ -29,12 +33,12 @@ export function HuntScreen() {
     functionName: 'getOwnerMonsterId',
     args: address ? [address] : undefined,
     query: {
-      enabled: !!address,
+      enabled: !!address && !mockMode,
     },
   });
 
   const { monster: hunterMonster } = useMonsterInfo(
-    hunterMonsterId && hunterMonsterId > 0n ? Number(hunterMonsterId) : undefined
+    mockMode ? 1 : (hunterMonsterId && hunterMonsterId > 0n ? Number(hunterMonsterId) : undefined)
   );
 
   useEffect(() => {
@@ -45,12 +49,16 @@ export function HuntScreen() {
   }, [isSuccess, addToast]);
 
   useEffect(() => {
-    if (totalMonsters) {
+    if (mockMode) {
+      // В mock режиме показываем 8 монстров
+      const mockMonsters = generateMockMonsters(8);
+      setAllMonsterIds(mockMonsters.map(m => m.id));
+    } else if (totalMonsters) {
       loadAllMonsters();
       const interval = setInterval(loadAllMonsters, 30000);
       return () => clearInterval(interval);
     }
-  }, [totalMonsters]);
+  }, [totalMonsters, mockMode]);
 
   const loadAllMonsters = () => {
     if (!totalMonsters) return;
@@ -71,9 +79,26 @@ export function HuntScreen() {
     ? getHuntCooldownRemaining(hunterMonster.lastHuntAttemptAt, currentTime)
     : BigInt(0);
 
+  const starvedCount = useMemo(() => {
+    if (!mockMode) return allMonsterIds.length;
+    return generateMockMonsters(8).filter(m => m.status.status === 'starved').length;
+  }, [mockMode, allMonsterIds.length]);
+
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>Hunt Starved Monsters</h2>
+      
+      {mockMode && (
+        <div className={styles.mockNotice}>
+          <div className={styles.mockIcon}>🎮</div>
+          <div className={styles.mockContent}>
+            <div className={styles.mockTitle}>Demo Mode</div>
+            <div className={styles.mockText}>
+              Showing mock monsters for demonstration. Connect to a deployed contract to see real data.
+            </div>
+          </div>
+        </div>
+      )}
       
       <div className={styles.warningBox}>
         <div className={styles.warningIcon}>⚠️</div>
@@ -92,7 +117,7 @@ export function HuntScreen() {
           <div className={styles.cooldownContent}>
             <div className={styles.cooldownTitle}>Hunt Cooldown Active</div>
             <div className={styles.cooldownText}>
-              You must wait {formatTime(hunterCooldown)} before hunting again.
+              Please wait before hunting again.
             </div>
           </div>
         </div>
@@ -101,15 +126,13 @@ export function HuntScreen() {
       <div className={styles.infoBox}>
         <div className={styles.infoItem}>
           <span className={styles.infoLabel}>Available:</span>
-          <span className={styles.infoValue}>{allMonsterIds.length} monsters</span>
+          <span className={styles.infoValue}>
+            {mockMode ? `${starvedCount} starved monsters (demo)` : `${allMonsterIds.length} monsters`}
+          </span>
         </div>
         <div className={styles.infoItem}>
           <span className={styles.infoLabel}>Cooldown:</span>
-          <span className={styles.infoValue}>20 minutes after each attempt</span>
-        </div>
-        <div className={styles.infoItem}>
-          <span className={styles.infoLabel}>Reward:</span>
-          <span className={styles.infoValue}>20% of monster weight</span>
+          <span className={styles.infoValue}>Active after each attempt</span>
         </div>
       </div>
 
@@ -118,7 +141,7 @@ export function HuntScreen() {
       ) : (
         <div className={styles.grid}>
           {allMonsterIds.map((id) => (
-            <StarvedMonsterCard key={id} monsterId={id} onHunt={huntMonster} />
+            <StarvedMonsterCard key={id} monsterId={id} onHunt={mockMode ? () => addToast('Demo mode: Connect to deployed contract to hunt', 'info') : huntMonster} />
           ))}
         </div>
       )}
@@ -129,17 +152,28 @@ export function HuntScreen() {
 function StarvedMonsterCard({ monsterId, onHunt }: { monsterId: number; onHunt: (id: number) => void }) {
   const { monster } = useMonsterInfo(monsterId);
   const { address } = useAccount();
+  const mockMode = isMockMode();
 
   if (!monster || !monster.alive) {
     return null;
   }
 
-  // Only show monsters that are starved and not owned by current user
-  if (monster.status.status !== 'starved' || monster.owner.toLowerCase() === address?.toLowerCase()) {
-    return null;
+  // В mock режиме показываем всех монстров, кроме вашего (ID 1)
+  // В реальном режиме показываем только starved и не своих
+  if (mockMode) {
+    if (monster.id === 1 && address) {
+      return null; // Не показываем свой монстр
+    }
+  } else {
+    // Only show monsters that are starved and not owned by current user
+    if (monster.status.status !== 'starved' || monster.owner.toLowerCase() === address?.toLowerCase()) {
+      return null;
+    }
   }
 
-  const canHunt = monster.status.canHunt ?? false;
+  const canHunt = mockMode 
+    ? (monster.status.status === 'starved' && monster.id !== 1)
+    : (monster.status.canHunt ?? false);
 
   return (
     <HuntCard

@@ -1,12 +1,27 @@
 .container {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 60vh;
   padding: 40px 20px;
+  background-image: url('/fon.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 0;
 }
 
 .content {
+  position: relative;
+  z-index: 1;
   max-width: 600px;
   text-align: center;
 }
@@ -22,7 +37,30 @@
 .subtitle {
   font-size: 20px;
   color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 40px;
+  margin-bottom: 16px;
+}
+
+.testnetBadge {
+  display: inline-block;
+  padding: 8px 16px;
+  background: rgba(255, 152, 0, 0.2);
+  border: 1px solid rgba(255, 152, 0, 0.5);
+  border-radius: 8px;
+  color: #FFC107;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 24px;
+}
+
+.warning {
+  margin-top: 16px;
+  padding: 12px;
+  background: rgba(244, 67, 54, 0.1);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  border-radius: 8px;
+  color: #ff8a80;
+  font-size: 14px;
+  text-align: center;
 }
 
 .rules {

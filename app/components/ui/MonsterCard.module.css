@@ -1,20 +1,23 @@
 .card {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 24px;
+  border-radius: 12px;
+  padding: 12px;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
   border: 1px solid rgba(255, 255, 255, 0.2);
   width: 100%;
+  max-width: 520px;
+  min-height: 140px;
+  box-sizing: border-box;
 }
 
 .card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   background: rgba(255, 255, 255, 0.15);
 }
@@ -23,27 +26,41 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 1152px;
-  height: 1152px;
-  max-width: 100%;
-  max-height: 300px;
+  width: 120px;
+  min-width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .avatarImage {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
+}
+
+.right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
 }
 
 .name {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   color: white;
-  text-align: center;
+  text-align: left;
+  line-height: 1.2;
 }
 
 .tier {
-  font-size: 14px;
+  font-size: 13px;
   color: rgba(255, 255, 255, 0.7);
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -53,19 +70,19 @@
 .weightInfo {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 4px;
+  align-items: flex-start;
+  gap: 2px;
 }
 
 .weightLabel {
-  font-size: 12px;
+  font-size: 10px;
   color: rgba(255, 255, 255, 0.6);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .weight {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   color: #4CAF50;
 }
@@ -73,23 +90,23 @@
 .rewards {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 16px;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 6px 10px;
   background: rgba(255, 193, 7, 0.1);
   border-radius: 8px;
   border: 1px solid rgba(255, 193, 7, 0.3);
 }
 
 .rewardsLabel {
-  font-size: 11px;
+  font-size: 10px;
   color: rgba(255, 193, 7, 0.8);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .rewardsAmount {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   color: #FFC107;
 }

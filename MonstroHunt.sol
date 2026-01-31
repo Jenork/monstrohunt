@@ -3,31 +3,33 @@ pragma solidity ^0.8.20;
 
 /**
  * @title Monstro Hunt
- * @notice FINAL ECONOMY v1.3 (LOCKED + VERIFIED)
+ * @notice FINAL TESTNET BUILD (Base Sepolia) - Economy LOCKED
  * @dev Onchain survival game - 1 wallet = 1 monster
- * No tokens, no NFTs, no upgradeability
+ * No tokens, no NFTs, no upgradeability, no admin control
  */
 contract MonstroHunt {
+    // Immutable hunger duration (set at deployment, never changeable)
+    uint256 public immutable HUNGER_DURATION;
+    
     // Constants
-    uint256 public constant HUNGER_WINDOW = 7 days;
     uint256 public constant HUNT_COOLDOWN = 20 minutes;
     
     // Tiers (FIXED)
-    uint256 public constant TIER_SCOUT = 0.001 ether;      // 0.001 ETH
-    uint256 public constant TIER_HUNTER = 0.005 ether;      // 0.005 ETH
-    uint256 public constant TIER_LEVIATHAN = 0.01 ether;   // 0.01 ETH
+    uint256 public constant TIER_SCOUT = 0.001 ether;
+    uint256 public constant TIER_HUNTER = 0.005 ether;
+    uint256 public constant TIER_LEVIATHAN = 0.01 ether;
     
-    // Distribution shares (basis points: 10000 = 100%)
-    uint16 public constant HUNTER_SHARE_BP = 2000;  // 20%
-    uint16 public constant ALIVE_SHARE_BP = 7500;    // 75%
+    // Distribution shares (basis points: 10000 = 100%) - LOCKED
+    uint16 public constant HUNTER_SHARE_BP = 3000;   // 30%
+    uint16 public constant ALIVE_SHARE_BP = 6500;    // 65%
     uint16 public constant PROTOCOL_SHARE_BP = 500;  // 5%
     
-    // Sell fee
+    // Sell fee - LOCKED
     uint16 public constant SELL_FEE_BP = 100;        // 1%
     
-    // Feed formula: 5% initialWeight + 5% currentWeight
-    uint16 public constant FEED_INITIAL_BP = 500;     // 5%
-    uint16 public constant FEED_CURRENT_BP = 500;     // 5%
+    // Feed formula (internal, not shown in UI) - LOCKED
+    uint16 public constant FEED_INITIAL_BP = 500;    // 5%
+    uint16 public constant FEED_CURRENT_BP = 500;    // 5%
     
     enum Tier {
         Scout,      // 0.001 ETH
@@ -39,24 +41,24 @@ contract MonstroHunt {
         bytes32 name;
         uint8 avatarId;
         Tier tier;
-        uint256 initialWeight;      // Initial deposit (wei)
-        uint256 weight;             // Current weight (wei)
-        uint256 hungerDeadline;     // Timestamp when monster becomes STARVED
-        bool alive;                 // false if hunted/dead
-        uint256 lastRewardIndex;    // Last globalRewardIndex when rewards were claimed
-        uint256 lastHuntAttemptAt;  // Timestamp of last hunt attempt (for cooldown)
+        uint256 initialWeight;
+        uint256 weight;
+        uint256 hungerDeadline;
+        bool alive;
+        uint256 lastRewardIndex;
+        uint256 lastHuntAttemptAt;
         address owner;
     }
     
     Monster[] public monsters;
-    mapping(address => uint256) public ownerToMonsterId;  // 1 wallet = 1 monster
-    mapping(uint256 => bool) public monsterExists;         // Quick existence check
+    mapping(address => uint256) public ownerToMonsterId;
+    mapping(uint256 => bool) public monsterExists;
     
-    // Reward distribution system
-    uint256 public totalAliveWeight;      // Sum of all alive monster weights
-    uint256 public globalRewardIndex;     // Accumulated rewards per weight (scaled by 1e18)
+    // Reward distribution system (O(1) global index pattern)
+    uint256 public totalAliveWeight;
+    uint256 public globalRewardIndex;
     
-    // Protocol balance (earns from 5% on deaths + 1% on sells)
+    // Protocol balance (5% on deaths + 1% on sells)
     uint256 public protocolBalance;
     
     event MonsterCreated(
@@ -91,7 +93,16 @@ contract MonstroHunt {
     );
     
     /**
-     * @notice Create a monster. 1 wallet = 1 monster.
+     * @notice Constructor sets immutable hunger duration
+     * @param hungerDuration Hunger window in seconds (testnet: 1 day, mainnet: 7 days)
+     */
+    constructor(uint256 hungerDuration) {
+        require(hungerDuration > 0, "Invalid hunger duration");
+        HUNGER_DURATION = hungerDuration;
+    }
+    
+    /**
+     * @notice Create a monster. 1 wallet = 1 monster. No protocol fee.
      * @param name Monster name (max 31 bytes)
      * @param avatarId Avatar ID
      * @param tier Tier (must match msg.value exactly)
@@ -117,11 +128,8 @@ contract MonstroHunt {
         
         require(msg.value == tierPrice, "Value must equal tier price");
         
-        // Update rewards for all monsters before state change
-        _updateAllMonsterRewards();
-        
-        uint256 monsterId = monsters.length + 1; // Start from 1 (0 means no monster)
-        uint256 hungerDeadline = block.timestamp + HUNGER_WINDOW;
+        uint256 monsterId = monsters.length + 1;
+        uint256 hungerDeadline = block.timestamp + HUNGER_DURATION;
         
         monsters.push(Monster({
             name: name,
@@ -144,7 +152,7 @@ contract MonstroHunt {
     }
     
     /**
-     * @notice Feed your monster. Cost = 5% initialWeight + 5% currentWeight
+     * @notice Feed your monster. No protocol fee. Full amount added to weight.
      * @param monsterId Your monster ID
      */
     function feedMonster(uint256 monsterId) external payable {
@@ -159,15 +167,15 @@ contract MonstroHunt {
         // Update rewards before state change
         _updateMonsterRewards(monsterId);
         
-        // Calculate feed cost: 5% initialWeight + 5% currentWeight
+        // Calculate feed cost (internal formula, not shown in UI)
         uint256 feedCost = (monster.initialWeight * FEED_INITIAL_BP) / 10000 +
                           (monster.weight * FEED_CURRENT_BP) / 10000;
         
         require(msg.value >= feedCost, "Insufficient payment");
         
         uint256 oldWeight = monster.weight;
-        monster.weight += feedCost; // Full feed amount is added to weight
-        monster.hungerDeadline = block.timestamp + HUNGER_WINDOW;
+        monster.weight += feedCost;
+        monster.hungerDeadline = block.timestamp + HUNGER_DURATION;
         
         totalAliveWeight = totalAliveWeight - oldWeight + monster.weight;
         monster.lastRewardIndex = globalRewardIndex;
@@ -196,20 +204,20 @@ contract MonstroHunt {
         uint256 hunterMonsterId = ownerToMonsterId[msg.sender];
         require(hunterMonsterId > 0, "Hunter must have a monster");
         
-        // Check cooldown
+        // Check cooldown (per monster, not per address)
         Monster storage hunter = monsters[hunterMonsterId - 1];
         require(
             block.timestamp >= hunter.lastHuntAttemptAt + HUNT_COOLDOWN,
             "Hunt cooldown active"
         );
         
-        // Update cooldown immediately (applies on success or failure)
+        // Update cooldown immediately (applies on any attempt)
         hunter.lastHuntAttemptAt = block.timestamp;
         
         // Update rewards for hunter before state change
         _updateMonsterRewards(hunterMonsterId);
         
-        // Re-check conditions (honest tx race)
+        // Re-check conditions (honest tx race - gas loss possible)
         require(target.alive, "Monster already dead");
         require(isStarved(targetMonsterId), "Target not starved");
         
@@ -218,12 +226,12 @@ contract MonstroHunt {
         
         uint256 weight = target.weight;
         
-        // Distribution: Hunter 20%, Alive monsters 75%, Protocol 5%
+        // Distribution: Hunter 30%, Alive monsters 65%, Protocol 5%
         uint256 hunterReward = (weight * HUNTER_SHARE_BP) / 10000;
         uint256 distributedToAlive = (weight * ALIVE_SHARE_BP) / 10000;
         uint256 protocolFee = (weight * PROTOCOL_SHARE_BP) / 10000;
         
-        // Remove monster
+        // Remove monster from alive pool
         totalAliveWeight -= weight;
         target.alive = false;
         monsterExists[targetMonsterId] = false;
@@ -232,7 +240,7 @@ contract MonstroHunt {
         payable(msg.sender).transfer(hunterReward);
         protocolBalance += protocolFee;
         
-        // Distribute to alive monsters proportionally
+        // Distribute to alive monsters proportionally (O(1) via global index)
         if (totalAliveWeight > 0) {
             globalRewardIndex += (distributedToAlive * 1e18) / totalAliveWeight;
         }
@@ -278,7 +286,7 @@ contract MonstroHunt {
     }
     
     /**
-     * @notice Update rewards for a specific monster
+     * @notice Update rewards for a specific monster (distribution variant A)
      */
     function _updateMonsterRewards(uint256 monsterId) internal {
         Monster storage monster = monsters[monsterId - 1];
@@ -293,21 +301,8 @@ contract MonstroHunt {
         monster.lastRewardIndex = globalRewardIndex;
     }
     
-    /**
-     * @notice Update rewards for all monsters (O(1) - no loops)
-     * Called before state changes that affect totalAliveWeight
-     */
-    function _updateAllMonsterRewards() internal {
-        // This is O(1) - we don't loop. Rewards are calculated on-demand
-        // when monsters interact with the system (feed/hunt/sell)
-        // The globalRewardIndex accumulates, and each monster tracks its lastRewardIndex
-    }
-    
     // View functions
     
-    /**
-     * @notice Get monster data
-     */
     function getMonster(uint256 monsterId) external view returns (
         bytes32 name,
         uint8 avatarId,
@@ -336,16 +331,10 @@ contract MonstroHunt {
         );
     }
     
-    /**
-     * @notice Get monster ID for an owner (0 if none)
-     */
     function getOwnerMonsterId(address owner) external view returns (uint256) {
         return ownerToMonsterId[owner];
     }
     
-    /**
-     * @notice Check if monster is STARVED (can be hunted)
-     */
     function isStarved(uint256 monsterId) public view returns (bool) {
         require(monsterId > 0 && monsterId <= monsters.length, "Monster not found");
         Monster memory monster = monsters[monsterId - 1];
@@ -353,15 +342,11 @@ contract MonstroHunt {
         return block.timestamp >= monster.hungerDeadline;
     }
     
-    /**
-     * @notice Calculate feed cost for a monster
-     */
     function getFeedCost(uint256 monsterId) external view returns (uint256) {
         require(monsterId > 0 && monsterId <= monsters.length, "Monster not found");
         Monster memory monster = monsters[monsterId - 1];
         require(monsterExists[monsterId], "Monster not found");
         
-        // Update weight with pending rewards for accurate calculation
         uint256 currentWeight = monster.weight;
         if (monster.alive && monster.weight > 0) {
             uint256 pending = monster.weight * (globalRewardIndex - monster.lastRewardIndex) / 1e18;
@@ -372,9 +357,6 @@ contract MonstroHunt {
                (currentWeight * FEED_CURRENT_BP) / 10000;
     }
     
-    /**
-     * @notice Get pending rewards for a monster
-     */
     function getPendingRewards(uint256 monsterId) external view returns (uint256) {
         require(monsterId > 0 && monsterId <= monsters.length, "Monster not found");
         Monster memory monster = monsters[monsterId - 1];
@@ -383,9 +365,6 @@ contract MonstroHunt {
         return monster.weight * (globalRewardIndex - monster.lastRewardIndex) / 1e18;
     }
     
-    /**
-     * @notice Check if hunter can hunt (cooldown check)
-     */
     function canHunt(address hunter, uint256 targetMonsterId) external view returns (bool) {
         uint256 hunterMonsterId = ownerToMonsterId[hunter];
         if (hunterMonsterId == 0) return false;
@@ -403,9 +382,6 @@ contract MonstroHunt {
         return true;
     }
     
-    /**
-     * @notice Get total number of monsters
-     */
     function getTotalMonsters() external view returns (uint256) {
         return monsters.length;
     }

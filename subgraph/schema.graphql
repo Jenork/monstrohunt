@@ -1,0 +1,42 @@
+type Monster @entity {
+  id: ID!
+  owner: Bytes!
+  tier: Int!
+  initialWeight: BigInt!
+  weight: BigInt!
+  status: String!
+  createdAt: BigInt!
+  diedAt: BigInt
+  feeds: [Feed!]! @derivedFrom(field: "monster")
+}
+
+type Feed @entity {
+  id: ID!
+  monster: Monster!
+  amount: BigInt!
+  timestamp: BigInt!
+}
+
+type Hunt @entity {
+  id: ID!
+  monster: Monster!
+  hunter: Bytes!
+  weight: BigInt!
+  timestamp: BigInt!
+}
+
+type Sale @entity {
+  id: ID!
+  monster: Monster!
+  payout: BigInt!
+  timestamp: BigInt!
+}
+
+type ProtocolStats @entity {
+  id: ID!
+  totalMonsters: BigInt!
+  totalKilled: BigInt!
+  totalFed: BigInt!
+  totalDistributed: BigInt!
+  protocolRevenue: BigInt!
+}

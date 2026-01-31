@@ -1,7 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-import { parseEther } from 'viem';
 import { CONTRACT_ADDRESS, monstroHuntABI } from '../utils/contract';
 import { TIER_PRICES } from '../constants/game';
 import type { Tier } from '../constants/game';
@@ -14,38 +14,46 @@ export function useCreateMonster() {
     hash,
   });
 
-  const createMonster = async (
+  useEffect(() => {
+    if (error?.message) {
+      addToast(error.message, 'error');
+    }
+  }, [error?.message, addToast]);
+
+  const createMonster = (
     name: string,
     avatarId: number,
     tier: Tier
   ) => {
-    try {
-      const tierPrice = TIER_PRICES[tier];
-      if (!tierPrice) {
-        addToast('Invalid tier selected', 'error');
-        return;
-      }
-
-      // Convert string to bytes32 (pad to 32 bytes, then convert to hex)
-      const encoder = new TextEncoder();
-      const nameBytes = encoder.encode(name.slice(0, 32));
-      const paddedBytes = new Uint8Array(32);
-      paddedBytes.set(nameBytes);
-      const hexString = Array.from(paddedBytes)
-        .map(b => b.toString(16).padStart(2, '0'))
-        .join('');
-      const nameBytes32 = `0x${hexString}` as `0x${string}`;
-      
-      writeContract({
-        address: CONTRACT_ADDRESS,
-        abi: monstroHuntABI,
-        functionName: 'createMonster',
-        args: [nameBytes32, avatarId, tier],
-        value: tierPrice,
-      });
-    } catch (err: any) {
-      addToast(err.message || 'Failed to create monster', 'error');
+    const tierPrice = TIER_PRICES[tier];
+    if (!tierPrice) {
+      addToast('Invalid tier selected', 'error');
+      return;
     }
+
+    // Contract: name max 31 bytes. Encode and take first 31 bytes, then pad to 32.
+    const encoder = new TextEncoder();
+    const encoded = encoder.encode(name.trim());
+    const nameBytes = new Uint8Array(32);
+    const copyLen = Math.min(31, encoded.length);
+    nameBytes.set(encoded.subarray(0, copyLen));
+    const hexString = Array.from(nameBytes)
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+    const nameBytes32 = `0x${hexString}` as `0x${string}`;
+
+    if (nameBytes32 === '0x' + '00'.repeat(32)) {
+      addToast('Name required', 'error');
+      return;
+    }
+
+    writeContract({
+      address: CONTRACT_ADDRESS,
+      abi: monstroHuntABI,
+      functionName: 'createMonster',
+      args: [nameBytes32, avatarId, tier],
+      value: tierPrice,
+    });
   };
 
   return {

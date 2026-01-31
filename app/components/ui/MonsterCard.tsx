@@ -27,19 +27,21 @@ export function MonsterCard({ monster, onClick }: MonsterCardProps) {
           className={styles.avatarImage}
         />
       </div>
-      <div className={styles.name}>{monster.name}</div>
-      <div className={styles.tier}>Tier: {TIER_NAMES[monster.tier]}</div>
-      <div className={styles.weightInfo}>
-        <div className={styles.weightLabel}>Weight</div>
-        <div className={styles.weight}>{formatETH(monster.weight)} ETH</div>
-      </div>
-      <StatusDisplay status={monster.status} />
-      {monster.pendingRewards > 0 && (
-        <div className={styles.rewards}>
-          <span className={styles.rewardsLabel}>Pending Rewards:</span>
-          <span className={styles.rewardsAmount}>+{formatETH(monster.pendingRewards)} ETH</span>
+      <div className={styles.right}>
+        <div className={styles.name}>{monster.name}</div>
+        <div className={styles.tier}>Tier: {TIER_NAMES[monster.tier]}</div>
+        <div className={styles.weightInfo}>
+          <div className={styles.weightLabel}>Weight</div>
+          <div className={styles.weight}>{formatETH(monster.weight)} ETH</div>
         </div>
-      )}
+        <StatusDisplay status={monster.status} />
+        {monster.pendingRewards > 0 && (
+          <div className={styles.rewards}>
+            <span className={styles.rewardsLabel}>Pending Rewards:</span>
+            <span className={styles.rewardsAmount}>+{formatETH(monster.pendingRewards)} ETH</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

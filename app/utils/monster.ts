@@ -1,5 +1,10 @@
 import { Monster, MonsterStatus } from '../types/monster';
-import { HUNGER_WINDOW, HUNT_COOLDOWN } from '../constants/game';
+import { HUNGER_WINDOW, HUNT_COOLDOWN, SELL_FEE_BP } from '../constants/game';
+
+/** Amount received after 1% protocol fee. */
+export function getSellAmount(weight: bigint): bigint {
+  return weight - (weight * BigInt(SELL_FEE_BP) / BigInt(10000));
+}
 
 export function getMonsterStatus(
   monster: Monster,
@@ -17,6 +22,7 @@ export function getMonsterStatus(
     ? monster.hungerDeadline - currentTime
     : BigInt(0);
   
+  // STARVED: deadline passed - can be hunted
   if (monster.hungerDeadline <= currentTime) {
     return {
       status: 'starved',
@@ -25,12 +31,20 @@ export function getMonsterStatus(
     };
   }
   
-  // Check if hungry (within 7 days but close to deadline)
   const hungerTime = BigInt(HUNGER_WINDOW);
-  const timeSinceDeadlineSet = hungerTime - timeUntilDeadline;
+  const percentRemaining = (timeUntilDeadline * BigInt(100)) / hungerTime;
   
-  if (timeSinceDeadlineSet >= hungerTime * BigInt(6) / BigInt(7)) {
-    // Last day before starvation
+  // CRITICAL: <25% time remaining (last quarter of hunger period)
+  if (percentRemaining < BigInt(25)) {
+    return {
+      status: 'critical',
+      timeToStarve: timeUntilDeadline,
+      canHunt: false,
+    };
+  }
+  
+  // HUNGRY: 25-50% time remaining
+  if (percentRemaining < BigInt(50)) {
     return {
       status: 'hungry',
       timeToStarve: timeUntilDeadline,
@@ -38,8 +52,9 @@ export function getMonsterStatus(
     };
   }
   
+  // CALM: >50% time remaining
   return {
-    status: 'fed',
+    status: 'calm',
     timeToStarve: timeUntilDeadline,
   };
 }

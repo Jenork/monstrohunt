@@ -5,9 +5,15 @@ import { CONTRACT_ADDRESS, monstroHuntABI } from '../utils/contract';
 import { MonsterInfo } from '../types/monster';
 import { formatMonsterName } from '../utils/format';
 import { getMonsterStatus } from '../utils/monster';
+import { generateMockMonsters, isMockMode } from '../utils/mockData';
 
-export function useMonsterInfo(monsterId: number | undefined) {
+export function useMonsterInfo(
+  monsterId: number | undefined,
+  options?: { fetchCanHunt?: boolean }
+) {
   const { address } = useAccount();
+  const mockMode = isMockMode();
+  const fetchCanHunt = options?.fetchCanHunt !== false;
   
   const { data: monsterData, refetch } = useReadContract({
     address: CONTRACT_ADDRESS,
@@ -15,7 +21,7 @@ export function useMonsterInfo(monsterId: number | undefined) {
     functionName: 'getMonster',
     args: monsterId !== undefined ? [BigInt(monsterId)] : undefined,
     query: {
-      enabled: monsterId !== undefined,
+      enabled: monsterId !== undefined && !mockMode,
     },
   });
 
@@ -25,7 +31,7 @@ export function useMonsterInfo(monsterId: number | undefined) {
     functionName: 'getPendingRewards',
     args: monsterId !== undefined ? [BigInt(monsterId)] : undefined,
     query: {
-      enabled: monsterId !== undefined && !!monsterData,
+      enabled: monsterId !== undefined && !!monsterData && !mockMode,
     },
   });
 
@@ -35,7 +41,7 @@ export function useMonsterInfo(monsterId: number | undefined) {
     functionName: 'getFeedCost',
     args: monsterId !== undefined ? [BigInt(monsterId)] : undefined,
     query: {
-      enabled: monsterId !== undefined && !!monsterData,
+      enabled: monsterId !== undefined && !!monsterData && !mockMode,
     },
   });
 
@@ -45,9 +51,33 @@ export function useMonsterInfo(monsterId: number | undefined) {
     functionName: 'canHunt',
     args: address && monsterId !== undefined ? [address, BigInt(monsterId)] : undefined,
     query: {
-      enabled: monsterId !== undefined && !!monsterData && !!address,
+      enabled: fetchCanHunt && monsterId !== undefined && !!monsterData && !!address && !mockMode,
     },
   });
+
+  // Mock режим
+  if (mockMode && monsterId !== undefined) {
+    const mockMonsters = generateMockMonsters(10);
+    const mockMonster = mockMonsters.find(m => m.id === monsterId);
+    
+    if (mockMonster) {
+      // Обновляем canHunt для starved монстров
+      const updatedMonster: MonsterInfo = {
+        ...mockMonster,
+        status: {
+          ...mockMonster.status,
+          canHunt: mockMonster.status.status === 'starved' && mockMonster.owner.toLowerCase() !== address?.toLowerCase(),
+        },
+      };
+      
+      return { 
+        monster: updatedMonster, 
+        refetch: () => Promise.resolve() 
+      };
+    }
+    
+    return { monster: null, refetch: () => Promise.resolve() };
+  }
 
   if (!monsterData) {
     return { monster: null, refetch };

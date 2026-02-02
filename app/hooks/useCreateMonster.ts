@@ -2,7 +2,13 @@
 
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from 'wagmi';
+import {
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  useChainId,
+  useSwitchChain,
+  useConnect,
+} from 'wagmi';
 import { baseSepolia } from 'wagmi/chains';
 import { CONTRACT_ADDRESS, isContractAddressValid, monstroHuntABI } from '../utils/contract';
 import { TIER_PRICES } from '../constants/game';
@@ -15,6 +21,7 @@ export function useCreateMonster() {
   const { isConnected } = usePlayerAddress();
   const chainId = useChainId();
   const { switchChainAsync, isPending: isSwitchingChain } = useSwitchChain();
+  const { connectAsync, connectors } = useConnect();
   const queryClient = useQueryClient();
   const { writeContractAsync, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
@@ -39,7 +46,17 @@ export function useCreateMonster() {
     tier: Tier
   ) => {
     if (!isConnected) {
-      addToast('Please connect your wallet', 'error');
+      const connector =
+        connectors.find((c) => c.type === 'walletConnect') ?? connectors[0];
+      if (!connector) {
+        addToast('No wallet connector available', 'error');
+        return;
+      }
+      addToast('Connecting wallet...', 'info');
+      connectAsync({ connector }).catch((e) => {
+        const msg = e instanceof Error ? e.message : 'Wallet connection failed';
+        addToast(msg, 'error');
+      });
       return;
     }
     if (!isContractAddressValid) {

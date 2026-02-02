@@ -1,7 +1,13 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from 'wagmi';
+import {
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  useChainId,
+  useSwitchChain,
+  useConnect,
+} from 'wagmi';
 import { baseSepolia } from 'wagmi/chains';
 import { CONTRACT_ADDRESS, isContractAddressValid, monstroHuntABI } from '../utils/contract';
 import { useToast } from './useToast';
@@ -12,6 +18,7 @@ export function useHuntMonster() {
   const { isConnected } = usePlayerAddress();
   const chainId = useChainId();
   const { switchChainAsync, isPending: isSwitchingChain } = useSwitchChain();
+  const { connectAsync, connectors } = useConnect();
   const { writeContractAsync, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,
@@ -25,7 +32,17 @@ export function useHuntMonster() {
 
   const huntMonster = async (monsterId: number) => {
     if (!isConnected) {
-      addToast('Please connect your wallet', 'error');
+      const connector =
+        connectors.find((c) => c.type === 'walletConnect') ?? connectors[0];
+      if (!connector) {
+        addToast('No wallet connector available', 'error');
+        return;
+      }
+      addToast('Connecting wallet...', 'info');
+      connectAsync({ connector }).catch((e) => {
+        const msg = e instanceof Error ? e.message : 'Wallet connection failed';
+        addToast(msg, 'error');
+      });
       return;
     }
     if (!isContractAddressValid) {

@@ -1,24 +1,18 @@
 "use client";
 
-import { useComposeCast } from '@coinbase/onchainkit/minikit';
+import sdk from "@farcaster/miniapp-sdk";
 import { minikitConfig } from "../../minikit.config";
 import styles from "./page.module.css";
 
 export default function Success() {
-
-  const { composeCastAsync } = useComposeCast();
-  
   const handleShare = async () => {
     try {
       const text = `Yay! I just joined the waitlist for ${minikitConfig.miniapp.name.toUpperCase()}! `;
-      
-      const result = await composeCastAsync({
-        text: text,
-        embeds: [process.env.NEXT_PUBLIC_URL || ""]
+      const result = await sdk.actions.composeCast({
+        text,
+        embeds: process.env.NEXT_PUBLIC_URL ? [process.env.NEXT_PUBLIC_URL] : undefined,
       });
-
-      // result.cast can be null if user cancels
-      if (result?.cast) {
+      if (result?.cast?.hash) {
         console.log("Cast created successfully:", result.cast.hash);
       } else {
         console.log("User cancelled the cast");

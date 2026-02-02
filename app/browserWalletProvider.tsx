@@ -14,13 +14,25 @@ import { PlayerAddressProvider } from './contexts/PlayerAddressContext';
 import { IsBrowserProvider } from './contexts/IsBrowserContext';
 
 const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? '';
+const appUrl =
+  process.env.NEXT_PUBLIC_URL ||
+  (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
 
 const config = createConfig({
   chains: [baseSepolia],
   connectors: [
     injected(),
     ...(walletConnectProjectId
-      ? [walletConnect({ projectId: walletConnectProjectId, showQrModal: true })]
+      ? [walletConnect({
+          projectId: walletConnectProjectId,
+          showQrModal: true,
+          metadata: {
+            name: 'MONSTROHUNT',
+            description: 'Onchain hunting game',
+            url: appUrl,
+            icons: [`${appUrl}/icon.png`],
+          },
+        })]
       : []),
   ],
   transports: {

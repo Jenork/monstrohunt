@@ -7,9 +7,11 @@ import { CONTRACT_ADDRESS, isContractAddressValid, monstroHuntABI } from '../uti
 import { TIER_PRICES } from '../constants/game';
 import type { Tier } from '../constants/game';
 import { useToast } from './useToast';
+import { usePlayerAddress } from './usePlayerAddress';
 
 export function useCreateMonster() {
   const { addToast } = useToast();
+  const { isConnected } = usePlayerAddress();
   const queryClient = useQueryClient();
   const { writeContract, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
@@ -33,6 +35,10 @@ export function useCreateMonster() {
     avatarId: number,
     tier: Tier
   ) => {
+    if (!isConnected) {
+      addToast('Please connect your wallet', 'error');
+      return;
+    }
     if (!isContractAddressValid) {
       addToast('Contract address is not configured', 'error');
       return;

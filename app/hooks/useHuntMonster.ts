@@ -5,9 +5,11 @@ import { useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchCh
 import { baseSepolia } from 'wagmi/chains';
 import { CONTRACT_ADDRESS, isContractAddressValid, monstroHuntABI } from '../utils/contract';
 import { useToast } from './useToast';
+import { usePlayerAddress } from './usePlayerAddress';
 
 export function useHuntMonster() {
   const { addToast } = useToast();
+  const { isConnected } = usePlayerAddress();
   const chainId = useChainId();
   const { switchChainAsync, isPending: isSwitchingChain } = useSwitchChain();
   const { writeContract, data: hash, isPending, error } = useWriteContract();
@@ -22,6 +24,10 @@ export function useHuntMonster() {
   }, [error?.message, addToast]);
 
   const huntMonster = async (monsterId: number) => {
+    if (!isConnected) {
+      addToast('Please connect your wallet', 'error');
+      return;
+    }
     if (!isContractAddressValid) {
       addToast('Contract address is not configured', 'error');
       return;

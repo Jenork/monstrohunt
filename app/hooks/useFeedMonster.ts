@@ -1,12 +1,15 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from 'wagmi';
+import { baseSepolia } from 'wagmi/chains';
 import { CONTRACT_ADDRESS, monstroHuntABI } from '../utils/contract';
 import { useToast } from './useToast';
 
 export function useFeedMonster() {
   const { addToast } = useToast();
+  const chainId = useChainId();
+  const { switchChainAsync } = useSwitchChain();
   const { writeContract, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,
@@ -18,7 +21,7 @@ export function useFeedMonster() {
     }
   }, [error?.message, addToast]);
 
-  const feedMonster = (monsterId: number, feedCost: bigint) => {
+  const feedMonster = async (monsterId: number, feedCost: bigint) => {
     if (monsterId <= 0) {
       addToast('Invalid monster', 'error');
       return;
@@ -27,18 +30,26 @@ export function useFeedMonster() {
       addToast('Invalid feed cost', 'error');
       return;
     }
-    writeContract({
-      address: CONTRACT_ADDRESS,
-      abi: monstroHuntABI,
-      functionName: 'feedMonster',
-      args: [BigInt(monsterId)],
-      value: feedCost,
-    });
+    try {
+      if (chainId !== baseSepolia.id) {
+        await switchChainAsync({ chainId: baseSepolia.id });
+      }
+      writeContract({
+        address: CONTRACT_ADDRESS,
+        abi: monstroHuntABI,
+        functionName: 'feedMonster',
+        args: [BigInt(monsterId)],
+        value: feedCost,
+      });
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Switch to Base Sepolia or try again';
+      addToast(msg, 'error');
+    }
   };
 
   return {
     feedMonster,
-    isPending: isPending || isConfirming,
+    isPending: isSwitchingChain || isPending || isConfirming,
     isSuccess,
     error,
     hash,

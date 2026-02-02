@@ -5,6 +5,7 @@
  * WalletConnect needed for mobile browsers where injected provider is absent.
  * Rendered only in regular browser, never inside Base App.
  */
+import { useState, useEffect } from 'react';
 import { useIsBrowser } from '../../contexts/IsBrowserContext';
 import { useConnect } from 'wagmi';
 
@@ -23,6 +24,14 @@ const buttonStyle: React.CSSProperties = {
 export function BrowserConnectButton() {
   const isBrowser = useIsBrowser();
   const { connect, connectors, isPending, pendingConnector } = useConnect();
+  const [isNarrow, setIsNarrow] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsNarrow(typeof window !== 'undefined' && window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   if (!isBrowser) return null;
 
@@ -61,16 +70,23 @@ export function BrowserConnectButton() {
 
   const connector = connectors[0];
   return (
-    <button
-      type="button"
-      onClick={() => connector && connect({ connector })}
-      disabled={!connector || isPending}
-      style={{
-        ...buttonStyle,
-        cursor: isPending || !connector ? 'not-allowed' : 'pointer',
-      }}
-    >
-      {isPending ? 'Connecting...' : 'Connect Wallet'}
-    </button>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'flex-start' }}>
+      <button
+        type="button"
+        onClick={() => connector && connect({ connector })}
+        disabled={!connector || isPending}
+        style={{
+          ...buttonStyle,
+          cursor: isPending || !connector ? 'not-allowed' : 'pointer',
+        }}
+      >
+        {isPending ? 'Connecting...' : 'Connect Wallet'}
+      </button>
+      {isNarrow && (
+        <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', maxWidth: '260px' }}>
+          На смартфоне нужен WalletConnect: в Vercel → Settings → Environment Variables добавьте NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID и пересоберите.
+        </span>
+      )}
+    </div>
   );
 }

@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { usePlayerAddress } from './hooks/usePlayerAddress';
 import { PanelTabs } from './components/ui/PanelTabs';
+import { SocialLinks } from './components/ui/SocialLinks';
 import { ToastContainer } from './components/ui/ToastContainer';
 import { BackgroundMusic } from './components/ui/BackgroundMusic';
 import { HomeScreen, CreateScreen, ManageScreen, HuntScreen, FAQScreen } from './components/screens';
@@ -55,6 +56,7 @@ export default function Home() {
           </div>
         </>
       )}
+      <SocialLinks />
     </main>
   );
 }

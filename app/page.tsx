@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { usePlayerAddress } from './hooks/usePlayerAddress';
 import { PanelTabs } from './components/ui/PanelTabs';
 import { ToastContainer } from './components/ui/ToastContainer';
@@ -9,13 +9,27 @@ import { HomeScreen, CreateScreen, ManageScreen, HuntScreen, FAQScreen } from '.
 import { Screen } from './types/screen';
 import styles from './page.module.css';
 
+const STORAGE_KEY = 'monstro-screen';
+
+function getStoredScreen(): Screen {
+  if (typeof window === 'undefined') return 'home';
+  const stored = sessionStorage.getItem(STORAGE_KEY);
+  if (stored === 'home' || stored === 'create' || stored === 'manage' || stored === 'hunt' || stored === 'faq') return stored;
+  return 'home';
+}
+
 export default function Home() {
-  const [currentScreen, setCurrentScreen] = useState<Screen>('home');
+  const [currentScreen, setCurrentScreenState] = useState<Screen>(getStoredScreen);
   const { isConnected } = usePlayerAddress();
 
-  const handleLaunch = () => {
+  const setCurrentScreen = useCallback((screen: Screen) => {
+    setCurrentScreenState(screen);
+    if (typeof window !== 'undefined') sessionStorage.setItem(STORAGE_KEY, screen);
+  }, []);
+
+  const handleLaunch = useCallback(() => {
     setCurrentScreen('create');
-  };
+  }, [setCurrentScreen]);
 
   return (
     <main className={styles.main}>

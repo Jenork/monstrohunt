@@ -33,8 +33,13 @@ export function PanelTabs({ currentScreen, onScreenChange }: PanelTabsProps) {
             {tabs.map((tab) => (
               <button
                 key={tab.screen}
+                type="button"
+                data-screen={tab.screen}
                 className={`${styles.tab} ${currentScreen === tab.screen ? styles.active : ''}`}
-                onClick={() => onScreenChange(tab.screen)}
+                onClick={(e) => {
+                  const screen = (e.currentTarget as HTMLButtonElement).getAttribute('data-screen') as Screen | null;
+                  if (screen) onScreenChange(screen);
+                }}
               >
                 {tab.label}
               </button>

@@ -9,7 +9,7 @@ import { useToast } from './useToast';
 export function useFeedMonster() {
   const { addToast } = useToast();
   const chainId = useChainId();
-  const { switchChainAsync } = useSwitchChain();
+  const { switchChainAsync, isPending: isSwitchingChain } = useSwitchChain();
   const { writeContract, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,

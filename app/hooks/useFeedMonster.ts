@@ -38,12 +38,14 @@ export function useFeedMonster() {
         addToast('No wallet connector available', 'error');
         return;
       }
-      addToast('Connecting wallet...', 'info');
-      connectAsync({ connector }).catch((e) => {
+      try {
+        addToast('Connecting wallet...', 'info');
+        await connectAsync({ connector });
+      } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : 'Wallet connection failed';
         addToast(msg, 'error');
-      });
-      return;
+        return;
+      }
     }
     if (!isContractAddressValid) {
       addToast('Contract address is not configured', 'error');

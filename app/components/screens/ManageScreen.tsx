@@ -8,6 +8,8 @@ import { useMonsterInfo } from '../../hooks/useMonsterInfo';
 import { useFeedMonster } from '../../hooks/useFeedMonster';
 import { useSellMonster } from '../../hooks/useSellMonster';
 import { useToast } from '../../hooks/useToast';
+import { useChainId } from 'wagmi';
+import { baseSepolia } from 'wagmi/chains';
 import { StatusDisplay } from '../ui/StatusDisplay';
 import { AVATARS } from '../../constants/avatars';
 import { TIER_NAMES } from '../../constants/game';
@@ -85,6 +87,9 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
   const { feedMonster, isPending: isFeeding } = useFeedMonster();
   const { sellMonster, isPending: isSelling } = useSellMonster();
   const { addToast } = useToast();
+  const { isConnected } = usePlayerAddress();
+  const chainId = useChainId();
+  const isWrongNetwork = isConnected && chainId !== baseSepolia.id;
 
   if (isLoadingMonster) {
     return <div className={styles.loading}>Loading...</div>;
@@ -137,8 +142,8 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
     }
   };
 
-  const canFeed = monster.alive;
-  const canSell = monster.alive && monster.status.status !== 'starved';
+  const canFeed = monster.alive && isConnected && !isWrongNetwork;
+  const canSell = monster.alive && monster.status.status !== 'starved' && isConnected && !isWrongNetwork;
   const isStarved = monster.status.status === 'starved';
   const avatar = AVATARS.find((a) => a.id === monster.avatarId) || AVATARS[0];
 

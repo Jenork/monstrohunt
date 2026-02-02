@@ -33,6 +33,7 @@ export function BrowserConnectButton() {
     return () => window.removeEventListener('resize', check);
   }, []);
 
+
   if (!isBrowser) return null;
 
   const injectedConnector = connectors.find((c) => c.type === 'injected');
@@ -82,11 +83,7 @@ export function BrowserConnectButton() {
       >
         {isPending ? 'Connecting...' : 'Connect Wallet'}
       </button>
-      {isNarrow && (
-        <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', maxWidth: '260px' }}>
-          На смартфоне нужен WalletConnect: в Vercel → Settings → Environment Variables добавьте NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID и пересоберите.
-        </span>
-      )}
+      {isNarrow && null}
     </div>
   );
 }

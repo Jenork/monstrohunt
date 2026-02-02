@@ -12,7 +12,7 @@ export function useHuntMonster() {
   const { isConnected } = usePlayerAddress();
   const chainId = useChainId();
   const { switchChainAsync, isPending: isSwitchingChain } = useSwitchChain();
-  const { writeContract, data: hash, isPending, error } = useWriteContract();
+  const { writeContractAsync, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,
   });
@@ -40,7 +40,7 @@ export function useHuntMonster() {
       if (chainId !== baseSepolia.id) {
         await switchChainAsync({ chainId: baseSepolia.id });
       }
-      writeContract({
+      await writeContractAsync({
         address: CONTRACT_ADDRESS,
         abi: monstroHuntABI,
         functionName: 'huntMonster',

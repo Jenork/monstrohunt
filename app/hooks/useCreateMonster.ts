@@ -2,7 +2,8 @@
 
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from 'wagmi';
+import { baseSepolia } from 'wagmi/chains';
 import { CONTRACT_ADDRESS, isContractAddressValid, monstroHuntABI } from '../utils/contract';
 import { TIER_PRICES } from '../constants/game';
 import type { Tier } from '../constants/game';
@@ -12,8 +13,10 @@ import { usePlayerAddress } from './usePlayerAddress';
 export function useCreateMonster() {
   const { addToast } = useToast();
   const { isConnected } = usePlayerAddress();
+  const chainId = useChainId();
+  const { switchChainAsync, isPending: isSwitchingChain } = useSwitchChain();
   const queryClient = useQueryClient();
-  const { writeContract, data: hash, isPending, error } = useWriteContract();
+  const { writeContractAsync, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,
   });
@@ -64,19 +67,28 @@ export function useCreateMonster() {
       addToast('Name required', 'error');
       return;
     }
-
-    writeContract({
-      address: CONTRACT_ADDRESS,
-      abi: monstroHuntABI,
-      functionName: 'createMonster',
-      args: [nameBytes32, avatarId, tier],
-      value: tierPrice,
-    });
+    (async () => {
+      try {
+        if (chainId !== baseSepolia.id) {
+          await switchChainAsync({ chainId: baseSepolia.id });
+        }
+        await writeContractAsync({
+          address: CONTRACT_ADDRESS,
+          abi: monstroHuntABI,
+          functionName: 'createMonster',
+          args: [nameBytes32, avatarId, tier],
+          value: tierPrice,
+        });
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : 'Transaction was cancelled or failed';
+        addToast(msg, 'error');
+      }
+    })();
   };
 
   return {
     createMonster,
-    isPending: isPending || isConfirming,
+    isPending: isSwitchingChain || isPending || isConfirming,
     isSuccess,
     error,
     hash,

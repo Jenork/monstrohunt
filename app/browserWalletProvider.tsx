@@ -1,81 +1,65 @@
 'use client';
 
 /**
- * TEMPORARY: Wallet support for testnet (browser + Base App).
- * Uses wagmi only (no OnchainKit in client bundle — avoids Node-only deps like http2).
- * isBrowser controls Connect/Disconnect button visibility. Remove when browser testing is removed.
+ * Base App only: uses MiniApp SDK provider via injected connector.
+ * Browser WalletConnect is removed.
  */
-import { useState, useMemo } from 'react';
-import { WagmiProvider, useAccount, useDisconnect, createConfig, http } from 'wagmi';
+import { useState, useMemo, useEffect } from 'react';
+import { WagmiProvider, useAccount, createConfig, http, useConnect } from 'wagmi';
 import { baseSepolia } from 'wagmi/chains';
-import { injected, walletConnect } from 'wagmi/connectors';
+import { injected } from 'wagmi/connectors';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import sdk from '@farcaster/miniapp-sdk';
 import { PlayerAddressProvider } from './contexts/PlayerAddressContext';
-import { IsBrowserProvider } from './contexts/IsBrowserContext';
-
-const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? '';
-const appUrl =
-  process.env.NEXT_PUBLIC_URL ||
-  (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
 
 const config = createConfig({
   chains: [baseSepolia],
-  connectors: [
-    injected(),
-    ...(walletConnectProjectId
-      ? [walletConnect({
-          projectId: walletConnectProjectId,
-          showQrModal: true,
-          metadata: {
-            name: 'MONSTROHUNT',
-            description: 'Onchain hunting game',
-            url: appUrl,
-            icons: [`${appUrl}/icon.png`],
-          },
-        })]
-      : []),
-  ],
+  connectors: [injected()],
   transports: {
     [baseSepolia.id]: http(),
   },
 });
 
-function WalletAddressInjector({
-  children,
-  isBrowser,
-}: {
-  children: React.ReactNode;
-  isBrowser: boolean;
-}) {
+function MiniAppReady() {
+  useEffect(() => {
+    sdk.actions.ready().catch(() => undefined);
+  }, []);
+  return null;
+}
+
+function WalletAddressInjector({ children }: { children: React.ReactNode }) {
   const { address, isConnected } = useAccount();
-  const { disconnect } = useDisconnect();
+  const { connectAsync, connectors } = useConnect();
+  const [autoConnectAttempted, setAutoConnectAttempted] = useState(false);
+
+  useEffect(() => {
+    if (isConnected || autoConnectAttempted) return;
+    const connector = connectors[0];
+    if (!connector) return;
+    setAutoConnectAttempted(true);
+    connectAsync({ connector }).catch(() => undefined);
+  }, [isConnected, autoConnectAttempted, connectors, connectAsync]);
+
   const value = useMemo(
     () => ({
       address: address ?? undefined,
       isConnected: isConnected && !!address,
-      disconnect: isBrowser ? () => disconnect() : null,
+      disconnect: null,
     }),
-    [address, isConnected, disconnect, isBrowser]
+    [address, isConnected]
   );
   return <PlayerAddressProvider value={value}>{children}</PlayerAddressProvider>;
 }
 
-export function BrowserWalletProvider({
-  children,
-  isBrowser,
-}: {
-  children: React.ReactNode;
-  isBrowser: boolean;
-}) {
+export function BaseAppProvider({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
 
   return (
-    <IsBrowserProvider value={isBrowser}>
-      <WagmiProvider config={config}>
-        <QueryClientProvider client={queryClient}>
-          <WalletAddressInjector isBrowser={isBrowser}>{children}</WalletAddressInjector>
-        </QueryClientProvider>
-      </WagmiProvider>
-    </IsBrowserProvider>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <MiniAppReady />
+        <WalletAddressInjector>{children}</WalletAddressInjector>
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }

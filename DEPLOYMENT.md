@@ -1,5 +1,7 @@
 # 🚀 Deployment Guide - MONSTROHUNT
 
+Приложение рассчитано на **Base App only** (Mini App). Кошелек подключается только при открытии в Base App.
+
 ## ✅ Текущий статус
 
 Приложение готово к деплою:
@@ -73,12 +75,10 @@
    npm run dev
    ```
 
-2. **Подключите кошелек к Base Sepolia:**
-   - Добавьте сеть Base Sepolia в MetaMask/Coinbase Wallet
-   - Network Name: Base Sepolia
-   - RPC URL: https://sepolia.base.org
-   - Chain ID: 84532
-   - Currency Symbol: ETH
+2. **Проверьте сеть Base Sepolia:**
+   - Откройте приложение **внутри Base App** по задеплоенному URL
+   - Кошелек подключается автоматически через Base App; при необходимости переключите сеть на Base Sepolia в настройках кошелька
+   - Параметры сети: Base Sepolia, RPC https://sepolia.base.org, Chain ID 84532
 
 3. **Протестируйте все функции:**
    - ✅ Создание монстра (выберите тир)

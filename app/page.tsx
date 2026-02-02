@@ -4,7 +4,6 @@ import { useState, useCallback, useEffect } from 'react';
 import { useChainId, useSwitchChain } from 'wagmi';
 import { baseSepolia } from 'wagmi/chains';
 import { usePlayerAddress } from './hooks/usePlayerAddress';
-import { useIsBrowser } from './contexts/IsBrowserContext';
 import { PanelTabs } from './components/ui/PanelTabs';
 import { SocialLinks } from './components/ui/SocialLinks';
 import { ToastContainer } from './components/ui/ToastContainer';
@@ -25,7 +24,6 @@ function getStoredScreen(): Screen {
 
 export default function Home() {
   const [currentScreen, setCurrentScreenState] = useState<Screen>(getStoredScreen);
-  const isBrowser = useIsBrowser();
   const { isConnected } = usePlayerAddress();
   const chainId = useChainId();
   const { switchChainAsync } = useSwitchChain();
@@ -41,7 +39,7 @@ export default function Home() {
   }, [setCurrentScreen]);
 
   useEffect(() => {
-    if (!isBrowser || !isConnected) return;
+    if (!isConnected) return;
     if (chainId === baseSepolia.id) {
       if (autoSwitchAttempted) setAutoSwitchAttempted(false);
       return;
@@ -51,7 +49,7 @@ export default function Home() {
     switchChainAsync({ chainId: baseSepolia.id }).catch(() => {
       // User rejected or wallet doesn't support auto switching.
     });
-  }, [isBrowser, isConnected, chainId, autoSwitchAttempted, switchChainAsync]);
+  }, [isConnected, chainId, autoSwitchAttempted, switchChainAsync]);
 
   if (!isContractAddressValid) {
     return (

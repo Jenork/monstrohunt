@@ -10,7 +10,6 @@ const nextConfig = {
       net: false,
       tls: false,
       http2: false,
-      // Опциональные зависимости, не нужные в браузере (MetaMask SDK, WalletConnect)
       'pino-pretty': false,
       '@react-native-async-storage/async-storage': false,
     };

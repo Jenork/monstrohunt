@@ -26,7 +26,9 @@ export default function RootLayout({
       <body>
         <ErrorSuppressor />
         <ErrorBoundary>
-          <WalletProviderGate>{children}</WalletProviderGate>
+          <div className="safeArea">
+            <WalletProviderGate>{children}</WalletProviderGate>
+          </div>
         </ErrorBoundary>
       </body>
     </html>

@@ -1,12 +1,11 @@
 'use client';
 
 /**
- * TEMPORARY: Chooses browser vs Base App mode (Connect/Disconnect visibility only).
- * Uses single wagmi provider for both; no OnchainKit in client bundle.
+ * Base App only: blocks browser usage and initializes MiniApp provider.
  */
 import { useState, useEffect } from 'react';
 import { isBaseApp } from './lib/isBaseApp';
-import { BrowserWalletProvider } from './browserWalletProvider';
+import { BaseAppProvider } from './browserWalletProvider';
 
 export function WalletProviderGate({ children }: { children: React.ReactNode }) {
   const [mode, setMode] = useState<'unknown' | 'baseapp' | 'browser'>('unknown');
@@ -31,9 +30,23 @@ export function WalletProviderGate({ children }: { children: React.ReactNode }) 
     );
   }
 
-  return (
-    <BrowserWalletProvider isBrowser={mode === 'browser'}>
-      {children}
-    </BrowserWalletProvider>
-  );
+  if (mode === 'browser') {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#fff',
+          textAlign: 'center',
+          padding: '24px',
+        }}
+      >
+        Open this app inside Base App.
+      </div>
+    );
+  }
+
+  return <BaseAppProvider>{children}</BaseAppProvider>;
 }

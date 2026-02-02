@@ -32,8 +32,7 @@ export function useSellMonster() {
 
   const sellMonster = async (monsterId: number) => {
     if (!isConnected) {
-      const connector =
-        connectors.find((c) => c.type === 'walletConnect') ?? connectors[0];
+      const connector = connectors[0];
       if (!connector) {
         addToast('No wallet connector available', 'error');
         return;

@@ -30,7 +30,7 @@ git push -u origin main
    - `NEXT_PUBLIC_CONTRACT_ADDRESS` = адрес вашего контракта
 6. Нажмите "Deploy"
 
-**Готово!** Ваше приложение будет доступно по адресу `https://monstrohunt.vercel.app`
+**Готово!** Ваше приложение будет доступно по адресу `https://monstrohunt.vercel.app`. Для игры откройте этот URL **внутри Base App**.
 
 ## ⚠️ Важно перед загрузкой
 

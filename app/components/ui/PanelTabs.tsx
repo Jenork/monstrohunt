@@ -3,12 +3,10 @@
 import { useChainId, useSwitchChain } from 'wagmi';
 import { baseSepolia } from 'wagmi/chains';
 import { usePlayerAddress } from '../../hooks/usePlayerAddress';
-import { useIsBrowser } from '../../contexts/IsBrowserContext';
 import { useToast } from '../../hooks/useToast';
 import { Screen } from '../../types/screen';
 import { formatAddress } from '../../utils/format';
 import { isContractAddressValid } from '../../utils/contract';
-import { BrowserConnectButton } from './BrowserConnectButton';
 import styles from './PanelTabs.module.css';
 
 interface PanelTabsProps {
@@ -17,8 +15,7 @@ interface PanelTabsProps {
 }
 
 export function PanelTabs({ currentScreen, onScreenChange }: PanelTabsProps) {
-  const { address, isConnected, disconnect } = usePlayerAddress();
-  const isBrowser = useIsBrowser();
+  const { address, isConnected } = usePlayerAddress();
   const { addToast } = useToast();
   const chainId = useChainId();
   const { switchChainAsync, isPending: isSwitching } = useSwitchChain();
@@ -61,24 +58,12 @@ export function PanelTabs({ currentScreen, onScreenChange }: PanelTabsProps) {
               </button>
             ))}
           </div>
-          {(isBrowser && !isConnected) || (isConnected && address) ? (
+          {isConnected && address ? (
             <div className={styles.walletWrap}>
-              {isBrowser && !isConnected && <BrowserConnectButton />}
-              {isConnected && address && (
-                <div className={styles.walletRow}>
-                  <span className={styles.address}>{formatAddress(address)}</span>
-                  <span className={styles.networkLabel}>{networkLabel}</span>
-                  {isBrowser && disconnect && (
-                    <button
-                      type="button"
-                      className={styles.disconnectButton}
-                      onClick={() => disconnect()}
-                    >
-                      Disconnect
-                    </button>
-                  )}
-                </div>
-              )}
+              <div className={styles.walletRow}>
+                <span className={styles.address}>{formatAddress(address)}</span>
+                <span className={styles.networkLabel}>{networkLabel}</span>
+              </div>
             </div>
           ) : null}
           {isConnected && (

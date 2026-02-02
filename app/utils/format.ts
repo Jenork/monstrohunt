@@ -16,7 +16,26 @@ export function formatAddress(address: string): string {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
-export function formatMonsterName(name: string): string {
-  // Convert bytes32 to string and trim null bytes
-  return name.replace(/\0/g, '').trim() || 'Unnamed';
+/**
+ * Decode contract bytes32 name to display string.
+ * Contract returns name as bytes32; wagmi returns it as hex "0x" + 64 hex chars.
+ * Never use or display this as an address — owner must come from getMonster().owner only.
+ */
+export function formatMonsterName(nameBytes: string | undefined): string {
+  if (!nameBytes) return 'Unnamed';
+  if (typeof nameBytes === 'string' && nameBytes.startsWith('0x')) {
+    try {
+      const hex = nameBytes.slice(2);
+      if (hex.length !== 64) return 'Unnamed';
+      const bytes = new Uint8Array(32);
+      for (let i = 0; i < 32; i++) {
+        bytes[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16);
+      }
+      const decoded = new TextDecoder().decode(bytes);
+      return decoded.replace(/\0/g, '').trim() || 'Unnamed';
+    } catch {
+      return 'Unnamed';
+    }
+  }
+  return String(nameBytes).replace(/\0/g, '').trim() || 'Unnamed';
 }

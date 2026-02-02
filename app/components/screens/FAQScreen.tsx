@@ -60,7 +60,7 @@ export function FAQScreen() {
         <div className={styles.faqItem}>
           <h3 className={styles.question}>Can I sell my monster?</h3>
           <p className={styles.answer}>
-            Yes. In the Profile tab you can sell any monster that is not starved. 
+            Yes. In the Manage tab you can sell any monster that is not starved. 
             You receive your monster&apos;s weight in ETH (minus a small protocol fee).
           </p>
         </div>

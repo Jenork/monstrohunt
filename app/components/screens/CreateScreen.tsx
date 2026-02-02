@@ -9,7 +9,11 @@ import { useToast } from '../../hooks/useToast';
 import { formatETH } from '../../utils/format';
 import styles from './CreateScreen.module.css';
 
-export function CreateScreen() {
+interface CreateScreenProps {
+  onCreated?: () => void;
+}
+
+export function CreateScreen({ onCreated }: CreateScreenProps) {
   const [name, setName] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState<AvatarId>(0);
   const [selectedTier, setSelectedTier] = useState<Tier>(0);
@@ -21,8 +25,9 @@ export function CreateScreen() {
     if (isSuccess) {
       addToast('Monster created successfully!', 'success');
       setName('');
+      onCreated?.();
     }
-  }, [isSuccess, addToast]);
+  }, [isSuccess, addToast, onCreated]);
 
   const handlePreviousAvatar = () => {
     const currentIndex = AVATARS.findIndex(a => a.id === selectedAvatar);

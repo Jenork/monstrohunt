@@ -18,17 +18,19 @@
     "next": "15.3.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "wagmi": "^2.16.3",
-    "viem": "^2.31.6"
+    "viem": "^2.31.6",
+    "wagmi": "^2.16.3"
   },
   "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^3.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "hardhat": "^3.1.5",
-    "typescript": "^5.0.0",
+    "dotenv": "^16.0.0",
     "eslint": "^8",
     "eslint-config-next": "15.3.6",
-    "ethers": "^6.0.0"
+    "ethers": "^6.0.0",
+    "hardhat": "^2.22.0",
+    "typescript": "^5.0.0"
   }
 }

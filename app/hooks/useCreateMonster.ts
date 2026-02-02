@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { CONTRACT_ADDRESS, monstroHuntABI } from '../utils/contract';
 import { TIER_PRICES } from '../constants/game';
@@ -9,6 +10,7 @@ import { useToast } from './useToast';
 
 export function useCreateMonster() {
   const { addToast } = useToast();
+  const queryClient = useQueryClient();
   const { writeContract, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,
@@ -19,6 +21,12 @@ export function useCreateMonster() {
       addToast(error.message, 'error');
     }
   }, [error?.message, addToast]);
+
+  // After tx confirmation: invalidate contract reads so UI refetches from chain (owner, weight, feedCost, sell amount, status).
+  useEffect(() => {
+    if (!isSuccess) return;
+    queryClient.invalidateQueries({ queryKey: ['readContract'] });
+  }, [isSuccess, queryClient]);
 
   const createMonster = (
     name: string,

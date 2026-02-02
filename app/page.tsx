@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useAccount, useConnect } from 'wagmi';
+import { usePlayerAddress } from './hooks/usePlayerAddress';
 import { PanelTabs } from './components/ui/PanelTabs';
 import { ToastContainer } from './components/ui/ToastContainer';
 import { BackgroundMusic } from './components/ui/BackgroundMusic';
@@ -11,13 +11,9 @@ import styles from './page.module.css';
 
 export default function Home() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
-  const { isConnected } = useAccount();
-  const { connect, connectors } = useConnect();
+  const { isConnected } = usePlayerAddress();
 
   const handleLaunch = () => {
-    if (!isConnected && connectors[0]) {
-      connect({ connector: connectors[0] });
-    }
     setCurrentScreen('create');
   };
 
@@ -32,10 +28,16 @@ export default function Home() {
         <>
           <PanelTabs currentScreen={currentScreen} onScreenChange={setCurrentScreen} />
           <div className={styles.content}>
-            {currentScreen === 'create' && <CreateScreen />}
-            {currentScreen === 'manage' && <ManageScreen />}
-            {currentScreen === 'hunt' && <HuntScreen />}
-            {currentScreen === 'faq' && <FAQScreen />}
+            <div className={styles.contentInner}>
+              <div className={styles.centeredContent} data-screen={currentScreen}>
+                {currentScreen === 'create' && (
+                  <CreateScreen onCreated={() => setCurrentScreen('manage')} />
+                )}
+                {currentScreen === 'manage' && <ManageScreen />}
+                {currentScreen === 'hunt' && <HuntScreen />}
+                {currentScreen === 'faq' && <FAQScreen />}
+              </div>
+            </div>
           </div>
         </>
       )}

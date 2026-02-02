@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
-import { useReadContract, useAccount } from 'wagmi';
+import { useEffect, useState, useMemo } from 'react';
+import { useReadContract, useReadContracts } from 'wagmi';
+import { usePlayerAddress } from '../../hooks/usePlayerAddress';
 import { CONTRACT_ADDRESS, monstroHuntABI } from '../../utils/contract';
 import { useMonsterInfo } from '../../hooks/useMonsterInfo';
 import { useHuntMonster } from '../../hooks/useHuntMonster';
@@ -15,7 +16,7 @@ export function HuntScreen() {
   const [allMonsterIds, setAllMonsterIds] = useState<number[]>([]);
   const { addToast } = useToast();
   const { huntMonster, isSuccess } = useHuntMonster();
-  const { address } = useAccount();
+  const { address } = usePlayerAddress();
   const mockMode = isMockMode();
 
   const { data: totalMonsters } = useReadContract({
@@ -26,6 +27,35 @@ export function HuntScreen() {
       enabled: !mockMode,
     },
   });
+
+  const totalNum = totalMonsters !== undefined ? Number(totalMonsters) : 0;
+  const existingMonsterContracts = useMemo(
+    () =>
+      totalNum > 0
+        ? Array.from({ length: totalNum }, (_, i) => ({
+            address: CONTRACT_ADDRESS,
+            abi: monstroHuntABI,
+            functionName: 'monsterExists' as const,
+            args: [BigInt(i + 1)] as const,
+          }))
+        : [],
+    [totalNum]
+  );
+
+  const { data: existingResults } = useReadContracts({
+    contracts: existingMonsterContracts,
+    query: {
+      enabled: !mockMode && existingMonsterContracts.length > 0,
+    },
+  });
+
+  const existingMonsterCount = useMemo(() => {
+    if (!existingResults || !Array.isArray(existingResults)) return 0;
+    return existingResults.filter(
+      (r): r is { result: boolean; status: 'success' } =>
+        r?.status === 'success' && r?.result === true
+    ).length;
+  }, [existingResults]);
 
   const { data: hunterMonsterId } = useReadContract({
     address: CONTRACT_ADDRESS,
@@ -125,9 +155,9 @@ export function HuntScreen() {
 
       <div className={styles.infoBox}>
         <div className={styles.infoItem}>
-          <span className={styles.infoLabel}>Available:</span>
+          <span className={styles.infoLabel}>Monsters now:</span>
           <span className={styles.infoValue}>
-            {mockMode ? `${starvedCount} starved monsters (demo)` : `${allMonsterIds.length} monsters`}
+            {mockMode ? `${starvedCount} starved (demo)` : `${existingMonsterCount} created`}
           </span>
         </div>
         <div className={styles.infoItem}>
@@ -151,7 +181,7 @@ export function HuntScreen() {
 
 function StarvedMonsterCard({ monsterId, onHunt }: { monsterId: number; onHunt: (id: number) => void }) {
   const { monster } = useMonsterInfo(monsterId);
-  const { address } = useAccount();
+  const { address } = usePlayerAddress();
   const mockMode = isMockMode();
 
   if (!monster || !monster.alive) {

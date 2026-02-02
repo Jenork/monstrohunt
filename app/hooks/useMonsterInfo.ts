@@ -1,6 +1,7 @@
 'use client';
 
-import { useReadContract, useAccount } from 'wagmi';
+import { useReadContract } from 'wagmi';
+import { usePlayerAddress } from './usePlayerAddress';
 import { CONTRACT_ADDRESS, monstroHuntABI } from '../utils/contract';
 import { MonsterInfo } from '../types/monster';
 import { formatMonsterName } from '../utils/format';
@@ -11,7 +12,7 @@ export function useMonsterInfo(
   monsterId: number | undefined,
   options?: { fetchCanHunt?: boolean }
 ) {
-  const { address } = useAccount();
+  const { address } = usePlayerAddress();
   const mockMode = isMockMode();
   const fetchCanHunt = options?.fetchCanHunt !== false;
   
@@ -83,6 +84,7 @@ export function useMonsterInfo(
     return { monster: null, refetch };
   }
 
+  // Single source of truth: all fields from getMonster + getFeedCost. Owner is contract owner only (never name/bytes32).
   const [
     nameBytes,
     avatarId,

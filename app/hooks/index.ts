@@ -1,4 +1,5 @@
 export { useToast } from './useToast';
+export { usePlayerAddress } from './usePlayerAddress';
 export { useMyMonsters } from './useMyMonsters';
 export { useMonsterInfo } from './useMonsterInfo';
 export { useCreateMonster } from './useCreateMonster';

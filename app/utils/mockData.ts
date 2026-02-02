@@ -94,20 +94,3 @@ export function isMockMode(): boolean {
   const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000';
   return contractAddress === '0x0000000000000000000000000000000000000000';
 }
-
-// Имитация данных профиля (для демо)
-export interface MockProfile {
-  displayName: string;
-  huntsWon: number;
-  totalRewardsEarned: bigint;
-  memberSince: string;
-}
-
-export function getMockProfile(_address?: string): MockProfile {
-  return {
-    displayName: 'Hunter_42',
-    huntsWon: 3,
-    totalRewardsEarned: BigInt('2000000000000000'), // 0.002 ETH
-    memberSince: 'Jan 2025',
-  };
-}

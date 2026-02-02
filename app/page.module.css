@@ -11,4 +11,28 @@
   margin-top: 24px;
   position: relative;
   z-index: 1;
+  width: 100%;
+}
+
+.contentInner {
+  width: 100%;
+}
+
+.centeredContent {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.centeredContent > * {
+  width: 100%;
+  max-width: 56rem;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.centeredContent[data-screen="manage"] > *,
+.centeredContent[data-screen="create"] > * {
+  max-width: 32rem;
 }

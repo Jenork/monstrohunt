@@ -96,6 +96,13 @@ export const monstroHuntABI = [
   },
   {
     type: 'function',
+    name: 'monsterExists',
+    inputs: [{ name: 'monsterId', type: 'uint256', internalType: 'uint256' }],
+    outputs: [{ name: '', type: 'bool', internalType: 'bool' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     name: 'HUNGER_DURATION',
     inputs: [],
     outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],

@@ -1,4 +1,6 @@
 require("hardhat/config");
+require("dotenv").config();
+require("@nomicfoundation/hardhat-ethers");
 
 /** @type {import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -24,7 +26,7 @@ module.exports = {
     },
   },
   paths: {
-    sources: "./",
+    sources: "./contracts",
     tests: "./test",
     cache: "./cache",
     artifacts: "./artifacts",

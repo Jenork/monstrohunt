@@ -1,11 +1,12 @@
 'use client';
 
-import { useReadContract, useAccount } from 'wagmi';
+import { useReadContract } from 'wagmi';
+import { usePlayerAddress } from './usePlayerAddress';
 import { CONTRACT_ADDRESS, monstroHuntABI } from '../utils/contract';
 import { isMockMode } from '../utils/mockData';
 
 export function useMyMonsters() {
-  const { address } = useAccount();
+  const { address } = usePlayerAddress();
   const mockMode = isMockMode();
   
   const { data: monsterId, refetch } = useReadContract({

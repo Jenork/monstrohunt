@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Providers } from './providers';
+import { WalletProviderGate } from './WalletProviderGate';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { ErrorSuppressor } from './components/ui/ErrorSuppressor';
 import './globals.css';
@@ -19,7 +19,7 @@ export default function RootLayout({
       <body>
         <ErrorSuppressor />
         <ErrorBoundary>
-          <Providers>{children}</Providers>
+          <WalletProviderGate>{children}</WalletProviderGate>
         </ErrorBoundary>
       </body>
     </html>

@@ -1,20 +1,23 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useAccount } from 'wagmi';
+import Image from 'next/image';
+import { usePlayerAddress } from '../../hooks/usePlayerAddress';
 import { useMyMonsters } from '../../hooks/useMyMonsters';
 import { useMonsterInfo } from '../../hooks/useMonsterInfo';
 import { useFeedMonster } from '../../hooks/useFeedMonster';
 import { useSellMonster } from '../../hooks/useSellMonster';
 import { useToast } from '../../hooks/useToast';
-import { MonsterCard } from '../ui/MonsterCard';
-import { formatETH, formatAddress } from '../../utils/format';
+import { StatusDisplay } from '../ui/StatusDisplay';
+import { AVATARS } from '../../constants/avatars';
+import { TIER_NAMES } from '../../constants/game';
+import { formatETH } from '../../utils/format';
 import { getSellAmount } from '../../utils/monster';
-import { isMockMode, getMockProfile } from '../../utils/mockData';
+import { isMockMode } from '../../utils/mockData';
 import styles from './ManageScreen.module.css';
 
 export function ManageScreen() {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected } = usePlayerAddress();
   const { monsterIds, refetch } = useMyMonsters();
   const { addToast } = useToast();
   const { feedMonster, isPending: isFeeding, isSuccess: feedSuccess } = useFeedMonster();
@@ -29,68 +32,44 @@ export function ManageScreen() {
 
   if (!isConnected) {
     return (
-      <div className={styles.container}>
-        <div className={styles.message}>Please connect your wallet</div>
+      <div className={styles.centerWrap}>
+        <div className={styles.container}>
+          <div className={styles.message}>Please connect your wallet</div>
+        </div>
       </div>
     );
   }
 
   const mockMode = isMockMode();
-  const profile = getMockProfile(address);
   const hasMonsters = monsterIds.length > 0;
 
   return (
-    <div className={styles.container}>
-      <h2 className={styles.title}>Profile</h2>
+    <div className={styles.centerWrap}>
+      <div className={styles.container}>
+        <h2 className={styles.title}>My Monster</h2>
 
-      <div className={styles.profileCard}>
-        <div className={styles.profileAvatar}>👤</div>
-        <div className={styles.profileInfo}>
-          <div className={styles.profileName}>{profile.displayName}</div>
-          <div className={styles.profileAddress}>
-            {address ? formatAddress(address) : '—'}
-          </div>
-          <div className={styles.profileStats}>
-            <span className={styles.profileStat}>
-              <strong>Monsters:</strong> {monsterIds.length}
-            </span>
-            <span className={styles.profileStat}>
-              <strong>Hunts won:</strong> {profile.huntsWon}
-            </span>
-            <span className={styles.profileStat}>
-              <strong>Total rewards:</strong> {formatETH(profile.totalRewardsEarned)} ETH
-            </span>
-            <span className={styles.profileStat}>
-              <strong>Member since:</strong> {profile.memberSince}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {mockMode && (
-        <div className={styles.mockNotice}>
-          <div className={styles.mockIcon}>🎮</div>
-          <div className={styles.mockContent}>
-            <div className={styles.mockTitle}>Demo Mode</div>
-            <div className={styles.mockText}>
-              Showing mock monster data. Connect to a deployed contract to manage your real monster.
+        {mockMode && (
+          <div className={styles.mockNotice}>
+            <div className={styles.mockIcon}>🎮</div>
+            <div className={styles.mockContent}>
+              <div className={styles.mockTitle}>Demo Mode</div>
+              <div className={styles.mockText}>
+                Showing mock monster data. Connect to a deployed contract to manage your real monster.
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {!hasMonsters ? (
-        <div className={styles.message}>You don&apos;t have a monster yet. Create one!</div>
-      ) : (
-        <>
-          <h3 className={styles.sectionTitle}>My Monster</h3>
+        {!hasMonsters ? (
+          <div className={styles.message}>You don&apos;t have a monster yet. Create one!</div>
+        ) : (
           <div className={styles.grid}>
             {monsterIds.map((id) => (
               <MonsterManager key={id.toString()} monsterId={Number(id)} />
             ))}
           </div>
-        </>
-      )}
+        )}
+      </div>
     </div>
   );
 }
@@ -100,10 +79,6 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
   const { feedMonster, isPending: isFeeding } = useFeedMonster();
   const { sellMonster, isPending: isSelling } = useSellMonster();
   const { addToast } = useToast();
-
-  useEffect(() => {
-    refetch();
-  }, [refetch]);
 
   if (!monster) {
     return <div className={styles.loading}>Loading...</div>;
@@ -149,48 +124,62 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
   const canFeed = monster.alive;
   const canSell = monster.alive && monster.status.status !== 'starved';
   const isStarved = monster.status.status === 'starved';
+  const avatar = AVATARS.find((a) => a.id === monster.avatarId) || AVATARS[0];
 
   return (
-    <div className={styles.monsterWrapper}>
-      <MonsterCard monster={monster} />
-      <div className={styles.actions}>
-        <div className={styles.feedSection}>
-          <div className={styles.feedInfo}>
-            <div className={styles.feedLabel}>Feed Cost Today</div>
-            <div className={styles.feedCost}>
-              {monster.feedCost ? formatETH(monster.feedCost) : '...'} ETH
-            </div>
-            <div className={styles.feedHint}>
-              {isStarved 
-                ? '⚠️ Your monster is starved! Feed now to save it.'
-                : 'Feed regularly to keep your monster alive'}
-            </div>
-          </div>
-          <button
-            className={`${styles.feedButton} ${isStarved ? styles.feedButtonUrgent : ''}`}
-            onClick={handleFeed}
-            disabled={isFeeding || !canFeed}
-          >
-            {isFeeding ? 'Feeding...' : isStarved ? 'Feed Now (Urgent!)' : 'Feed Monster'}
-          </button>
+    <div className={styles.unifiedCard}>
+      <div className={styles.cardHeader}>
+        <div className={styles.cardAvatar}>
+          <Image
+            src={avatar.image}
+            alt={avatar.name}
+            width={96}
+            height={96}
+            className={styles.cardAvatarImage}
+          />
         </div>
-        
-        <div className={styles.sellSection}>
-          <div className={styles.sellInfo}>
-            <div className={styles.sellLabel}>Sell Amount</div>
-            <div className={styles.sellAmount}>
-              {monster.weight ? formatETH(getSellAmount(monster.weight)) : '...'} ETH
-            </div>
-            <div className={styles.sellHint}>Protocol fee applies</div>
-          </div>
-          <button
-            className={styles.sellButton}
-            onClick={handleSell}
-            disabled={isSelling || !canSell}
-          >
-            {isSelling ? 'Selling...' : 'Sell Monster'}
-          </button>
+        <div className={styles.cardInfo}>
+          <div className={styles.cardName}>{monster.name}</div>
+          <div className={styles.cardTier}>Tier: {TIER_NAMES[monster.tier]}</div>
+          <div className={styles.cardWeight}>{formatETH(monster.weight)} ETH</div>
+          <StatusDisplay status={monster.status} />
+          {monster.pendingRewards > 0 && (
+            <div className={styles.cardRewards}>+{formatETH(monster.pendingRewards)} ETH</div>
+          )}
         </div>
+      </div>
+      <div className={styles.cardFeedRow}>
+        <div className={styles.cardFeedInfo}>
+          <span className={styles.cardFeedLabel}>Feed</span>
+          <span className={styles.cardFeedCost}>
+            {monster.feedCost ? formatETH(monster.feedCost) : '...'} ETH
+          </span>
+        </div>
+        <button
+          type="button"
+          className={`${styles.cardFeedBtn} ${isStarved ? styles.cardFeedBtnUrgent : ''}`}
+          onClick={handleFeed}
+          disabled={isFeeding || !canFeed}
+        >
+          {isFeeding ? '…' : isStarved ? 'Feed Now' : 'Feed'}
+        </button>
+      </div>
+      <div className={styles.cardDivider} />
+      <div className={styles.cardSellRow}>
+        <div className={styles.cardSellInfo}>
+          <span className={styles.cardSellLabel}>Sell</span>
+          <span className={styles.cardSellAmount}>
+            {monster.weight ? formatETH(getSellAmount(monster.weight)) : '...'} ETH
+          </span>
+        </div>
+        <button
+          type="button"
+          className={styles.cardSellBtn}
+          onClick={handleSell}
+          disabled={isSelling || !canSell}
+        >
+          {isSelling ? '…' : 'Sell'}
+        </button>
       </div>
     </div>
   );

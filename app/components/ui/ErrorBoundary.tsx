@@ -8,6 +8,8 @@ interface Props {
 
 interface State {
   hasError: boolean;
+  message?: string;
+  stack?: string;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -16,8 +18,8 @@ export class ErrorBoundary extends Component<Props, State> {
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(): State {
-    return { hasError: true };
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, message: error?.message || 'Unknown error' };
   }
 
   componentDidCatch(error: Error, errorInfo: any) {
@@ -27,6 +29,9 @@ export class ErrorBoundary extends Component<Props, State> {
         !error.stack?.includes('chrome-extension')) {
       console.error('Application error:', error, errorInfo);
     }
+    this.setState({
+      stack: errorInfo?.componentStack || error?.stack,
+    });
   }
 
   render() {
@@ -43,7 +48,21 @@ export class ErrorBoundary extends Component<Props, State> {
             textAlign: 'center',
           }}
         >
-          Something went wrong. Please refresh the page.
+          <div>
+            <div style={{ fontWeight: 600, marginBottom: '8px' }}>
+              Something went wrong. Please refresh the page.
+            </div>
+            {this.state.message && (
+              <div style={{ fontSize: '12px', opacity: 0.9 }}>
+                Error: {this.state.message}
+              </div>
+            )}
+            {process.env.NODE_ENV === 'development' && this.state.stack && (
+              <pre style={{ fontSize: '11px', opacity: 0.7, marginTop: '8px', whiteSpace: 'pre-wrap' }}>
+                {this.state.stack}
+              </pre>
+            )}
+          </div>
         </div>
       );
     }

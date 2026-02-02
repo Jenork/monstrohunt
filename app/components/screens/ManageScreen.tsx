@@ -143,7 +143,13 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
   };
 
   const canFeed = monster.alive && isConnected && !isWrongNetwork;
-  const canSell = monster.alive && monster.status.status !== 'starved' && isConnected && !isWrongNetwork;
+  const canSell =
+    monster.alive && monster.status.status !== 'starved' && isConnected && !isWrongNetwork;
+  const actionHint = !isConnected
+    ? 'Connect wallet'
+    : isWrongNetwork
+      ? 'Switch to Base Sepolia'
+      : '';
   const isStarved = monster.status.status === 'starved';
   const avatar = AVATARS.find((a) => a.id === monster.avatarId) || AVATARS[0];
 
@@ -175,6 +181,9 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
           <span className={styles.cardFeedCost}>
             {monster.feedCost ? formatETH(monster.feedCost) : '...'} ETH
           </span>
+          {!canFeed && actionHint && (
+            <span className={styles.actionHint}>{actionHint}</span>
+          )}
         </div>
         <button
           type="button"
@@ -192,6 +201,9 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
           <span className={styles.cardSellAmount}>
             {monster.weight ? formatETH(getSellAmount(monster.weight)) : '...'} ETH
           </span>
+          {!canSell && actionHint && (
+            <span className={styles.actionHint}>{actionHint}</span>
+          )}
         </div>
         <button
           type="button"

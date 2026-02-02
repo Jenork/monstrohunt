@@ -260,3 +260,39 @@
   border-color: rgba(255, 255, 255, 0.1);
   box-shadow: none;
 }
+
+@media (max-width: 480px) {
+  .container {
+    padding: 10px 12px;
+  }
+  .title {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  .form {
+    gap: 12px;
+  }
+  .arrowButton {
+    width: 44px;
+    height: 44px;
+    font-size: 22px;
+  }
+  .avatarDisplay {
+    min-width: 120px;
+  }
+  .avatarImg {
+    max-height: 100px;
+  }
+  .tierOption {
+    padding: 14px;
+    min-height: 48px;
+  }
+  .tierOptionSelected {
+    padding: 14px;
+  }
+  .createButton {
+    min-height: 48px;
+    padding: 14px 18px;
+    font-size: 15px;
+  }
+}

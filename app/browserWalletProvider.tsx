@@ -8,14 +8,21 @@
 import { useState, useMemo } from 'react';
 import { WagmiProvider, useAccount, useDisconnect, createConfig, http } from 'wagmi';
 import { baseSepolia } from 'wagmi/chains';
-import { injected } from 'wagmi/connectors';
+import { injected, walletConnect } from 'wagmi/connectors';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { PlayerAddressProvider } from './contexts/PlayerAddressContext';
 import { IsBrowserProvider } from './contexts/IsBrowserContext';
 
+const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? '';
+
 const config = createConfig({
   chains: [baseSepolia],
-  connectors: [injected()],
+  connectors: [
+    injected(),
+    ...(walletConnectProjectId
+      ? [walletConnect({ projectId: walletConnectProjectId, showQrModal: true })]
+      : []),
+  ],
   transports: {
     [baseSepolia.id]: http(),
   },

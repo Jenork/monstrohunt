@@ -9,6 +9,13 @@ export const metadata: Metadata = {
   description: 'Create, feed, and hunt monsters on Base Network',
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: 'cover',
+};
+
 export default function RootLayout({
   children,
 }: {

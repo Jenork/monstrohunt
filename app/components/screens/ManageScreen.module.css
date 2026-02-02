@@ -373,3 +373,45 @@
   border-color: rgba(255, 255, 255, 0.1);
   box-shadow: none;
 }
+
+@media (max-width: 480px) {
+  .container {
+    padding: 10px 12px;
+  }
+  .title {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  .unifiedCard {
+    padding: 10px 12px;
+    margin: 0 auto;
+  }
+  .cardHeader {
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .cardAvatar {
+    width: 56px;
+    height: 56px;
+  }
+  .cardName {
+    font-size: 15px;
+  }
+  .cardFeedBtn,
+  .cardSellBtn {
+    min-height: 44px;
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+  .feedSection,
+  .sellSection {
+    padding: 12px;
+    gap: 10px;
+  }
+  .feedButton,
+  .sellButton {
+    min-height: 48px;
+    padding: 14px 18px;
+    font-size: 15px;
+  }
+}

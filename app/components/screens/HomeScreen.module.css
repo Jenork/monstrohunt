@@ -157,3 +157,71 @@
   transform: translateY(0);
   box-shadow: 0 2px 4px rgba(139, 69, 19, 0.3);
 }
+
+@media (max-width: 640px) {
+  .container {
+    min-height: 50vh;
+    padding: 24px 16px;
+  }
+  .content {
+    max-width: 100%;
+  }
+  .title {
+    font-size: 32px;
+    margin-bottom: 6px;
+  }
+  .subtitle {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+  .testnetBadge {
+    padding: 6px 12px;
+    font-size: 12px;
+    margin-bottom: 16px;
+  }
+  .rules {
+    padding: 16px;
+    margin-bottom: 24px;
+  }
+  .rules h2 {
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+  .rules li {
+    padding: 10px 0;
+    font-size: 14px;
+  }
+  .warning {
+    padding: 10px;
+    font-size: 13px;
+    margin-top: 12px;
+  }
+  .features {
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .feature {
+    min-width: 100px;
+    padding: 14px;
+  }
+  .featureIcon {
+    font-size: 28px;
+  }
+  .featureText {
+    font-size: 13px;
+  }
+  .launchButton {
+    min-height: 48px;
+    padding: 14px 20px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 380px) {
+  .title {
+    font-size: 26px;
+  }
+  .subtitle {
+    font-size: 14px;
+  }
+}

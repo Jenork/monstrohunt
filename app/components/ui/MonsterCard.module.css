@@ -110,3 +110,27 @@
   font-weight: 600;
   color: #FFC107;
 }
+
+@media (max-width: 480px) {
+  .card {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px;
+    min-height: auto;
+    gap: 12px;
+  }
+  .avatar {
+    width: 100%;
+    min-width: unset;
+    height: 100px;
+  }
+  .right {
+    gap: 8px;
+  }
+  .name {
+    font-size: 16px;
+  }
+  .tier {
+    font-size: 12px;
+  }
+}

@@ -90,6 +90,51 @@
   justify-items: center;
 }
 
+@media (max-width: 640px) {
+  .container {
+    padding: 16px 12px;
+  }
+  .title {
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+  .warningBox,
+  .infoBox,
+  .cooldownBox,
+  .mockNotice {
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+  .warningTitle,
+  .cooldownTitle,
+  .mockTitle {
+    font-size: 15px;
+  }
+  .warningText,
+  .cooldownText,
+  .mockText {
+    font-size: 13px;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 0 4px;
+  }
+  .message {
+    font-size: 16px;
+    padding: 24px 16px;
+  }
+}
+
+@media (max-width: 380px) {
+  .container {
+    padding: 12px 10px;
+  }
+  .title {
+    font-size: 20px;
+  }
+}
+
 .cardWrapper {
   display: flex;
   flex-direction: column;

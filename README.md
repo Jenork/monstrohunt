@@ -50,7 +50,7 @@ Fully onchain monster hunting game on Base Network. Players create monsters for 
 
 **Wagmi and RainbowKit are used only for browser-based testnet testing.** When the app is opened in a regular browser (not inside Base App), MetaMask / WalletConnect can be used to connect. When opened inside Base App, MiniKit remains the primary wallet source. All UI and contract logic use a single hook `usePlayerAddress()` so wallet logic is not duplicated. This integration is **temporary** and will be removed before Base App production launch. Do not rely on it for production.
 
-Optional: set `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` for WalletConnect in browser mode.
+**Для подключения кошелька на смартфоне** (Chrome/Safari) нужен WalletConnect: в `.env` задайте `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` (получить: [cloud.walletconnect.com](https://cloud.walletconnect.com)). В интерфейсе появится кнопка «WalletConnect (mobile)».
 
 ## 🚀 Quick Start
 

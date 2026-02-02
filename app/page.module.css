@@ -36,3 +36,12 @@
 .centeredContent[data-screen="create"] > * {
   max-width: 32rem;
 }
+
+@media (max-width: 480px) {
+  .main {
+    padding: 12px 10px;
+  }
+  .content {
+    margin-top: 12px;
+  }
+}

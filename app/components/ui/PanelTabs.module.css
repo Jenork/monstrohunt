@@ -100,3 +100,46 @@
   color: white;
   box-shadow: 0 2px 6px rgba(139, 69, 19, 0.3);
 }
+
+@media (max-width: 640px) {
+  .wrapper {
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .centralColumn {
+    gap: 8px;
+    width: 100%;
+  }
+  .container {
+    width: 100%;
+    padding: 6px;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .tab {
+    min-height: 44px;
+    min-width: 0;
+    padding: 10px 10px;
+    font-size: 13px;
+  }
+  .walletRow {
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 8px 10px;
+  }
+  .address {
+    font-size: 12px;
+  }
+  .disconnectButton {
+    min-height: 44px;
+    padding: 10px 14px;
+  }
+}
+
+@media (max-width: 380px) {
+  .tab {
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+}

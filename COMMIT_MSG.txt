@@ -1,0 +1,8 @@
+Compact UI: unified monster card, centered layout, Hunt screen fixes
+
+- Manage: single compact card (avatar, tier, weight, status, feed, sell), smaller max-width
+- Create: reduced padding, font sizes, avatar/tier/summary spacing, max-width 32rem
+- Centered content: centeredContent + data-screen for manage/create, max-width 32rem
+- Hunt: Monsters now count from monsterExists, label clarity
+- PanelTabs: wallet/connect in central column
+- Remove profile card, mock profile data; format bytes32 name; refetch after create

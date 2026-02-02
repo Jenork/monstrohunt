@@ -52,6 +52,17 @@
   margin-bottom: 24px;
 }
 
+.warningBanner {
+  margin: 8px 0 16px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(244, 67, 54, 0.25);
+  border: 1px solid rgba(244, 67, 54, 0.5);
+  text-align: center;
+}
+
 .warning {
   margin-top: 16px;
   padding: 12px;
@@ -178,6 +189,11 @@
     padding: 6px 12px;
     font-size: 12px;
     margin-bottom: 16px;
+  }
+  .warningBanner {
+    padding: 8px 12px;
+    font-size: 12px;
+    margin: 6px 0 12px;
   }
   .rules {
     padding: 16px;

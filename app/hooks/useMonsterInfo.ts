@@ -2,7 +2,7 @@
 
 import { useReadContract } from 'wagmi';
 import { usePlayerAddress } from './usePlayerAddress';
-import { CONTRACT_ADDRESS, monstroHuntABI } from '../utils/contract';
+import { CONTRACT_ADDRESS, isContractAddressValid, monstroHuntABI } from '../utils/contract';
 import { MonsterInfo } from '../types/monster';
 import { formatMonsterName } from '../utils/format';
 import { getMonsterStatus } from '../utils/monster';
@@ -16,13 +16,18 @@ export function useMonsterInfo(
   const mockMode = isMockMode();
   const fetchCanHunt = options?.fetchCanHunt !== false;
   
-  const { data: monsterData, refetch } = useReadContract({
+  const {
+    data: monsterData,
+    refetch,
+    isLoading: isLoadingMonster,
+    isError: isErrorMonster,
+  } = useReadContract({
     address: CONTRACT_ADDRESS,
     abi: monstroHuntABI,
     functionName: 'getMonster',
     args: monsterId !== undefined ? [BigInt(monsterId)] : undefined,
     query: {
-      enabled: monsterId !== undefined && !mockMode,
+      enabled: monsterId !== undefined && !mockMode && isContractAddressValid,
     },
   });
 
@@ -32,7 +37,7 @@ export function useMonsterInfo(
     functionName: 'getPendingRewards',
     args: monsterId !== undefined ? [BigInt(monsterId)] : undefined,
     query: {
-      enabled: monsterId !== undefined && !!monsterData && !mockMode,
+      enabled: monsterId !== undefined && !!monsterData && !mockMode && isContractAddressValid,
     },
   });
 
@@ -42,7 +47,7 @@ export function useMonsterInfo(
     functionName: 'getFeedCost',
     args: monsterId !== undefined ? [BigInt(monsterId)] : undefined,
     query: {
-      enabled: monsterId !== undefined && !!monsterData && !mockMode,
+      enabled: monsterId !== undefined && !!monsterData && !mockMode && isContractAddressValid,
     },
   });
 
@@ -52,7 +57,13 @@ export function useMonsterInfo(
     functionName: 'canHunt',
     args: address && monsterId !== undefined ? [address, BigInt(monsterId)] : undefined,
     query: {
-      enabled: fetchCanHunt && monsterId !== undefined && !!monsterData && !!address && !mockMode,
+      enabled:
+        fetchCanHunt &&
+        monsterId !== undefined &&
+        !!monsterData &&
+        !!address &&
+        !mockMode &&
+        isContractAddressValid,
     },
   });
 
@@ -77,11 +88,15 @@ export function useMonsterInfo(
       };
     }
     
-    return { monster: null, refetch: () => Promise.resolve() };
+    return { monster: null, refetch: () => Promise.resolve(), isLoading: false, isError: false };
   }
 
-  if (!monsterData) {
-    return { monster: null, refetch };
+  if (isLoadingMonster) {
+    return { monster: null, refetch, isLoading: true, isError: false };
+  }
+
+  if (!monsterData || isErrorMonster) {
+    return { monster: null, refetch, isLoading: false, isError: isErrorMonster };
   }
 
   // Single source of truth: all fields from getMonster + getFeedCost. Owner is contract owner only (never name/bytes32).
@@ -142,5 +157,5 @@ export function useMonsterInfo(
     feedCost: BigInt(feedCost || 0),
   };
 
-  return { monster, refetch };
+  return { monster, refetch, isLoading: false, isError: false };
 }

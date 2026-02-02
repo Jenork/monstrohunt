@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-import { CONTRACT_ADDRESS, monstroHuntABI } from '../utils/contract';
+import { CONTRACT_ADDRESS, isContractAddressValid, monstroHuntABI } from '../utils/contract';
 import { TIER_PRICES } from '../constants/game';
 import type { Tier } from '../constants/game';
 import { useToast } from './useToast';
@@ -33,6 +33,10 @@ export function useCreateMonster() {
     avatarId: number,
     tier: Tier
   ) => {
+    if (!isContractAddressValid) {
+      addToast('Contract address is not configured', 'error');
+      return;
+    }
     const tierPrice = TIER_PRICES[tier];
     if (!tierPrice) {
       addToast('Invalid tier selected', 'error');

@@ -45,3 +45,13 @@
     margin-top: 12px;
   }
 }
+
+.blocker {
+  width: 100%;
+  padding: 16px;
+  text-align: center;
+  border-radius: 12px;
+  background: rgba(244, 67, 54, 0.2);
+  border: 1px solid rgba(244, 67, 54, 0.5);
+  color: rgba(255, 255, 255, 0.95);
+}

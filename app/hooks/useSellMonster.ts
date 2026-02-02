@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from 'wagmi';
 import { baseSepolia } from 'wagmi/chains';
-import { CONTRACT_ADDRESS, monstroHuntABI } from '../utils/contract';
+import { CONTRACT_ADDRESS, isContractAddressValid, monstroHuntABI } from '../utils/contract';
 import { useToast } from './useToast';
 
 export function useSellMonster() {
@@ -22,6 +22,10 @@ export function useSellMonster() {
   }, [error?.message, addToast]);
 
   const sellMonster = async (monsterId: number) => {
+    if (!isContractAddressValid) {
+      addToast('Contract address is not configured', 'error');
+      return;
+    }
     if (monsterId <= 0) {
       addToast('Invalid monster', 'error');
       return;

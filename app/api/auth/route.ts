@@ -3,14 +3,37 @@ import { NextRequest, NextResponse } from "next/server";
 
 const client = createClient();
 
+function normalizeHost(value: string | null | undefined): string | null {
+  if (!value) return null;
+  try {
+    const url = value.startsWith('http') ? new URL(value) : new URL(`https://${value}`);
+    return url.host;
+  } catch {
+    return null;
+  }
+}
+
+function getAllowedHosts(): string[] {
+  const hosts: string[] = [];
+  const publicUrlHost = normalizeHost(process.env.NEXT_PUBLIC_URL);
+  if (publicUrlHost) hosts.push(publicUrlHost);
+  const vercelUrlHost = normalizeHost(process.env.VERCEL_URL);
+  if (vercelUrlHost) hosts.push(vercelUrlHost);
+  return Array.from(new Set(hosts));
+}
+
 // Helper function to determine the correct domain for JWT verification
 function getUrlHost(request: NextRequest): string {
+  const allowedHosts = getAllowedHosts();
+
   // First try to get the origin from the Origin header (most reliable for CORS requests)
   const origin = request.headers.get("origin");
   if (origin) {
     try {
       const url = new URL(origin);
-      return url.host;
+      if (allowedHosts.length === 0 || allowedHosts.includes(url.host)) {
+        return url.host;
+      }
     } catch (error) {
       console.warn("Invalid origin header:", origin, error);
     }
@@ -18,8 +41,9 @@ function getUrlHost(request: NextRequest): string {
 
   // Fallback to Host header
   const host = request.headers.get("host");
-  if (host) {
-    return host;
+  const normalizedHost = normalizeHost(host);
+  if (normalizedHost && (allowedHosts.length === 0 || allowedHosts.includes(normalizedHost))) {
+    return normalizedHost;
   }
 
   // Final fallback to environment variables (your original logic)

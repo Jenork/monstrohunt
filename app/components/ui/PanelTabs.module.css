@@ -34,6 +34,27 @@
   align-items: center;
 }
 
+.alerts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
+
+.alert {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(244, 67, 54, 0.25);
+  border: 1px solid rgba(244, 67, 54, 0.5);
+  border-radius: 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
+
 .container {
   display: flex;
   gap: 8px;
@@ -58,6 +79,36 @@
   font-size: 13px;
   color: rgba(255, 255, 255, 0.8);
   font-family: monospace;
+}
+
+.networkLabel {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.switchButton {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(244, 67, 54, 0.35);
+  border: 1px solid rgba(244, 67, 54, 0.6);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.switchButton:hover {
+  background: rgba(244, 67, 54, 0.5);
+}
+
+.switchButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .disconnectButton {

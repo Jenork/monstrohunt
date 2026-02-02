@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useReadContract, useReadContracts } from 'wagmi';
 import { usePlayerAddress } from '../../hooks/usePlayerAddress';
-import { CONTRACT_ADDRESS, monstroHuntABI } from '../../utils/contract';
+import { CONTRACT_ADDRESS, isContractAddressValid, monstroHuntABI } from '../../utils/contract';
 import { useMonsterInfo } from '../../hooks/useMonsterInfo';
 import { useHuntMonster } from '../../hooks/useHuntMonster';
 import { useToast } from '../../hooks/useToast';
@@ -19,12 +19,12 @@ export function HuntScreen() {
   const { address } = usePlayerAddress();
   const mockMode = isMockMode();
 
-  const { data: totalMonsters } = useReadContract({
+  const { data: totalMonsters, isLoading: isLoadingTotal } = useReadContract({
     address: CONTRACT_ADDRESS,
     abi: monstroHuntABI,
     functionName: 'getTotalMonsters',
     query: {
-      enabled: !mockMode,
+      enabled: !mockMode && isContractAddressValid,
     },
   });
 
@@ -42,10 +42,10 @@ export function HuntScreen() {
     [totalNum]
   );
 
-  const { data: existingResults } = useReadContracts({
+  const { data: existingResults, isLoading: isLoadingExisting } = useReadContracts({
     contracts: existingMonsterContracts,
     query: {
-      enabled: !mockMode && existingMonsterContracts.length > 0,
+      enabled: !mockMode && isContractAddressValid && existingMonsterContracts.length > 0,
     },
   });
 
@@ -63,7 +63,7 @@ export function HuntScreen() {
     functionName: 'getOwnerMonsterId',
     args: address ? [address] : undefined,
     query: {
-      enabled: !!address && !mockMode,
+      enabled: !!address && !mockMode && isContractAddressValid,
     },
   });
 
@@ -71,38 +71,41 @@ export function HuntScreen() {
     mockMode ? 1 : (hunterMonsterId && hunterMonsterId > 0n ? Number(hunterMonsterId) : undefined)
   );
 
+  const loadAllMonsters = useCallback(() => {
+    if (!totalMonsters) return;
+
+    const total = Number(totalMonsters);
+    const ids: number[] = [];
+
+    // Check monsters starting from ID 1 (0 means no monster)
+    for (let i = 1; i <= total; i++) {
+      ids.push(i);
+    }
+
+    setAllMonsterIds(ids);
+  }, [totalMonsters]);
+
   useEffect(() => {
     if (isSuccess) {
       addToast('Monster hunted successfully!', 'success');
       loadAllMonsters();
     }
-  }, [isSuccess, addToast]);
+  }, [isSuccess, addToast, loadAllMonsters]);
 
   useEffect(() => {
     if (mockMode) {
       // В mock режиме показываем 8 монстров
       const mockMonsters = generateMockMonsters(8);
-      setAllMonsterIds(mockMonsters.map(m => m.id));
-    } else if (totalMonsters) {
+      setAllMonsterIds(mockMonsters.map((m) => m.id));
+      return;
+    }
+
+    if (totalMonsters) {
       loadAllMonsters();
       const interval = setInterval(loadAllMonsters, 30000);
       return () => clearInterval(interval);
     }
-  }, [totalMonsters, mockMode]);
-
-  const loadAllMonsters = () => {
-    if (!totalMonsters) return;
-    
-    const total = Number(totalMonsters);
-    const ids: number[] = [];
-    
-    // Check monsters starting from ID 1 (0 means no monster)
-    for (let i = 1; i <= total; i++) {
-      ids.push(i);
-    }
-    
-    setAllMonsterIds(ids);
-  };
+  }, [totalMonsters, mockMode, loadAllMonsters]);
 
   const currentTime = BigInt(Math.floor(Date.now() / 1000));
   const hunterCooldown = hunterMonster 
@@ -167,11 +170,21 @@ export function HuntScreen() {
       </div>
 
       {allMonsterIds.length === 0 ? (
-        <div className={styles.message}>Loading monsters...</div>
+        <div className={styles.message}>
+          {mockMode || isLoadingTotal || isLoadingExisting ? 'Loading monsters...' : 'No monsters yet.'}
+        </div>
       ) : (
         <div className={styles.grid}>
           {allMonsterIds.map((id) => (
-            <StarvedMonsterCard key={id} monsterId={id} onHunt={mockMode ? () => addToast('Demo mode: Connect to deployed contract to hunt', 'info') : huntMonster} />
+            <StarvedMonsterCard
+              key={id}
+              monsterId={id}
+              onHunt={
+                mockMode
+                  ? () => addToast('Demo mode: Connect to deployed contract to hunt', 'info')
+                  : huntMonster
+              }
+            />
           ))}
         </div>
       )}

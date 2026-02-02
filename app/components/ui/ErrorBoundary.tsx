@@ -17,7 +17,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   static getDerivedStateFromError(): State {
-    return { hasError: false }; // Don't show error UI for extension conflicts
+    return { hasError: true };
   }
 
   componentDidCatch(error: Error, errorInfo: any) {
@@ -30,6 +30,23 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   render() {
+    if (this.state.hasError) {
+      return (
+        <div
+          style={{
+            minHeight: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#fff',
+            padding: '24px',
+            textAlign: 'center',
+          }}
+        >
+          Something went wrong. Please refresh the page.
+        </div>
+      );
+    }
     return this.props.children;
   }
 }

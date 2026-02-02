@@ -221,6 +221,23 @@
   padding: 12px;
 }
 
+.retryLink {
+  margin-left: 8px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.retryLink:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
 .grid {
   display: flex;
   flex-direction: column;

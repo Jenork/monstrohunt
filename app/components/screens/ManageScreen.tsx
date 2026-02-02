@@ -18,7 +18,7 @@ import styles from './ManageScreen.module.css';
 
 export function ManageScreen() {
   const { address, isConnected } = usePlayerAddress();
-  const { monsterIds, refetch } = useMyMonsters();
+  const { monsterIds, refetch, isLoading: isLoadingList, isError: isListError } = useMyMonsters();
   const { addToast } = useToast();
   const { feedMonster, isPending: isFeeding, isSuccess: feedSuccess } = useFeedMonster();
   const { sellMonster, isPending: isSelling, isSuccess: sellSuccess } = useSellMonster();
@@ -60,7 +60,13 @@ export function ManageScreen() {
           </div>
         )}
 
-        {!hasMonsters ? (
+        {isLoadingList ? (
+          <div className={styles.message}>Loading...</div>
+        ) : isListError ? (
+          <div className={styles.message}>
+            Failed to load. Check network (Base Sepolia) and try again.
+          </div>
+        ) : !hasMonsters ? (
           <div className={styles.message}>You don&apos;t have a monster yet. Create one!</div>
         ) : (
           <div className={styles.grid}>
@@ -75,13 +81,23 @@ export function ManageScreen() {
 }
 
 function MonsterManager({ monsterId }: { monsterId: number }) {
-  const { monster, refetch } = useMonsterInfo(monsterId, { fetchCanHunt: false });
+  const { monster, refetch, isLoading: isLoadingMonster, isError: isMonsterError } = useMonsterInfo(monsterId, { fetchCanHunt: false });
   const { feedMonster, isPending: isFeeding } = useFeedMonster();
   const { sellMonster, isPending: isSelling } = useSellMonster();
   const { addToast } = useToast();
 
-  if (!monster) {
+  if (isLoadingMonster) {
     return <div className={styles.loading}>Loading...</div>;
+  }
+  if (!monster || isMonsterError) {
+    return (
+      <div className={styles.loading}>
+        <span>Failed to load monster. </span>
+        <button type="button" onClick={() => refetch()} className={styles.retryLink}>
+          Retry
+        </button>
+      </div>
+    );
   }
 
   const handleFeed = async () => {

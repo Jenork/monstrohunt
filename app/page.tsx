@@ -1,13 +1,17 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { useChainId, useSwitchChain } from 'wagmi';
+import { baseSepolia } from 'wagmi/chains';
 import { usePlayerAddress } from './hooks/usePlayerAddress';
+import { useIsBrowser } from './contexts/IsBrowserContext';
 import { PanelTabs } from './components/ui/PanelTabs';
 import { SocialLinks } from './components/ui/SocialLinks';
 import { ToastContainer } from './components/ui/ToastContainer';
 import { BackgroundMusic } from './components/ui/BackgroundMusic';
 import { HomeScreen, CreateScreen, ManageScreen, HuntScreen, FAQScreen } from './components/screens';
 import { Screen } from './types/screen';
+import { isContractAddressValid } from './utils/contract';
 import styles from './page.module.css';
 
 const STORAGE_KEY = 'monstro-screen';
@@ -21,7 +25,11 @@ function getStoredScreen(): Screen {
 
 export default function Home() {
   const [currentScreen, setCurrentScreenState] = useState<Screen>(getStoredScreen);
+  const isBrowser = useIsBrowser();
   const { isConnected } = usePlayerAddress();
+  const chainId = useChainId();
+  const { switchChainAsync } = useSwitchChain();
+  const [autoSwitchAttempted, setAutoSwitchAttempted] = useState(false);
 
   const setCurrentScreen = useCallback((screen: Screen) => {
     setCurrentScreenState(screen);
@@ -32,13 +40,44 @@ export default function Home() {
     setCurrentScreen('create');
   }, [setCurrentScreen]);
 
+  useEffect(() => {
+    if (!isBrowser || !isConnected) return;
+    if (chainId === baseSepolia.id) {
+      if (autoSwitchAttempted) setAutoSwitchAttempted(false);
+      return;
+    }
+    if (autoSwitchAttempted) return;
+    setAutoSwitchAttempted(true);
+    switchChainAsync({ chainId: baseSepolia.id }).catch(() => {
+      // User rejected or wallet doesn't support auto switching.
+    });
+  }, [isBrowser, isConnected, chainId, autoSwitchAttempted, switchChainAsync]);
+
+  if (!isContractAddressValid) {
+    return (
+      <main className={styles.main}>
+        <div className={styles.blocker}>
+          Contract address is not configured. Set NEXT_PUBLIC_CONTRACT_ADDRESS and redeploy.
+        </div>
+        <SocialLinks />
+      </main>
+    );
+  }
+
   return (
     <main className={styles.main}>
       <ToastContainer />
       <BackgroundMusic />
       
       {currentScreen === 'home' ? (
-        <HomeScreen onLaunch={handleLaunch} />
+        <HomeScreen
+          onLaunch={handleLaunch}
+          warning={
+            isConnected && chainId !== baseSepolia.id
+              ? 'Wrong network. Please switch to Base Sepolia.'
+              : undefined
+          }
+        />
       ) : (
         <>
           <PanelTabs currentScreen={currentScreen} onScreenChange={setCurrentScreen} />

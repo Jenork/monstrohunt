@@ -6,11 +6,12 @@ import styles from './HomeScreen.module.css';
 
 interface HomeScreenProps {
   onLaunch: () => void;
+  warning?: string;
 }
 
 const isTestnet = HUNGER_DAYS === 1;
 
-export function HomeScreen({ onLaunch }: HomeScreenProps) {
+export function HomeScreen({ onLaunch, warning }: HomeScreenProps) {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
@@ -22,6 +23,8 @@ export function HomeScreen({ onLaunch }: HomeScreenProps) {
             Base Sepolia Testnet - Accelerated timing for testing
           </div>
         )}
+
+        {warning && <div className={styles.warningBanner}>{warning}</div>}
         
         <div className={styles.rules}>
           <h2>How to Play</h2>

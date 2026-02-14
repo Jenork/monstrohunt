@@ -9,7 +9,7 @@ import { useFeedMonster } from '../../hooks/useFeedMonster';
 import { useSellMonster } from '../../hooks/useSellMonster';
 import { useToast } from '../../hooks/useToast';
 import { useChainId } from 'wagmi';
-import { baseSepolia } from 'wagmi/chains';
+import { base } from 'wagmi/chains';
 import { StatusDisplay } from '../ui/StatusDisplay';
 import { AVATARS } from '../../constants/avatars';
 import { TIER_NAMES } from '../../constants/game';
@@ -66,7 +66,7 @@ export function ManageScreen() {
           <div className={styles.message}>Loading...</div>
         ) : isListError ? (
           <div className={styles.message}>
-            Failed to load. Check network (Base Sepolia) and try again.
+            Failed to load. Check network (Base) and try again.
           </div>
         ) : !hasMonsters ? (
           <div className={styles.message}>You don&apos;t have a monster yet. Create one!</div>
@@ -89,7 +89,7 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
   const { addToast } = useToast();
   const { isConnected } = usePlayerAddress();
   const chainId = useChainId();
-  const isWrongNetwork = isConnected && chainId !== baseSepolia.id;
+  const isWrongNetwork = isConnected && chainId !== base.id;
 
   if (isLoadingMonster) {
     return <div className={styles.loading}>Loading...</div>;
@@ -148,7 +148,7 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
   const actionHint = !isConnected
     ? 'Connect wallet'
     : isWrongNetwork
-      ? 'Switch to Base Sepolia'
+      ? 'Switch to Base'
       : '';
   const isStarved = monster.status.status === 'starved';
   const avatar = AVATARS.find((a) => a.id === monster.avatarId) || AVATARS[0];

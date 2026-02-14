@@ -8,7 +8,7 @@ import {
   useSwitchChain,
   useConnect,
 } from 'wagmi';
-import { baseSepolia } from 'wagmi/chains';
+import { base } from 'wagmi/chains';
 import { CONTRACT_ADDRESS, isContractAddressValid, monstroHuntABI } from '../utils/contract';
 import { useToast } from './useToast';
 import { usePlayerAddress } from './usePlayerAddress';
@@ -59,8 +59,8 @@ export function useFeedMonster() {
       return;
     }
     try {
-      if (chainId !== baseSepolia.id) {
-        await switchChainAsync({ chainId: baseSepolia.id });
+      if (chainId !== base.id) {
+        await switchChainAsync({ chainId: base.id });
       }
       await writeContractAsync({
         address: CONTRACT_ADDRESS,
@@ -70,7 +70,7 @@ export function useFeedMonster() {
         value: feedCost,
       });
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'Switch to Base Sepolia or try again';
+      const msg = e instanceof Error ? e.message : 'Switch to Base or try again';
       addToast(msg, 'error');
     }
   };

@@ -14,8 +14,8 @@ Fully onchain monster hunting game on Base Network. Players create monsters for 
 
 - **Create Monsters**: Choose from 3 tiers (Scout 0.001 ETH, Hunter 0.005 ETH, Leviathan 0.01 ETH)
 - **Feed System**: Feed monsters every 7 days to keep them alive
-- **Reward System**: Earn ETH from 75% of hunted monsters' weight (distributed proportionally)
-- **Hunting**: Hunt starved monsters (7 days without feeding) - 20% reward + 20min cooldown
+- **Reward System**: Earn ETH from 65% of hunted monsters' weight (distributed to alive monsters proportionally)
+- **Hunting**: Hunt starved monsters (7 days without feeding) - 30% reward to hunter + 20min cooldown
 - **Risk/Reward**: Lose your monster if you forget to feed!
 
 ## 💰 Economic Model (FINAL v1.3)
@@ -29,7 +29,7 @@ Fully onchain monster hunting game on Base Network. Players create monsters for 
 - **Hunger Timer**: 7 days
 - **Feed Cost**: 5% initial weight + 5% current weight (no protocol fee)
 - **Hunt Cooldown**: 20 minutes after each attempt
-- **Death Distribution**: Hunter 20%, Alive monsters 75%, Protocol 5%
+- **Death Distribution**: Hunter 30%, Alive monsters 65%, Protocol 5%
 - **Sell Fee**: 1% protocol fee (only if not starved)
 - **1 wallet = 1 monster** (enforced by contract)
 
@@ -42,7 +42,7 @@ Fully onchain monster hunting game on Base Network. Players create monsters for 
 
 - **Frontend**: Next.js 15, React 19, TypeScript
 - **Web3**: Wagmi, Viem
-- **Blockchain**: Base Network (Sepolia/Mainnet)
+- **Blockchain**: Base Network (Mainnet)
 - **Smart Contract**: Solidity 0.8.20
 
 ## ✅ Base App only
@@ -69,10 +69,11 @@ cp .env.example .env
 npm run compile
 ```
 
-### 4. Deploy to Testnet
+### 4. Deploy Contract
 ```bash
-npm run deploy:sepolia
+npm run deploy:mainnet
 ```
+(For testnet: `npm run deploy:sepolia` and set `NEXT_PUBLIC_HUNGER_DAYS=1` in `.env`.)
 
 ### 5. Update Contract Address
 After deployment, update `.env`:
@@ -118,7 +119,9 @@ app/
 
 ## 🎯 Deployment
 
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions.
+- [DEPLOYMENT.md](./DEPLOYMENT.md) — деплой контракта и фронтенда.
+- [DEPLOY_TO_BASE.md](./DEPLOY_TO_BASE.md) — деплой в Base (контракт + Vercel).
+- [PUBLISH_MINI_APP_BASE.md](./PUBLISH_MINI_APP_BASE.md) — публикация Mini App в Base App (account association, [base.dev/preview](https://base.dev/preview), пост в Base app). Соответствует [Create a Mini App](https://docs.base.org/mini-apps/quickstart/create-new-miniapp/) (docs.base.org).
 
 ## ⚠️ Important Notes
 

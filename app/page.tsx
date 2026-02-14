@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useChainId, useSwitchChain } from 'wagmi';
-import { baseSepolia } from 'wagmi/chains';
+import { base } from 'wagmi/chains';
 import { usePlayerAddress } from './hooks/usePlayerAddress';
 import { PanelTabs } from './components/ui/PanelTabs';
 import { SocialLinks } from './components/ui/SocialLinks';
@@ -40,13 +40,13 @@ export default function Home() {
 
   useEffect(() => {
     if (!isConnected) return;
-    if (chainId === baseSepolia.id) {
+    if (chainId === base.id) {
       if (autoSwitchAttempted) setAutoSwitchAttempted(false);
       return;
     }
     if (autoSwitchAttempted) return;
     setAutoSwitchAttempted(true);
-    switchChainAsync({ chainId: baseSepolia.id }).catch(() => {
+    switchChainAsync({ chainId: base.id }).catch(() => {
       // User rejected or wallet doesn't support auto switching.
     });
   }, [isConnected, chainId, autoSwitchAttempted, switchChainAsync]);
@@ -71,8 +71,8 @@ export default function Home() {
         <HomeScreen
           onLaunch={handleLaunch}
           warning={
-            isConnected && chainId !== baseSepolia.id
-              ? 'Wrong network. Please switch to Base Sepolia.'
+            isConnected && chainId !== base.id
+              ? 'Wrong network. Please switch to Base.'
               : undefined
           }
         />

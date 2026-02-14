@@ -2,12 +2,12 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiProvider, createConfig, http } from 'wagmi';
-import { base, baseSepolia } from 'wagmi/chains';
+import { base } from 'wagmi/chains';
 import { coinbaseWallet } from 'wagmi/connectors';
 import { useState } from 'react';
 
 const config = createConfig({
-  chains: [base, baseSepolia],
+  chains: [base],
   connectors: [
     coinbaseWallet({
       appName: 'Monstro Hunt',
@@ -16,7 +16,6 @@ const config = createConfig({
   ],
   transports: {
     [base.id]: http(),
-    [baseSepolia.id]: http(),
   },
 });
 

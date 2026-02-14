@@ -6,17 +6,17 @@
  */
 import { useState, useMemo, useEffect } from 'react';
 import { WagmiProvider, useAccount, createConfig, http, useConnect } from 'wagmi';
-import { baseSepolia } from 'wagmi/chains';
+import { base } from 'wagmi/chains';
 import { injected } from 'wagmi/connectors';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import sdk from '@farcaster/miniapp-sdk';
 import { PlayerAddressProvider } from './contexts/PlayerAddressContext';
 
 const config = createConfig({
-  chains: [baseSepolia],
+  chains: [base],
   connectors: [injected()],
   transports: {
-    [baseSepolia.id]: http(),
+    [base.id]: http(),
   },
 });
 

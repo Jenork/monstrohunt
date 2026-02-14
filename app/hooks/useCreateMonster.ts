@@ -9,7 +9,7 @@ import {
   useSwitchChain,
   useConnect,
 } from 'wagmi';
-import { baseSepolia } from 'wagmi/chains';
+import { base } from 'wagmi/chains';
 import { CONTRACT_ADDRESS, isContractAddressValid, monstroHuntABI } from '../utils/contract';
 import { TIER_PRICES } from '../constants/game';
 import type { Tier } from '../constants/game';
@@ -85,8 +85,8 @@ export function useCreateMonster() {
     }
     (async () => {
       try {
-        if (chainId !== baseSepolia.id) {
-          await switchChainAsync({ chainId: baseSepolia.id });
+        if (chainId !== base.id) {
+          await switchChainAsync({ chainId: base.id });
         }
         await writeContractAsync({
           address: CONTRACT_ADDRESS,

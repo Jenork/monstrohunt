@@ -17,8 +17,8 @@ interface HuntCardProps {
 export function HuntCard({ monster, onHunt, canHunt }: HuntCardProps) {
   const avatar = AVATARS.find((a) => a.id === monster.avatarId) || AVATARS[0];
   
-  // Calculate potential reward (20% of weight)
-  const potentialReward = (monster.weight * BigInt(2000)) / BigInt(10000);
+  // Calculate potential reward (HUNTER_SHARE_BP = 30% of weight)
+  const potentialReward = (monster.weight * BigInt(HUNTER_SHARE_BP)) / BigInt(10000);
 
   return (
     <div className={styles.card}>

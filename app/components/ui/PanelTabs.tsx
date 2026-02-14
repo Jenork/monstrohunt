@@ -1,7 +1,7 @@
 'use client';
 
 import { useChainId, useSwitchChain } from 'wagmi';
-import { baseSepolia } from 'wagmi/chains';
+import { base } from 'wagmi/chains';
 import { usePlayerAddress } from '../../hooks/usePlayerAddress';
 import { useToast } from '../../hooks/useToast';
 import { Screen } from '../../types/screen';
@@ -19,7 +19,7 @@ export function PanelTabs({ currentScreen, onScreenChange }: PanelTabsProps) {
   const { addToast } = useToast();
   const chainId = useChainId();
   const { switchChainAsync, isPending: isSwitching } = useSwitchChain();
-  const isWrongNetwork = isConnected && chainId !== baseSepolia.id;
+  const isWrongNetwork = isConnected && chainId !== base.id;
   const networkLabel = chainId
     ? ({
         1: 'Ethereum',
@@ -75,12 +75,12 @@ export function PanelTabs({ currentScreen, onScreenChange }: PanelTabsProps) {
               )}
               {isWrongNetwork && (
                 <div className={styles.alert}>
-                  Wrong network. Please switch to Base Sepolia.
+                  Wrong network. Please switch to Base.
                   <button
                     type="button"
                     className={styles.switchButton}
                     onClick={() =>
-                      switchChainAsync({ chainId: baseSepolia.id }).catch((e) => {
+                      switchChainAsync({ chainId: base.id }).catch((e) => {
                         const msg =
                           e instanceof Error
                             ? e.message

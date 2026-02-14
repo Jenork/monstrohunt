@@ -1,6 +1,6 @@
-// FINAL TESTNET BUILD (Base Sepolia) - Economy LOCKED
-// Testnet: NEXT_PUBLIC_HUNGER_DAYS=1 (accelerated); Mainnet: 7
-export const HUNGER_DAYS = Number(process.env.NEXT_PUBLIC_HUNGER_DAYS || 1);
+// Base Mainnet - Economy LOCKED
+// NEXT_PUBLIC_HUNGER_DAYS=7 (mainnet). For testnet use 1.
+export const HUNGER_DAYS = Number(process.env.NEXT_PUBLIC_HUNGER_DAYS || 7);
 
 export type Tier = 0 | 1 | 2; // Scout, Hunter, Leviathan
 

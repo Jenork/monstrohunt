@@ -22,11 +22,14 @@ export function CreateScreen({ onCreated }: CreateScreenProps) {
   const { addToast } = useToast();
 
   useEffect(() => {
-    if (isSuccess) {
-      addToast('Monster created successfully!', 'success');
-      setName('');
+    if (!isSuccess) return;
+    addToast('Monster created successfully!', 'success');
+    setName('');
+    // Wait for chain state + cache refetch before navigating to Manage
+    const t = setTimeout(() => {
       onCreated?.();
-    }
+    }, 2500);
+    return () => clearTimeout(t);
   }, [isSuccess, addToast, onCreated]);
 
   const handlePreviousAvatar = () => {

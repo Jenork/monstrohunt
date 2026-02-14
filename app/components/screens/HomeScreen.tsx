@@ -1,6 +1,6 @@
 'use client';
 
-import { TIERS, TIER_NAMES, HUNGER_DAYS } from '../../constants/game';
+import { TIERS, TIER_NAMES } from '../../constants/game';
 import { formatETH } from '../../utils/format';
 import styles from './HomeScreen.module.css';
 
@@ -9,20 +9,12 @@ interface HomeScreenProps {
   warning?: string;
 }
 
-const isTestnet = HUNGER_DAYS === 1;
-
 export function HomeScreen({ onLaunch, warning }: HomeScreenProps) {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
         <h1 className={styles.title}>MONSTROHUNT</h1>
-        <p className={styles.subtitle}>Onchain hunting game{isTestnet ? ' (Testnet)' : ''}</p>
-        
-        {isTestnet && (
-          <div className={styles.testnetBadge}>
-            Base Sepolia Testnet - Accelerated timing for testing
-          </div>
-        )}
+        <p className={styles.subtitle}>Onchain hunting game</p>
 
         {warning && <div className={styles.warningBanner}>{warning}</div>}
         

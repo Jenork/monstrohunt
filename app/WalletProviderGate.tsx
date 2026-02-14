@@ -18,11 +18,22 @@ export function WalletProviderGate({ children }: { children: React.ReactNode }) 
       setMode('baseapp');
       return;
     }
-    // Async check: Base App may open in WebView where sync check fails
-    sdk.isInMiniApp(2500).then((inMiniApp) => {
-      setMode(inMiniApp ? 'baseapp' : 'browser');
-    }).catch(() => {
-      setMode('browser');
+    // Async check: Base App context can be ready with delay on first load
+    const runCheck = (timeoutMs: number) =>
+      sdk.isInMiniApp(timeoutMs).then((inMiniApp) => !!inMiniApp).catch(() => false);
+
+    runCheck(4000).then((firstIsBaseApp) => {
+      if (firstIsBaseApp) {
+        setMode('baseapp');
+        return;
+      }
+      // Retry once after delay (context often appears late on first open)
+      const t = setTimeout(() => {
+        runCheck(3000).then((retryIsBaseApp) => {
+          setMode(retryIsBaseApp ? 'baseapp' : 'browser');
+        });
+      }, 1000);
+      return () => clearTimeout(t);
     });
   }, []);
 

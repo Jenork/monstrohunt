@@ -1,21 +1,12 @@
 'use client';
 
-import { HUNGER_DAYS } from '../../constants/game';
 import styles from './FAQScreen.module.css';
-
-const isTestnet = HUNGER_DAYS === 1;
 
 export function FAQScreen() {
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>Frequently Asked Questions</h2>
-      
-      {isTestnet && (
-        <div className={styles.testnetNotice}>
-          <strong>Testnet Mode:</strong> This is Base Sepolia with accelerated timing for testing.
-        </div>
-      )}
-      
+
       <div className={styles.faqList}>
         <div className={styles.faqItem}>
           <h3 className={styles.question}>How do I create a monster?</h3>
@@ -80,26 +71,6 @@ export function FAQScreen() {
             Higher tier means higher initial weight and larger reward share, but also higher feed costs.
           </p>
         </div>
-
-        {isTestnet && (
-          <>
-            <div className={styles.faqItem}>
-              <h3 className={styles.question}>Why is feeding so frequent on testnet?</h3>
-              <p className={styles.answer}>
-                Testnet uses accelerated time so players can experience the full lifecycle quickly. 
-                Mainnet will use a longer hunger cycle.
-              </p>
-            </div>
-
-            <div className={styles.faqItem}>
-              <h3 className={styles.question}>Can the rules change?</h3>
-              <p className={styles.answer}>
-                No. Economic rules are locked forever. Only timing is accelerated on testnet.
-                There is no admin control or upgradeability.
-              </p>
-            </div>
-          </>
-        )}
       </div>
     </div>
   );

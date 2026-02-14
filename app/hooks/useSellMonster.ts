@@ -65,8 +65,8 @@ export function useSellMonster() {
         args: [BigInt(monsterId)],
       });
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'Switch to Base or try again';
-      addToast(msg, 'error');
+      addToast(e instanceof Error ? e.message : 'Switch to Base or try again', 'error');
+      throw e;
     }
   };
 

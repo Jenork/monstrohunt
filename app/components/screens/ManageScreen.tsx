@@ -25,6 +25,11 @@ export function ManageScreen() {
   const { feedMonster, isPending: isFeeding, isSuccess: feedSuccess } = useFeedMonster();
   const { sellMonster, isPending: isSelling, isSuccess: sellSuccess } = useSellMonster();
 
+  // Refetch when opening Manage (e.g. right after creating a monster)
+  useEffect(() => {
+    if (address) refetch();
+  }, [address, refetch]);
+
   useEffect(() => {
     if (feedSuccess || sellSuccess) {
       refetch();
@@ -145,12 +150,14 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
   const canFeed = monster.alive && isConnected && !isWrongNetwork;
   const canSell =
     monster.alive && monster.status.status !== 'starved' && isConnected && !isWrongNetwork;
+  const isStarved = monster.status.status === 'starved';
   const actionHint = !isConnected
     ? 'Connect wallet'
     : isWrongNetwork
       ? 'Switch to Base'
-      : '';
-  const isStarved = monster.status.status === 'starved';
+      : isStarved
+        ? 'Feed first to sell'
+        : '';
   const avatar = AVATARS.find((a) => a.id === monster.avatarId) || AVATARS[0];
 
   return (

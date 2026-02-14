@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 /**
  * @title Monstro Hunt
- * @notice FINAL TESTNET BUILD (Base Sepolia) - Economy LOCKED
+ * @notice Economy LOCKED
  * @dev Onchain survival game - 1 wallet = 1 monster
  * No tokens, no NFTs, no upgradeability, no admin control
  */

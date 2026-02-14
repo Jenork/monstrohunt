@@ -135,10 +135,6 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
       addToast('Cannot sell a starved monster. Feed it first or wait to be hunted.', 'error');
       return;
     }
-    
-    const sellAmount = getSellAmount(monster.weight);
-    if (!confirm(`Sell your monster for ${formatETH(sellAmount)} ETH? (1% fee applies)`)) return;
-    
     try {
       await sellMonster(monsterId);
       refetch();

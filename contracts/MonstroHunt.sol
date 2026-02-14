@@ -3,13 +3,15 @@ pragma solidity ^0.8.20;
 
 /**
  * @title Monstro Hunt
- * @notice Economy LOCKED
+ * @notice Economy LOCKED - protocol fees (5% death, 1% sell) withdrawable to treasury
  * @dev Onchain survival game - 1 wallet = 1 monster
- * No tokens, no NFTs, no upgradeability, no admin control
+ * No tokens, no NFTs, no upgradeability. Treasury set at deploy.
  */
 contract MonstroHunt {
     // Immutable hunger duration (set at deployment, never changeable)
     uint256 public immutable HUNGER_DURATION;
+    // Address that can withdraw accumulated protocol fees (set at deployment, never changeable)
+    address public immutable protocolTreasury;
     
     // Constants
     uint256 public constant HUNT_COOLDOWN = 20 minutes;
@@ -92,13 +94,18 @@ contract MonstroHunt {
         uint256 protocolFee
     );
     
+    event ProtocolWithdrawn(address indexed to, uint256 amount);
+    
     /**
-     * @notice Constructor sets immutable hunger duration
+     * @notice Constructor sets hunger duration and treasury for protocol fees
      * @param hungerDuration Hunger window in seconds (testnet: 1 day, mainnet: 7 days)
+     * @param treasury Address that receives 5% on hunt death and 1% on sell
      */
-    constructor(uint256 hungerDuration) {
+    constructor(uint256 hungerDuration, address treasury) {
         require(hungerDuration > 0, "Invalid hunger duration");
+        require(treasury != address(0), "Invalid treasury");
         HUNGER_DURATION = hungerDuration;
+        protocolTreasury = treasury;
     }
     
     /**
@@ -384,5 +391,17 @@ contract MonstroHunt {
     
     function getTotalMonsters() external view returns (uint256) {
         return monsters.length;
+    }
+    
+    /**
+     * @notice Withdraw accumulated protocol fees to treasury. Only treasury can call.
+     */
+    function withdrawProtocolBalance() external {
+        require(msg.sender == protocolTreasury, "Not treasury");
+        uint256 amount = protocolBalance;
+        require(amount > 0, "Nothing to withdraw");
+        protocolBalance = 0;
+        payable(protocolTreasury).transfer(amount);
+        emit ProtocolWithdrawn(protocolTreasury, amount);
     }
 }

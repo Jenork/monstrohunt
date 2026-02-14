@@ -19,8 +19,12 @@ async function main() {
   console.log(`Hunger Duration: ${hungerDuration} seconds (${hungerDuration / 86400} days)`);
   console.log(`Mode: ${isMainnet ? 'MAINNET' : 'TESTNET'}\n`);
 
+  // Protocol fees (5% on death, 1% on sell) go to this address
+  const treasury = process.env.PROTOCOL_TREASURY || "0xEb45918A1efC99C84Fa337E36A2F84317a9DE1b8";
+  console.log("Protocol treasury (fee recipient):", treasury);
+
   const MonstroHunt = await hre.ethers.getContractFactory("MonstroHunt");
-  const monstroHunt = await MonstroHunt.deploy(hungerDuration);
+  const monstroHunt = await MonstroHunt.deploy(hungerDuration, treasury);
 
   const deployTx = monstroHunt.deploymentTransaction();
   const receipt = await monstroHunt.waitForDeployment();

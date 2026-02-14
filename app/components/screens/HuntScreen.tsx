@@ -201,20 +201,16 @@ function StarvedMonsterCard({ monsterId, onHunt }: { monsterId: number; onHunt: 
     return null;
   }
 
-  // В mock режиме показываем всех монстров, кроме вашего (ID 1)
-  // В реальном режиме показываем только starved и не своих
-  if (mockMode) {
-    if (monster.id === 1 && address) {
-      return null; // Не показываем свой монстр
-    }
-  } else {
-    // Only show monsters that are starved and not owned by current user
-    if (monster.status.status !== 'starved' || monster.owner.toLowerCase() === address?.toLowerCase()) {
-      return null;
-    }
+  // Не показываем своего монстра
+  if (address && monster.owner.toLowerCase() === address.toLowerCase()) {
+    return null;
+  }
+  if (mockMode && monster.id === 1 && address) {
+    return null;
   }
 
-  const canHunt = mockMode 
+  // Показываем всех чужих монстров; охота доступна только если starved
+  const canHunt = mockMode
     ? (monster.status.status === 'starved' && monster.id !== 1)
     : (monster.status.canHunt ?? false);
 

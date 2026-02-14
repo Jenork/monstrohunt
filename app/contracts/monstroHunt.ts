@@ -96,6 +96,20 @@ export const monstroHuntABI = [
   },
   {
     type: 'function',
+    name: 'withdrawProtocolBalance',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'protocolTreasury',
+    inputs: [],
+    outputs: [{ name: '', type: 'address', internalType: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     name: 'monsterExists',
     inputs: [{ name: 'monsterId', type: 'uint256', internalType: 'uint256' }],
     outputs: [{ name: '', type: 'bool', internalType: 'bool' }],
@@ -156,6 +170,14 @@ export const monstroHuntABI = [
       { name: 'owner', type: 'address', indexed: true },
       { name: 'payout', type: 'uint256', indexed: false },
       { name: 'protocolFee', type: 'uint256', indexed: false },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'ProtocolWithdrawn',
+    inputs: [
+      { name: 'to', type: 'address', indexed: true },
+      { name: 'amount', type: 'uint256', indexed: false },
     ],
   },
 ] as const;

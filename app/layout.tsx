@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   title: 'Monstro Hunt - Onchain Monster Game',
   description: 'Create, feed, and hunt monsters on Base Network',
   other: {
-    'base:app_id': homeUrl,
+    'base:app_id': '696b8f1dc0ab25addaaaf26b',
     'fc:frame': JSON.stringify(frameEmbed),
     'fc:miniapp': JSON.stringify(frameEmbed),
   },

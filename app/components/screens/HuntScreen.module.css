@@ -85,9 +85,16 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 24px;
-  justify-items: center;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  justify-items: stretch;
+  align-content: start;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: calc(100vh - 320px);
+  min-height: 120px;
+  padding-bottom: 16px;
+  -webkit-overflow-scrolling: touch;
 }
 
 @media (max-width: 640px) {
@@ -116,9 +123,10 @@
     font-size: 13px;
   }
   .grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
     padding: 0 4px;
+    max-height: calc(100vh - 340px);
   }
   .message {
     font-size: 16px;

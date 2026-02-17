@@ -8,7 +8,26 @@ import { PanelTabs } from './components/ui/PanelTabs';
 import { SocialLinks } from './components/ui/SocialLinks';
 import { ToastContainer } from './components/ui/ToastContainer';
 import { BackgroundMusic } from './components/ui/BackgroundMusic';
-import { HomeScreen, CreateScreen, ManageScreen, HuntScreen, FAQScreen } from './components/screens';
+import { HomeScreen } from './components/screens';
+import dynamic from 'next/dynamic';
+
+// Lazy load screens for better performance (code splitting)
+const CreateScreen = dynamic(() => import('./components/screens').then(mod => ({ default: mod.CreateScreen })), { 
+  ssr: false,
+  loading: () => <div style={{ color: '#fff', textAlign: 'center', padding: '20px' }}>Loading...</div>
+});
+const ManageScreen = dynamic(() => import('./components/screens').then(mod => ({ default: mod.ManageScreen })), { 
+  ssr: false,
+  loading: () => <div style={{ color: '#fff', textAlign: 'center', padding: '20px' }}>Loading...</div>
+});
+const HuntScreen = dynamic(() => import('./components/screens').then(mod => ({ default: mod.HuntScreen })), { 
+  ssr: false,
+  loading: () => <div style={{ color: '#fff', textAlign: 'center', padding: '20px' }}>Loading...</div>
+});
+const FAQScreen = dynamic(() => import('./components/screens').then(mod => ({ default: mod.FAQScreen })), { 
+  ssr: false,
+  loading: () => <div style={{ color: '#fff', textAlign: 'center', padding: '20px' }}>Loading...</div>
+});
 import { Screen } from './types/screen';
 import { isContractAddressValid } from './utils/contract';
 import styles from './page.module.css';

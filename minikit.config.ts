@@ -29,9 +29,9 @@ export const minikitConfig = {
     primaryCategory: "social",
     tags: ["gaming", "base", "quickstart", "waitlist"],
     heroImageUrl: `${ROOT_URL}/splash.png`,
-    tagline: "",
-    ogTitle: "",
-    ogDescription: "",
+    tagline: "Onchain monster hunting game",
+    ogTitle: "Monstro Hunt - Onchain Monster Game on Base",
+    ogDescription: "Create, feed, and hunt monsters on Base Network. Pure ETH game with no tokens or NFTs.",
     ogImageUrl: `${ROOT_URL}/splash.png`,
   },
 } as const;

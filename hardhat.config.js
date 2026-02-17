@@ -1,9 +1,27 @@
 require("hardhat/config");
 require("dotenv").config();
 require("@nomicfoundation/hardhat-ethers");
+require("@nomicfoundation/hardhat-verify");
 
 /** @type {import('hardhat/config').HardhatUserConfig */
 module.exports = {
+  etherscan: {
+    // Etherscan API V2: one key for all chains (Base, Ethereum, etc.)
+    apiKey: process.env.ETHERSCAN_API_KEY || process.env.BASESCAN_API_KEY || "",
+    customChains: [
+      {
+        network: "baseMainnet",
+        chainId: 8453,
+        urls: {
+          apiURL: "https://api.basescan.org/api",
+          browserURL: "https://basescan.org",
+        },
+      },
+    ],
+  },
+  sourcify: {
+    enabled: false,
+  },
   solidity: {
     version: "0.8.20",
     settings: {

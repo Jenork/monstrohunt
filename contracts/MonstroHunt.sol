@@ -3,9 +3,11 @@ pragma solidity ^0.8.20;
 
 /**
  * @title Monstro Hunt
- * @notice Economy LOCKED - protocol fees (5% death, 1% sell) withdrawable to treasury
+ * @notice Economy LOCKED - protocol fees (5% death, 1% sell) auto-sent to treasury
  * @dev Onchain survival game - 1 wallet = 1 monster
  * No tokens, no NFTs, no upgradeability. Treasury set at deploy.
+ * Protocol fees are automatically sent to treasury on each event (hunt/sell).
+ * If auto-send fails, fees accumulate in protocolBalance for manual withdrawal.
  */
 contract MonstroHunt {
     // Immutable hunger duration (set at deployment, never changeable)
@@ -245,7 +247,15 @@ contract MonstroHunt {
         
         // Distribute rewards
         payable(msg.sender).transfer(hunterReward);
-        protocolBalance += protocolFee;
+        
+        // Send protocol fee directly to treasury (auto-withdraw)
+        if (protocolFee > 0) {
+            (bool ok,) = payable(protocolTreasury).call{value: protocolFee}("");
+            // If transfer fails, accumulate (fallback for edge cases)
+            if (!ok) {
+                protocolBalance += protocolFee;
+            }
+        }
         
         // Distribute to alive monsters proportionally (O(1) via global index)
         if (totalAliveWeight > 0) {
@@ -286,7 +296,15 @@ contract MonstroHunt {
         monsterExists[monsterId] = false;
         ownerToMonsterId[msg.sender] = 0;
         
-        protocolBalance += protocolFee;
+        // Send protocol fee directly to treasury (auto-withdraw)
+        if (protocolFee > 0) {
+            (bool ok,) = payable(protocolTreasury).call{value: protocolFee}("");
+            // If transfer fails, accumulate (fallback for edge cases)
+            if (!ok) {
+                protocolBalance += protocolFee;
+            }
+        }
+        
         payable(msg.sender).transfer(payout);
         
         emit MonsterSold(monsterId, msg.sender, payout, protocolFee);
@@ -400,8 +418,10 @@ contract MonstroHunt {
         require(msg.sender == protocolTreasury, "Not treasury");
         uint256 amount = protocolBalance;
         require(amount > 0, "Nothing to withdraw");
+        require(address(this).balance >= amount, "Insufficient contract balance");
         protocolBalance = 0;
-        payable(protocolTreasury).transfer(amount);
+        (bool ok,) = payable(protocolTreasury).call{value: amount}("");
+        require(ok, "Transfer failed");
         emit ProtocolWithdrawn(protocolTreasury, amount);
     }
 }

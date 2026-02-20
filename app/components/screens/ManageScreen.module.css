@@ -139,13 +139,14 @@
 }
 
 .cardFeedBtn {
-  border: 1px solid rgba(139, 69, 19, 0.5);
-  background: linear-gradient(135deg, rgba(139, 69, 19, 0.8) 0%, rgba(101, 50, 50, 0.9) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.9);
+  background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
   color: white;
 }
 
 .cardFeedBtn:hover:not(:disabled) {
-  background: linear-gradient(135deg, rgba(139, 69, 19, 0.9) 0%, rgba(101, 50, 50, 1) 100%);
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+  filter: brightness(1.08);
 }
 
 .cardFeedBtn:disabled {
@@ -154,8 +155,13 @@
 }
 
 .cardFeedBtnUrgent {
-  background: linear-gradient(135deg, rgba(220, 38, 38, 0.9) 0%, rgba(185, 28, 28, 1) 100%) !important;
-  border-color: rgba(220, 38, 38, 0.6) !important;
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%) !important;
+  border-color: rgba(74, 222, 128, 0.9) !important;
+}
+
+.cardSellRow,
+.cardSellBtn {
+  display: none !important;
 }
 
 .cardSellBtn {
@@ -177,6 +183,11 @@
   height: 1px;
   background: rgba(255, 255, 255, 0.12);
   margin: 4px 0;
+}
+
+.cardSellRow,
+.cardDivider {
+  display: none;
 }
 
 .mockNotice {
@@ -313,38 +324,38 @@
 .feedButton {
   padding: 14px 20px;
   border-radius: 8px;
-  border: 1px solid rgba(139, 69, 19, 0.5);
-  background: linear-gradient(135deg, rgba(139, 69, 19, 0.8) 0%, rgba(101, 50, 50, 0.9) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.6);
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
   color: white;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(139, 69, 19, 0.3);
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
   width: 100%;
 }
 
 .feedButton:hover:not(:disabled) {
-  background: linear-gradient(135deg, rgba(139, 69, 19, 0.9) 0%, rgba(101, 50, 50, 1) 100%);
-  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.5);
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.5);
   transform: translateY(-1px);
 }
 
 .feedButton:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(139, 69, 19, 0.3);
+  box-shadow: 0 2px 4px rgba(34, 197, 94, 0.3);
 }
 
 .feedButton.feedButtonUrgent {
-  background: linear-gradient(135deg, rgba(220, 38, 38, 0.9) 0%, rgba(185, 28, 28, 1) 100%);
-  border-color: rgba(220, 38, 38, 0.6);
-  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+  border-color: rgba(74, 222, 128, 0.8);
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4);
   animation: pulse 2s ease-in-out infinite;
 }
 
 .feedButton.feedButtonUrgent:hover:not(:disabled) {
-  background: linear-gradient(135deg, rgba(220, 38, 38, 1) 0%, rgba(185, 28, 28, 1) 100%);
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.6);
+  background: linear-gradient(135deg, #86efac 0%, #4ade80 100%);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.6);
 }
 
 @keyframes pulse {

@@ -63,17 +63,6 @@
   text-align: center;
 }
 
-.warning {
-  margin-top: 16px;
-  padding: 12px;
-  background: rgba(244, 67, 54, 0.1);
-  border: 1px solid rgba(244, 67, 54, 0.3);
-  border-radius: 8px;
-  color: #ff8a80;
-  font-size: 14px;
-  text-align: center;
-}
-
 .rules {
   background: rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(8px);
@@ -206,11 +195,6 @@
   .rules li {
     padding: 10px 0;
     font-size: 14px;
-  }
-  .warning {
-    padding: 10px;
-    font-size: 13px;
-    margin-top: 12px;
   }
   .features {
     gap: 12px;

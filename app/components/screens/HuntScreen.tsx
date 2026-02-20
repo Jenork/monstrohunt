@@ -132,17 +132,6 @@ export function HuntScreen() {
           </div>
         </div>
       )}
-      
-      <div className={styles.warningBox}>
-        <div className={styles.warningIcon}>⚠️</div>
-        <div className={styles.warningContent}>
-          <div className={styles.warningTitle}>Hunt Risk Warning</div>
-          <div className={styles.warningText}>
-            Hunt attempts may fail if the monster is fed before your transaction confirms. 
-            Gas fees will still be charged even if the hunt fails.
-          </div>
-        </div>
-      </div>
 
       {hunterCooldown > 0n && (
         <div className={styles.cooldownBox}>

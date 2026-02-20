@@ -18,7 +18,7 @@ export const minikitConfig = {
   miniapp: {
     version: "1",
     name: "Monstro Hunt",
-    subtitle: "Onchain monster hunting game on Base",
+    subtitle: "",
     description: "Onchain monster hunting game on Base",
     screenshotUrls: [`${ROOT_URL}/screenshot-portrait.png`],
     iconUrl: `${ROOT_URL}/icon.png`,
@@ -29,7 +29,7 @@ export const minikitConfig = {
     primaryCategory: "social",
     tags: ["gaming", "base", "quickstart", "waitlist"],
     heroImageUrl: `${ROOT_URL}/splash.png`,
-    tagline: "Onchain monster hunting game",
+    tagline: "",
     ogTitle: "Monstro Hunt - Onchain Monster Game on Base",
     ogDescription: "Create, feed, and hunt monsters on Base Network. Pure ETH game with no tokens or NFTs.",
     ogImageUrl: `${ROOT_URL}/splash.png`,

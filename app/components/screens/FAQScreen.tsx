@@ -43,8 +43,16 @@ export function FAQScreen() {
         <div className={styles.faqItem}>
           <h3 className={styles.question}>How do I hunt other monsters?</h3>
           <p className={styles.answer}>
-            Go to the Hunt tab to see starved monsters. Click &quot;Hunt&quot; to claim a reward. 
-            Warning: hunting is a race — gas may be lost if someone else hunts first or the owner feeds.
+            Go to the Hunt tab to see starved monsters. Click &quot;Hunt&quot; to claim a reward.
+          </p>
+        </div>
+
+        <div className={styles.faqItem}>
+          <h3 className={styles.question}>What are the risks?</h3>
+          <p className={styles.answer}>
+            If you don&apos;t feed your monster in time, it becomes starved and can be hunted by others — you lose the monster.
+            When hunting: the attempt can fail if the target is fed before your transaction confirms; gas fees are still charged.
+            Hunting is a race — if someone else hunts first or the owner feeds in time, you may pay gas without getting a reward.
           </p>
         </div>
 

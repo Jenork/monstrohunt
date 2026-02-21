@@ -53,13 +53,6 @@ export function HuntCard({ monster, onHunt, canHunt }: HuntCardProps) {
         >
           {canHunt ? 'Hunt Monster' : 'Cannot Hunt'}
         </button>
-        {!canHunt && (
-          <div className={styles.disabledReason}>
-            {monster.status.status === 'starved'
-              ? 'Cooldown active or conditions not met'
-              : 'Not starved yet — hunt when feed deadline passes'}
-          </div>
-        )}
       </div>
     </div>
   );

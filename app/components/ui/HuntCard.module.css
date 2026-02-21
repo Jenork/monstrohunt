@@ -174,14 +174,6 @@
   box-shadow: none;
 }
 
-.disabledReason {
-  font-size: 7px;
-  color: rgba(255, 255, 255, 0.5);
-  text-align: left;
-  font-style: italic;
-  line-height: 1.2;
-}
-
 @media (max-width: 480px) {
   .card {
     padding: 6px;

@@ -64,7 +64,6 @@ export function CreateScreen({ onCreated }: CreateScreenProps) {
       
       <div className={styles.form}>
         <div className={styles.section}>
-          <label className={styles.label}>Choose Avatar</label>
           <div className={styles.avatarSelector}>
             <button
               className={styles.arrowButton}

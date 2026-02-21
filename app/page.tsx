@@ -6,6 +6,7 @@ import { base } from 'wagmi/chains';
 import { usePlayerAddress } from './hooks/usePlayerAddress';
 import { PanelTabs } from './components/ui/PanelTabs';
 import { SocialLinks } from './components/ui/SocialLinks';
+import { WalletCorner } from './components/ui/WalletCorner';
 import { ToastContainer } from './components/ui/ToastContainer';
 import { BackgroundMusic } from './components/ui/BackgroundMusic';
 import { HomeScreen } from './components/screens';
@@ -76,7 +77,10 @@ export default function Home() {
         <div className={styles.blocker}>
           Contract address is not configured. Set NEXT_PUBLIC_CONTRACT_ADDRESS and redeploy.
         </div>
-        <SocialLinks />
+        <div className={styles.topBar}>
+          <SocialLinks />
+          <WalletCorner />
+        </div>
       </main>
     );
   }
@@ -85,7 +89,12 @@ export default function Home() {
     <main className={styles.main}>
       <ToastContainer />
       <BackgroundMusic />
-      
+
+      <div className={styles.topBar}>
+        <SocialLinks />
+        <WalletCorner />
+      </div>
+
       {currentScreen === 'home' ? (
         <HomeScreen
           onLaunch={handleLaunch}
@@ -112,7 +121,6 @@ export default function Home() {
           </div>
         </>
       )}
-      <SocialLinks />
     </main>
   );
 }

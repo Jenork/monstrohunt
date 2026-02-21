@@ -14,7 +14,6 @@ export function SocialLinks() {
         aria-label="Telegram"
       >
         <span className={styles.icon} aria-hidden>TG</span>
-        <span>Telegram</span>
       </a>
       <a
         href={TWITTER_URL}
@@ -24,7 +23,6 @@ export function SocialLinks() {
         aria-label="Twitter / X"
       >
         <span className={styles.icon} aria-hidden>𝕏</span>
-        <span>Twitter</span>
       </a>
     </div>
   );

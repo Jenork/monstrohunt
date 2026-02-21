@@ -27,7 +27,7 @@
   justify-content: center;
   width: 100%;
   aspect-ratio: 1;
-  max-height: 72px;
+  max-height: 86px;
   border-radius: 6px;
   overflow: hidden;
   flex-shrink: 0;
@@ -180,7 +180,7 @@
     gap: 4px;
   }
   .avatar {
-    max-height: 56px;
+    max-height: 67px;
   }
   .name {
     font-size: 10px;

@@ -1,6 +1,6 @@
 .container {
   padding: 12px 16px;
-  max-width: 420px;
+  max-width: 320px;
   margin: 0 auto;
   box-sizing: border-box;
 }
@@ -70,14 +70,14 @@
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  min-width: 202px;
+  min-width: 242px;
 }
 
 .avatarImg {
   width: auto;
   height: auto;
   max-width: 100%;
-  max-height: 173px;
+  max-height: 208px;
   object-fit: contain;
 }
 
@@ -278,10 +278,10 @@
     font-size: 22px;
   }
   .avatarDisplay {
-    min-width: 173px;
+    min-width: 208px;
   }
   .avatarImg {
-    max-height: 144px;
+    max-height: 173px;
   }
   .tierOption {
     padding: 14px;

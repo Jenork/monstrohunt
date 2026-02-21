@@ -17,9 +17,16 @@ export function FAQScreen() {
         </div>
 
         <div className={styles.faqItem}>
+          <h3 className={styles.question}>How many monsters can I have?</h3>
+          <p className={styles.answer}>
+            One monster per wallet. The contract enforces this: you can only create a new monster if you don&apos;t already own one.
+          </p>
+        </div>
+
+        <div className={styles.faqItem}>
           <h3 className={styles.question}>What happens if I forget to feed my monster?</h3>
           <p className={styles.answer}>
-            You must feed your monster regularly to keep it alive. If you don&apos;t feed in time, 
+            You must feed your monster before the hunger deadline (see Manage tab). If you don&apos;t feed in time, 
             it becomes starved and other players can hunt it. If hunted, you lose your monster.
           </p>
         </div>
@@ -27,23 +34,22 @@ export function FAQScreen() {
         <div className={styles.faqItem}>
           <h3 className={styles.question}>How much does feeding cost?</h3>
           <p className={styles.answer}>
-            The feed cost is shown in your Profile. Feed on time to keep your monster alive and earning.
-            The cost grows as your monster gains weight from rewards.
+            The feed cost is shown in your Profile. It is 5% of initial weight plus 5% of current weight. 
+            Feed on time to keep your monster alive. The cost grows as your monster gains weight from rewards.
           </p>
         </div>
 
         <div className={styles.faqItem}>
           <h3 className={styles.question}>How do I earn rewards?</h3>
           <p className={styles.answer}>
-            When someone&apos;s monster is hunted, rewards are distributed proportionally among 
-            all alive monsters by weight. The heavier your monster, the larger your share.
+            When a monster is hunted: the hunter gets 30% of its weight, 65% is distributed to all alive monsters by weight, and 5% goes to the protocol. The heavier your monster, the larger your share of the 65%.
           </p>
         </div>
 
         <div className={styles.faqItem}>
           <h3 className={styles.question}>How do I hunt other monsters?</h3>
           <p className={styles.answer}>
-            Go to the Hunt tab to see starved monsters. Click &quot;Hunt&quot; to claim a reward.
+            Go to the Hunt tab to see starved monsters. Click &quot;Hunt&quot; to claim a reward. After each hunt attempt you have a 20-minute cooldown before you can hunt again.
           </p>
         </div>
 
@@ -60,7 +66,7 @@ export function FAQScreen() {
           <h3 className={styles.question}>Can I sell my monster?</h3>
           <p className={styles.answer}>
             Yes. In the Manage tab you can sell any monster that is not starved. 
-            You receive your monster&apos;s weight in ETH (minus a small protocol fee).
+            You receive your monster&apos;s weight in ETH minus a 1% protocol fee.
           </p>
         </div>
 

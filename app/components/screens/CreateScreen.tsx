@@ -107,7 +107,6 @@ export function CreateScreen({ onCreated }: CreateScreenProps) {
         </div>
 
         <div className={styles.section}>
-          <label className={styles.label}>Select Tier</label>
           <div className={styles.tierGroup}>
             {([0, 1, 2] as Tier[]).map((tier) => {
               const tierPrice = TIER_PRICES[tier];

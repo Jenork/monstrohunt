@@ -38,8 +38,8 @@
 }
 
 .cardAvatar {
-  width: 64px;
-  height: 64px;
+  width: 77px;
+  height: 77px;
   border-radius: 8px;
   overflow: hidden;
   flex-shrink: 0;
@@ -416,8 +416,8 @@
     margin-bottom: 8px;
   }
   .cardAvatar {
-    width: 56px;
-    height: 56px;
+    width: 67px;
+    height: 67px;
   }
   .cardName {
     font-size: 15px;

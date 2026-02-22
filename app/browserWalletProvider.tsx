@@ -11,6 +11,7 @@ import { injected } from 'wagmi/connectors';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import sdk from '@farcaster/miniapp-sdk';
 import { PlayerAddressProvider } from './contexts/PlayerAddressContext';
+import { BaseAppUserProvider } from './contexts/BaseAppUserContext';
 
 const config = createConfig({
   chains: [base],
@@ -48,7 +49,11 @@ function WalletAddressInjector({ children }: { children: React.ReactNode }) {
     }),
     [address, isConnected]
   );
-  return <PlayerAddressProvider value={value}>{children}</PlayerAddressProvider>;
+  return (
+    <BaseAppUserProvider>
+      <PlayerAddressProvider value={value}>{children}</PlayerAddressProvider>
+    </BaseAppUserProvider>
+  );
 }
 
 export function BaseAppProvider({ children }: { children: React.ReactNode }) {

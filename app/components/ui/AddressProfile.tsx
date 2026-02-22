@@ -13,7 +13,7 @@ const DEFAULT_AVATAR_SVG = `data:image/svg+xml,${encodeURIComponent(
 
 interface AddressProfileProps {
   address: string;
-  size?: 'default' | 'compact';
+  size?: 'default' | 'compact' | 'small';
   /** If true, show only name (no avatar). Used in Hunt cards. */
   nameOnly?: boolean;
   className?: string;
@@ -32,9 +32,11 @@ export function AddressProfile({ address, size = 'default', nameOnly = false, cl
   const initials = address.slice(2, 4).toUpperCase();
   const displayName = name || short;
   const isCurrentUser = playerAddress && address.toLowerCase() === playerAddress.toLowerCase();
+  // For current user, prefer Base App profile avatar so it isn't replaced by OnchainKit default
   const imgSrc =
-    avatarUrl ??
-    (isCurrentUser && baseAppPfpUrl ? baseAppPfpUrl : name ? DEFAULT_AVATAR_SVG : null);
+    isCurrentUser && baseAppPfpUrl
+      ? baseAppPfpUrl
+      : avatarUrl ?? (name ? DEFAULT_AVATAR_SVG : null);
 
   if (nameOnly) {
     return (

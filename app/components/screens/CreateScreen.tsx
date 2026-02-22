@@ -16,7 +16,7 @@ interface CreateScreenProps {
 export function CreateScreen({ onCreated }: CreateScreenProps) {
   const [name, setName] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState<AvatarId>(0);
-  const [selectedTier, setSelectedTier] = useState<Tier>(0);
+  const [selectedTier, setSelectedTier] = useState<Tier>(1); // Hunter by default
   
   const { createMonster, isPending, isSuccess } = useCreateMonster();
   const { addToast } = useToast();

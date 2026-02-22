@@ -10,9 +10,17 @@ import sdk from '@farcaster/miniapp-sdk';
 export interface BaseAppUserValue {
   /** Profile image URL from Base App; undefined if not in Mini App or not yet loaded. */
   pfpUrl: string | undefined;
+  /** Display name from Base App (Farcaster) profile. */
+  displayName: string | undefined;
+  /** Username from Base App (Farcaster) profile. */
+  username: string | undefined;
 }
 
-const BaseAppUserContext = createContext<BaseAppUserValue>({ pfpUrl: undefined });
+const BaseAppUserContext = createContext<BaseAppUserValue>({
+  pfpUrl: undefined,
+  displayName: undefined,
+  username: undefined,
+});
 
 export function useBaseAppUser(): BaseAppUserValue {
   return useContext(BaseAppUserContext);
@@ -20,14 +28,25 @@ export function useBaseAppUser(): BaseAppUserValue {
 
 export function BaseAppUserProvider({ children }: { children: ReactNode }) {
   const [pfpUrl, setPfpUrl] = useState<string | undefined>(undefined);
+  const [displayName, setDisplayName] = useState<string | undefined>(undefined);
+  const [username, setUsername] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     sdk.context
-      .then((ctx) => setPfpUrl(ctx.user?.pfpUrl ?? undefined))
-      .catch(() => setPfpUrl(undefined));
+      .then((ctx) => {
+        const u = ctx.user;
+        setPfpUrl(u?.pfpUrl ?? undefined);
+        setDisplayName(u?.displayName ?? undefined);
+        setUsername(u?.username ?? undefined);
+      })
+      .catch(() => {
+        setPfpUrl(undefined);
+        setDisplayName(undefined);
+        setUsername(undefined);
+      });
   }, []);
 
-  const value: BaseAppUserValue = { pfpUrl };
+  const value: BaseAppUserValue = { pfpUrl, displayName, username };
   return (
     <BaseAppUserContext.Provider value={value}>
       {children}

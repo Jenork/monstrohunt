@@ -34,7 +34,8 @@ export function FAQScreen() {
         <div className={styles.faqItem}>
           <h3 className={styles.question}>How much does feeding cost?</h3>
           <p className={styles.answer}>
-            The feed cost is shown in your Profile. It is 5% of initial weight plus 5% of current weight. 
+            The feed cost is shown in your Profile (Manage tab). Formula: <strong>5% of initial weight + 5% of current weight</strong>. 
+            The full amount you pay goes into your monster&apos;s weight (no protocol fee on feeding). 
             Feed on time to keep your monster alive. The cost grows as your monster gains weight from rewards.
           </p>
         </div>
@@ -42,14 +43,14 @@ export function FAQScreen() {
         <div className={styles.faqItem}>
           <h3 className={styles.question}>How do I earn rewards?</h3>
           <p className={styles.answer}>
-            When a monster is hunted: the hunter gets 30% of its weight, 65% is distributed to all alive monsters by weight, and 5% goes to the protocol. The heavier your monster, the larger your share of the 65%.
+            When a monster is hunted, its weight is split: <strong>30% to the hunter</strong>, <strong>65% distributed to all alive monsters</strong> (by weight share), <strong>5% to the protocol</strong>. The heavier your monster, the larger your share of the 65%.
           </p>
         </div>
 
         <div className={styles.faqItem}>
           <h3 className={styles.question}>How do I hunt other monsters?</h3>
           <p className={styles.answer}>
-            Go to the Hunt tab to see starved monsters. Click &quot;Hunt&quot; to claim a reward. After each hunt attempt you have a 20-minute cooldown before you can hunt again.
+            Go to the Hunt tab to see starved monsters. Click &quot;Hunt&quot; to claim a reward. You receive <strong>30% of the target&apos;s weight</strong>. After each hunt attempt you have a 20-minute cooldown before you can hunt again.
           </p>
         </div>
 
@@ -66,7 +67,7 @@ export function FAQScreen() {
           <h3 className={styles.question}>Can I sell my monster?</h3>
           <p className={styles.answer}>
             Yes. In the Manage tab you can sell any monster that is not starved. 
-            You receive your monster&apos;s weight in ETH minus a 1% protocol fee.
+            You receive <strong>99% of your monster&apos;s weight</strong> in ETH; <strong>1% goes to the protocol</strong>.
           </p>
         </div>
 

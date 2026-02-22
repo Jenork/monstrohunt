@@ -5,6 +5,7 @@ import { base } from 'viem/chains';
 import { formatAddress } from '../../utils/format';
 import { usePlayerAddress } from '../../hooks/usePlayerAddress';
 import { useBaseAppUser } from '../../contexts/BaseAppUserContext';
+import { useFarcasterProfile } from '../../hooks/useFarcasterProfile';
 import styles from './AddressProfile.module.css';
 
 const DEFAULT_AVATAR_SVG = `data:image/svg+xml,${encodeURIComponent(
@@ -19,10 +20,11 @@ interface AddressProfileProps {
   className?: string;
 }
 
-/** Profile: avatar image (or initials) + name (Basename/ENS or short address). Or name only when nameOnly. */
+/** Profile: avatar + name. Name = Base App / Farcaster profile name, or Basename/ENS, or short address. */
 export function AddressProfile({ address, size = 'default', nameOnly = false, className }: AddressProfileProps) {
   const { address: playerAddress } = usePlayerAddress();
-  const { pfpUrl: baseAppPfpUrl } = useBaseAppUser();
+  const { pfpUrl: baseAppPfpUrl, displayName: baseAppDisplayName, username: baseAppUsername } = useBaseAppUser();
+  const farcaster = useFarcasterProfile(address);
   const { data: name, isLoading: nameLoading } = useName({ address: address as `0x${string}`, chain: base });
   const { data: avatarUrl } = useAvatar(
     { ensName: name ?? '', chain: base },
@@ -30,18 +32,31 @@ export function AddressProfile({ address, size = 'default', nameOnly = false, cl
   );
   const short = formatAddress(address);
   const initials = address.slice(2, 4).toUpperCase();
-  const displayName = name || short;
   const isCurrentUser = playerAddress && address.toLowerCase() === playerAddress.toLowerCase();
+  // Prefer Base App profile name (current user) or Farcaster profile (e.g. Hunt card owners), then on-chain name, then short address
+  const profileName =
+    (isCurrentUser && (baseAppDisplayName || baseAppUsername)) ||
+    farcaster.displayName ||
+    farcaster.username ||
+    name ||
+    short;
+  const displayName = profileName;
   // For current user, prefer Base App profile avatar so it isn't replaced by OnchainKit default
   const imgSrc =
     isCurrentUser && baseAppPfpUrl
       ? baseAppPfpUrl
       : avatarUrl ?? (name ? DEFAULT_AVATAR_SVG : null);
 
+  const isLoadingName =
+    nameLoading &&
+    !farcaster.displayName &&
+    !farcaster.username &&
+    !(isCurrentUser && (baseAppDisplayName || baseAppUsername));
+
   if (nameOnly) {
     return (
       <span className={`${styles.labelOnly} ${styles[size]} ${className ?? ''}`}>
-        {nameLoading ? '…' : displayName}
+        {isLoadingName ? '…' : displayName}
       </span>
     );
   }
@@ -67,7 +82,7 @@ export function AddressProfile({ address, size = 'default', nameOnly = false, cl
         </span>
       </div>
       <span className={styles.label}>
-        {nameLoading ? '…' : displayName}
+        {isLoadingName ? '…' : displayName}
       </span>
     </div>
   );

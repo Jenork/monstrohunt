@@ -15,28 +15,29 @@
 .infoBox {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px 24px;
-  padding: 16px 20px;
+  gap: 10px 24px;
+  padding: 10px 20px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  border-radius: 10px;
   margin-bottom: 24px;
+  line-height: 1.2;
 }
 
 .infoItem {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
 }
 
 .infoLabel {
-  font-size: 14px;
+  font-size: 12px;
   color: rgba(255, 255, 255, 0.7);
   font-weight: 500;
 }
 
 .infoValue {
-  font-size: 14px;
+  font-size: 12px;
   color: white;
   font-weight: 600;
 }
@@ -73,8 +74,12 @@
   .infoBox,
   .cooldownBox,
   .mockNotice {
-    padding: 12px 14px;
+    padding: 8px 14px;
     margin-bottom: 14px;
+  }
+  .infoLabel,
+  .infoValue {
+    font-size: 11px;
   }
   .cooldownTitle,
   .mockTitle {

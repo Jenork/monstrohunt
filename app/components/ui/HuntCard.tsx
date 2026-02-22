@@ -36,7 +36,7 @@ export function HuntCard({ monster, onHunt, canHunt }: HuntCardProps) {
         <div className={styles.info}>
           <div className={styles.name}>{monster.name}</div>
           <div className={styles.tier}>Tier: {TIER_NAMES[monster.tier]}</div>
-          <div className={styles.owner}><AddressProfile address={monster.owner} size="compact" /></div>
+          <div className={styles.owner}><AddressProfile address={monster.owner} size="compact" nameOnly /></div>
         </div>
         <StatusDisplay status={monster.status} />
         <div className={styles.weightSection}>

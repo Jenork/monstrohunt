@@ -123,7 +123,7 @@ export function HuntScreen() {
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>Hunt Starved Monsters</h2>
+      <h2 className={styles.title}>Hunt</h2>
       
       {mockMode && (
         <div className={styles.mockNotice}>

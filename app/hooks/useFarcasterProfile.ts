@@ -8,14 +8,19 @@ export interface FarcasterProfile {
 }
 
 async function fetchProfile(address: string): Promise<FarcasterProfile> {
-  const params = new URLSearchParams({ address: address.toLowerCase() });
-  const res = await fetch(`/api/profile?${params}`);
-  if (!res.ok) return { displayName: null, username: null };
-  const data = await res.json();
-  return {
-    displayName: data.displayName ?? null,
-    username: data.username ?? null,
-  };
+  const fallback: FarcasterProfile = { displayName: null, username: null };
+  try {
+    const params = new URLSearchParams({ address: address.toLowerCase() });
+    const res = await fetch(`/api/profile?${params}`);
+    if (!res.ok) return fallback;
+    const data = await res.json();
+    return {
+      displayName: data.displayName ?? null,
+      username: data.username ?? null,
+    };
+  } catch {
+    return fallback;
+  }
 }
 
 /**

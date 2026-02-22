@@ -5,6 +5,7 @@ import { base } from 'wagmi/chains';
 import { encodeFunctionData, type Address } from 'viem';
 import { eip5792Actions } from 'viem/experimental';
 import { CONTRACT_ADDRESS, monstroHuntABI } from '../utils/contract';
+import { getErrorMessage } from '../utils/error';
 import { useToast } from './useToast';
 import { usePlayerAddress } from './usePlayerAddress';
 
@@ -85,8 +86,7 @@ export function useBatchTransactions() {
       addToast(`Batch transaction sent (${calls.length} calls, 1 signature)`, 'success');
       return result;
     } catch (error: unknown) {
-      const msg = error instanceof Error ? error.message : 'Batch transaction failed';
-      addToast(msg, 'error');
+      addToast(getErrorMessage(error, 'Batch transaction failed'), 'error');
       throw error;
     }
   };
@@ -111,7 +111,7 @@ export function useBatchTransactions() {
         });
         results.push(hash);
       } catch (error) {
-        throw new Error(`Failed to send transaction: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        throw new Error(`Failed to send transaction: ${getErrorMessage(error, 'Unknown error')}`);
       }
     }
 

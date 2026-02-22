@@ -11,6 +11,7 @@ import {
 } from 'wagmi';
 import { base } from 'wagmi/chains';
 import { CONTRACT_ADDRESS, isContractAddressValid, monstroHuntABI } from '../utils/contract';
+import { getErrorMessage } from '../utils/error';
 import { TIER_PRICES } from '../constants/game';
 import type { Tier } from '../constants/game';
 import { useToast } from './useToast';
@@ -53,8 +54,7 @@ export function useCreateMonster() {
       }
       addToast('Connecting wallet...', 'info');
       connectAsync({ connector }).catch((e) => {
-        const msg = e instanceof Error ? e.message : 'Wallet connection failed';
-        addToast(msg, 'error');
+        addToast(getErrorMessage(e, 'Wallet connection failed'), 'error');
       });
       return;
     }
@@ -96,8 +96,7 @@ export function useCreateMonster() {
           value: tierPrice,
         });
       } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : 'Transaction was cancelled or failed';
-        addToast(msg, 'error');
+        addToast(getErrorMessage(e, 'Transaction was cancelled or failed'), 'error');
       }
     })();
   };

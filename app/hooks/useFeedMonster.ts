@@ -10,6 +10,7 @@ import {
 } from 'wagmi';
 import { base } from 'wagmi/chains';
 import { CONTRACT_ADDRESS, isContractAddressValid, monstroHuntABI } from '../utils/contract';
+import { getErrorMessage } from '../utils/error';
 import { useToast } from './useToast';
 import { usePlayerAddress } from './usePlayerAddress';
 import { useBatchTransactions } from './useBatchTransactions';
@@ -46,8 +47,7 @@ export function useFeedMonster() {
         addToast('Connecting wallet...', 'info');
         await connectAsync({ connector });
       } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : 'Wallet connection failed';
-        addToast(msg, 'error');
+        addToast(getErrorMessage(e, 'Wallet connection failed'), 'error');
         return;
       }
     }
@@ -75,8 +75,7 @@ export function useFeedMonster() {
         value: feedCost,
       });
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'Switch to Base or try again';
-      addToast(msg, 'error');
+      addToast(getErrorMessage(e, 'Switch to Base or try again'), 'error');
     }
   };
 
@@ -99,8 +98,7 @@ export function useFeedMonster() {
         addToast('Connecting wallet...', 'info');
         await connectAsync({ connector });
       } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : 'Wallet connection failed';
-        addToast(msg, 'error');
+        addToast(getErrorMessage(e, 'Wallet connection failed'), 'error');
         return;
       }
     }
@@ -133,8 +131,7 @@ export function useFeedMonster() {
 
       await sendBatch(calls, { atomic: false }); // Not atomic - each feed can succeed independently
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'Batch feed failed';
-      addToast(msg, 'error');
+      addToast(getErrorMessage(e, 'Batch feed failed'), 'error');
     }
   };
 

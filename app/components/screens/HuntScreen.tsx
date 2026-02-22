@@ -21,7 +21,7 @@ export function HuntScreen() {
   const { address } = usePlayerAddress();
   const mockMode = isMockMode();
 
-  const { data: totalMonsters, isLoading: isLoadingTotal } = useReadContract({
+  const { data: totalMonsters, isLoading: isLoadingTotal, isError: isErrorTotal } = useReadContract({
     address: CONTRACT_ADDRESS,
     abi: monstroHuntABI,
     functionName: 'getTotalMonsters',
@@ -44,7 +44,7 @@ export function HuntScreen() {
     [totalNum]
   );
 
-  const { data: existingResults, isLoading: isLoadingExisting } = useReadContracts({
+  const { data: existingResults, isLoading: isLoadingExisting, isError: isErrorExisting } = useReadContracts({
     contracts: existingMonsterContracts,
     query: {
       enabled: !mockMode && isContractAddressValid && existingMonsterContracts.length > 0,
@@ -59,7 +59,7 @@ export function HuntScreen() {
     ).length;
   }, [existingResults]);
 
-  const { data: hunterMonsterId } = useReadContract({
+  const { data: hunterMonsterId, isError: isErrorHunter } = useReadContract({
     address: CONTRACT_ADDRESS,
     abi: monstroHuntABI,
     functionName: 'getOwnerMonsterId',
@@ -121,10 +121,18 @@ export function HuntScreen() {
     return generateMockMonsters(8).filter(m => m.status.status === 'starved').length;
   }, [mockMode, allMonsterIds.length]);
 
+  const contractError = !mockMode && (isErrorTotal || isErrorExisting || isErrorHunter);
+
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>Hunt</h2>
-      
+
+      {contractError && (
+        <div className={styles.message}>
+          Failed to load. Check network (Base) and try again.
+        </div>
+      )}
+
       {mockMode && (
         <div className={styles.mockNotice}>
           <div className={styles.mockIcon}>🎮</div>
@@ -162,11 +170,11 @@ export function HuntScreen() {
         </div>
       </div>
 
-      {allMonsterIds.length === 0 ? (
+      {!contractError && allMonsterIds.length === 0 ? (
         <div className={styles.message}>
           {mockMode || isLoadingTotal || isLoadingExisting ? 'Loading monsters...' : 'No monsters yet.'}
         </div>
-      ) : (
+      ) : !contractError ? (
         <div className={styles.grid}>
           {allMonsterIds.map((id) => (
             <StarvedMonsterCard
@@ -183,7 +191,7 @@ export function HuntScreen() {
             />
           ))}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

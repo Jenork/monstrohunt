@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "compile": "hardhat compile",
     "deploy:sepolia": "hardhat run scripts/deploy.js --network baseSepolia",
     "deploy:mainnet": "hardhat run scripts/deploy.js --network baseMainnet"
@@ -38,6 +40,8 @@
     "eslint-config-next": "15.3.8",
     "ethers": "^6.0.0",
     "hardhat": "^2.22.0",
-    "typescript": "^5.0.0"
+    "jsdom": "^25.0.1",
+    "typescript": "^5.0.0",
+    "vitest": "^2.1.9"
   }
 }

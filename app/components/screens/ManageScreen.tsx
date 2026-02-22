@@ -15,6 +15,7 @@ import { StatusDisplay } from '../ui/StatusDisplay';
 import { AVATARS } from '../../constants/avatars';
 import { TIER_NAMES } from '../../constants/game';
 import { formatETH } from '../../utils/format';
+import { getErrorMessage } from '../../utils/error';
 import { getSellAmount } from '../../utils/monster';
 import { formatAddress } from '../../utils/format';
 import { isMockMode } from '../../utils/mockData';
@@ -136,8 +137,8 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
     try {
       await feedMonster(monsterId, monster.feedCost);
       refetch();
-    } catch (error: any) {
-      addToast(error.message || 'Failed to feed monster', 'error');
+    } catch (error: unknown) {
+      addToast(getErrorMessage(error, 'Failed to feed monster'), 'error');
     }
   };
 
@@ -149,8 +150,8 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
     try {
       await sellMonster(monsterId);
       refetch();
-    } catch (error: any) {
-      addToast(error.message || 'Failed to sell monster', 'error');
+    } catch (error: unknown) {
+      addToast(getErrorMessage(error, 'Failed to sell monster'), 'error');
     }
   };
 

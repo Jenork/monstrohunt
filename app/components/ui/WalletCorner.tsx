@@ -5,6 +5,7 @@ import { base } from 'wagmi/chains';
 import { usePlayerAddress } from '../../hooks/usePlayerAddress';
 import { useToast } from '../../hooks/useToast';
 import { isContractAddressValid } from '../../utils/contract';
+import { getErrorMessage } from '../../utils/error';
 import { AddressProfile } from './AddressProfile';
 import styles from './WalletCorner.module.css';
 
@@ -50,11 +51,7 @@ export function WalletCorner({ showProfile = true }: WalletCornerProps) {
                 className={styles.switchButton}
                 onClick={() =>
                   switchChainAsync({ chainId: base.id }).catch((e) => {
-                    const msg =
-                      e instanceof Error
-                        ? e.message
-                        : 'Network switch was cancelled or failed';
-                    addToast(msg, 'error');
+                    addToast(getErrorMessage(e, 'Network switch was cancelled or failed'), 'error');
                   })
                 }
                 disabled={isSwitching}

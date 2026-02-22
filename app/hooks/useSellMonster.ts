@@ -10,6 +10,7 @@ import {
 } from 'wagmi';
 import { base } from 'wagmi/chains';
 import { CONTRACT_ADDRESS, isContractAddressValid, monstroHuntABI } from '../utils/contract';
+import { getErrorMessage } from '../utils/error';
 import { useToast } from './useToast';
 import { usePlayerAddress } from './usePlayerAddress';
 
@@ -41,8 +42,7 @@ export function useSellMonster() {
         addToast('Connecting wallet...', 'info');
         await connectAsync({ connector });
       } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : 'Wallet connection failed';
-        addToast(msg, 'error');
+        addToast(getErrorMessage(e, 'Wallet connection failed'), 'error');
         return;
       }
     }
@@ -65,8 +65,7 @@ export function useSellMonster() {
         args: [BigInt(monsterId)],
       });
     } catch (e: unknown) {
-      addToast(e instanceof Error ? e.message : 'Switch to Base or try again', 'error');
-      throw e;
+      addToast(getErrorMessage(e, 'Switch to Base or try again'), 'error');
     }
   };
 

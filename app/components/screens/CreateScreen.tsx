@@ -25,8 +25,12 @@ export function CreateScreen({ onCreated }: CreateScreenProps) {
   const { addToast } = useToast();
 
   useEffect(() => {
-    if (!isSuccess) return;
-    addHistoryEntry(address, { type: 'created', monsterName: name });
+    if (!isSuccess || !address) return;
+    try {
+      addHistoryEntry(address, { type: 'created', monsterName: name });
+    } catch {
+      // history store is best-effort; don't block success UX
+    }
     addToast('Monster created successfully!', 'success');
     setName('');
     const t = setTimeout(() => {

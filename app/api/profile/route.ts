@@ -30,9 +30,12 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await res.json();
+    if (!data || typeof data !== 'object') {
+      return NextResponse.json({ displayName: null, username: null });
+    }
     // Neynar bulk-by-address: response may be { [address]: User[] } or { users: User[] }
     let users = data[address.toLowerCase()] ?? data[address] ?? data.users;
-    if (!Array.isArray(users) && data && typeof data === 'object')
+    if (!Array.isArray(users) && typeof data === 'object')
       users = Object.values(data).find((v): v is unknown[] => Array.isArray(v) && v.length > 0);
     const user = Array.isArray(users) ? users[0] : null;
     const displayName = user?.display_name ?? null;

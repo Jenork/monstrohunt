@@ -44,9 +44,10 @@ export function addHistoryEntry(
   try {
     localStorage.setItem(storageKey(address), JSON.stringify(next));
   } catch {
-    // ignore quota or parse errors
+    // ignore quota or other storage errors
   }
 }
+
 
 /** Check if we already added a victim entry for this monster (to avoid duplicates). */
 export function hasVictimEntryForMonster(address: string | undefined, monsterId: number): boolean {
@@ -67,5 +68,7 @@ export function addVictimEntry(
   const next = [newEntry, ...list].slice(0, MAX_ENTRIES);
   try {
     localStorage.setItem(storageKey(address), JSON.stringify(next));
-  } catch {}
+  } catch {
+    // ignore quota or other storage errors
+  }
 }

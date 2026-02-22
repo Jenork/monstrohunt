@@ -16,13 +16,13 @@ function formatTime(ts: number): string {
 function entryLabel(e: HistoryEntry): string {
   switch (e.type) {
     case 'created':
-      return `Создание монстра${e.monsterName ? `: ${e.monsterName}` : ''}`;
+      return `Monster created${e.monsterName ? `: ${e.monsterName}` : ''}`;
     case 'fed':
-      return 'Кормление монстра';
+      return 'Monster fed';
     case 'hunted':
-      return `Успешная охота${e.victimName ? `: ${e.victimName}` : ''}`;
+      return `Successful hunt${e.victimName ? `: ${e.victimName}` : ''}`;
     case 'victim':
-      return `Ты стал жертвой${e.killerName ? ` (${e.killerName})` : ''}`;
+      return `You were hunted${e.killerName ? ` (${e.killerName})` : ''}`;
     default:
       return '';
   }
@@ -53,7 +53,7 @@ export function HistoryButton() {
         type="button"
         className={styles.button}
         onClick={() => setOpen((v) => !v)}
-        aria-label="История действий"
+        aria-label="Action history"
         aria-expanded={open}
       >
         <svg className={styles.icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -63,10 +63,10 @@ export function HistoryButton() {
       </button>
       {open && (
         <div className={styles.popover}>
-          <div className={styles.popoverTitle}>История</div>
+          <div className={styles.popoverTitle}>History</div>
           <ul className={styles.list}>
             {entries.length === 0 ? (
-              <li className={styles.empty}>Пока нет записей</li>
+              <li className={styles.empty}>No entries yet</li>
             ) : (
               entries.map((e, i) => (
                 <li key={`${e.timestamp}-${i}`} className={styles.item}>

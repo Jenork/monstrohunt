@@ -30,10 +30,9 @@ export function WalletCorner({ showProfile = true }: WalletCornerProps) {
 
   return (
     <div className={styles.wrapper}>
-      {isConnected && address ? (
+      {isConnected && address && showProfile ? (
         <div className={styles.walletRow}>
-          {showProfile && <AddressProfile address={address} />}
-          <span className={styles.networkLabel}>{networkLabel}</span>
+          <AddressProfile address={address} />
         </div>
       ) : null}
       {isConnected && (

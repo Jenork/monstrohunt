@@ -12,8 +12,8 @@
     "deploy:mainnet": "hardhat run scripts/deploy.js --network baseMainnet"
   },
   "dependencies": {
-    "@coinbase/onchainkit": "^0.2.0",
-    "@farcaster/miniapp-sdk": "^0.1.8",
+    "@coinbase/onchainkit": "^1.1.2",
+    "@farcaster/miniapp-sdk": "^0.2.3",
     "@tanstack/react-query": "^5.81.5",
     "next": "15.3.8",
     "react": "^19.0.0",

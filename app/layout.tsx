@@ -3,6 +3,7 @@ import { WalletProviderGate } from './WalletProviderGate';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { ErrorSuppressor } from './components/ui/ErrorSuppressor';
 import { minikitConfig } from '../minikit.config';
+import '@coinbase/onchainkit/styles.css';
 import './globals.css';
 
 const m = minikitConfig.miniapp;

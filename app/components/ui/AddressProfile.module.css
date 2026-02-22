@@ -1,0 +1,26 @@
+.wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ockAvatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ockName {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.compact .ockAvatar {
+  width: 20px;
+  height: 20px;
+}
+
+.compact .ockName {
+  font-size: 11px;
+}

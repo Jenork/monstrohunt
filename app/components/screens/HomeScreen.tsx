@@ -12,6 +12,7 @@ export function HomeScreen({ onLaunch, warning }: HomeScreenProps) {
     <div className={styles.container}>
       <div className={styles.content}>
         <h1 className={styles.title}>MONSTROHUNT</h1>
+        <p className={styles.subtitle}>Create a monster, feed it in time, hunt others for ETH.</p>
 
         {warning && <div className={styles.warningBanner}>{warning}</div>}
 

@@ -4,8 +4,8 @@ import { useChainId, useSwitchChain } from 'wagmi';
 import { base } from 'wagmi/chains';
 import { usePlayerAddress } from '../../hooks/usePlayerAddress';
 import { useToast } from '../../hooks/useToast';
-import { formatAddress } from '../../utils/format';
 import { isContractAddressValid } from '../../utils/contract';
+import { AddressProfile } from './AddressProfile';
 import styles from './WalletCorner.module.css';
 
 export function WalletCorner() {
@@ -27,7 +27,7 @@ export function WalletCorner() {
     <div className={styles.wrapper}>
       {isConnected && address ? (
         <div className={styles.walletRow}>
-          <span className={styles.address}>{formatAddress(address)}</span>
+          <AddressProfile address={address} />
           <span className={styles.networkLabel}>{networkLabel}</span>
         </div>
       ) : null}

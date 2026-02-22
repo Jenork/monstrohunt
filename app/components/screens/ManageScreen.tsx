@@ -8,6 +8,7 @@ import { useMonsterInfo } from '../../hooks/useMonsterInfo';
 import { useFeedMonster } from '../../hooks/useFeedMonster';
 import { useSellMonster } from '../../hooks/useSellMonster';
 import { useToast } from '../../hooks/useToast';
+import { addHistoryEntry, addVictimEntry, hasVictimEntryForMonster } from '../../utils/historyStore';
 import { useChainId } from 'wagmi';
 import { base } from 'wagmi/chains';
 import { StatusDisplay } from '../ui/StatusDisplay';
@@ -15,7 +16,9 @@ import { AVATARS } from '../../constants/avatars';
 import { TIER_NAMES } from '../../constants/game';
 import { formatETH } from '../../utils/format';
 import { getSellAmount } from '../../utils/monster';
+import { formatAddress } from '../../utils/format';
 import { isMockMode } from '../../utils/mockData';
+import { useHunterOfDeadMonster } from '../../hooks/useHunterOfDeadMonster';
 import styles from './ManageScreen.module.css';
 
 export function ManageScreen() {
@@ -32,10 +35,11 @@ export function ManageScreen() {
 
   useEffect(() => {
     if (feedSuccess || sellSuccess) {
+      if (feedSuccess && address) addHistoryEntry(address, { type: 'fed' });
       refetch();
       addToast(feedSuccess ? 'Monster fed successfully!' : 'Monster sold successfully!', 'success');
     }
-  }, [feedSuccess, sellSuccess, refetch, addToast]);
+  }, [feedSuccess, sellSuccess, address, refetch, addToast]);
 
   if (!isConnected) {
     return (
@@ -89,12 +93,19 @@ export function ManageScreen() {
 
 function MonsterManager({ monsterId }: { monsterId: number }) {
   const { monster, refetch, isLoading: isLoadingMonster, isError: isMonsterError } = useMonsterInfo(monsterId, { fetchCanHunt: false });
+  const { address, isConnected } = usePlayerAddress();
+  const hunterAddress = useHunterOfDeadMonster(monsterId, !!monster && !monster.alive);
   const { feedMonster, isPending: isFeeding } = useFeedMonster();
   const { sellMonster, isPending: isSelling } = useSellMonster();
   const { addToast } = useToast();
-  const { isConnected } = usePlayerAddress();
   const chainId = useChainId();
   const isWrongNetwork = isConnected && chainId !== base.id;
+
+  useEffect(() => {
+    if (!address || !monster || monster.alive || !hunterAddress) return;
+    if (hasVictimEntryForMonster(address, monsterId)) return;
+    addVictimEntry(address, formatAddress(hunterAddress), monsterId);
+  }, [address, monster, hunterAddress, monsterId]);
 
   if (isLoadingMonster) {
     return <div className={styles.loading}>Loading...</div>;

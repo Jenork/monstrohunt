@@ -94,7 +94,7 @@
   padding: 2px 6px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 4px;
-  width: 100%;
+  width: 70%;
 }
 
 .weightLabel {
@@ -120,7 +120,7 @@
   background: rgba(255, 193, 7, 0.1);
   border-radius: 4px;
   border: 1px solid rgba(255, 193, 7, 0.3);
-  width: 100%;
+  width: 70%;
 }
 
 .rewardLabel {

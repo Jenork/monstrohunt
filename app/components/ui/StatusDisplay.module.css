@@ -6,6 +6,10 @@
   width: 100%;
 }
 
+.container.compact {
+  max-width: 70%;
+}
+
 .statusRow {
   display: flex;
   flex-direction: column;

@@ -6,6 +6,8 @@ import { AVATARS, AvatarId } from '../../constants/avatars';
 import { TIER_PRICES, TIER_NAMES, Tier } from '../../constants/game';
 import { useCreateMonster } from '../../hooks/useCreateMonster';
 import { useToast } from '../../hooks/useToast';
+import { usePlayerAddress } from '../../hooks/usePlayerAddress';
+import { addHistoryEntry } from '../../utils/historyStore';
 import { formatETH } from '../../utils/format';
 import styles from './CreateScreen.module.css';
 
@@ -18,19 +20,20 @@ export function CreateScreen({ onCreated }: CreateScreenProps) {
   const [selectedAvatar, setSelectedAvatar] = useState<AvatarId>(0);
   const [selectedTier, setSelectedTier] = useState<Tier>(1); // Hunter by default
   
+  const { address } = usePlayerAddress();
   const { createMonster, isPending, isSuccess } = useCreateMonster();
   const { addToast } = useToast();
 
   useEffect(() => {
     if (!isSuccess) return;
+    addHistoryEntry(address, { type: 'created', monsterName: name });
     addToast('Monster created successfully!', 'success');
     setName('');
-    // Wait for chain state + cache refetch before navigating to Manage
     const t = setTimeout(() => {
       onCreated?.();
     }, 2500);
     return () => clearTimeout(t);
-  }, [isSuccess, addToast, onCreated]);
+  }, [isSuccess, address, name, addToast, onCreated]);
 
   const handlePreviousAvatar = () => {
     const currentIndex = AVATARS.findIndex(a => a.id === selectedAvatar);

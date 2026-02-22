@@ -8,7 +8,12 @@ import { isContractAddressValid } from '../../utils/contract';
 import { AddressProfile } from './AddressProfile';
 import styles from './WalletCorner.module.css';
 
-export function WalletCorner() {
+interface WalletCornerProps {
+  /** When false, only network label and alerts are shown (profile is in center). */
+  showProfile?: boolean;
+}
+
+export function WalletCorner({ showProfile = true }: WalletCornerProps) {
   const { address, isConnected } = usePlayerAddress();
   const { addToast } = useToast();
   const chainId = useChainId();
@@ -27,7 +32,7 @@ export function WalletCorner() {
     <div className={styles.wrapper}>
       {isConnected && address ? (
         <div className={styles.walletRow}>
-          <AddressProfile address={address} />
+          {showProfile && <AddressProfile address={address} />}
           <span className={styles.networkLabel}>{networkLabel}</span>
         </div>
       ) : null}

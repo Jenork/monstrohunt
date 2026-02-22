@@ -7,6 +7,7 @@ import { CONTRACT_ADDRESS, isContractAddressValid, monstroHuntABI } from '../../
 import { useMonsterInfo } from '../../hooks/useMonsterInfo';
 import { useHuntMonster } from '../../hooks/useHuntMonster';
 import { useToast } from '../../hooks/useToast';
+import { addHistoryEntry } from '../../utils/historyStore';
 import { HuntCard } from '../ui/HuntCard';
 import { getHuntCooldownRemaining } from '../../utils/monster';
 import { generateMockMonsters, isMockMode } from '../../utils/mockData';
@@ -14,6 +15,7 @@ import styles from './HuntScreen.module.css';
 
 export function HuntScreen() {
   const [allMonsterIds, setAllMonsterIds] = useState<number[]>([]);
+  const [lastHuntedVictimName, setLastHuntedVictimName] = useState<string | null>(null);
   const { addToast } = useToast();
   const { huntMonster, isSuccess } = useHuntMonster();
   const { address } = usePlayerAddress();
@@ -87,10 +89,12 @@ export function HuntScreen() {
 
   useEffect(() => {
     if (isSuccess) {
+      if (address) addHistoryEntry(address, { type: 'hunted', victimName: lastHuntedVictimName ?? undefined });
+      setLastHuntedVictimName(null);
       addToast('Monster hunted successfully!', 'success');
       loadAllMonsters();
     }
-  }, [isSuccess, addToast, loadAllMonsters]);
+  }, [isSuccess, address, lastHuntedVictimName, addToast, loadAllMonsters]);
 
   useEffect(() => {
     if (mockMode) {
@@ -171,7 +175,10 @@ export function HuntScreen() {
               onHunt={
                 mockMode
                   ? () => addToast('Demo mode: Connect to deployed contract to hunt', 'info')
-                  : huntMonster
+                  : (monsterId, victimName) => {
+                      setLastHuntedVictimName(victimName);
+                      huntMonster(monsterId);
+                    }
               }
             />
           ))}
@@ -181,7 +188,13 @@ export function HuntScreen() {
   );
 }
 
-function StarvedMonsterCard({ monsterId, onHunt }: { monsterId: number; onHunt: (id: number) => void }) {
+function StarvedMonsterCard({
+  monsterId,
+  onHunt,
+}: {
+  monsterId: number;
+  onHunt: (id: number, victimName: string) => void;
+}) {
   const { monster } = useMonsterInfo(monsterId);
   const { address } = usePlayerAddress();
   const mockMode = isMockMode();
@@ -190,7 +203,6 @@ function StarvedMonsterCard({ monsterId, onHunt }: { monsterId: number; onHunt: 
     return null;
   }
 
-  // Не показываем своего монстра
   if (address && monster.owner.toLowerCase() === address.toLowerCase()) {
     return null;
   }
@@ -198,7 +210,6 @@ function StarvedMonsterCard({ monsterId, onHunt }: { monsterId: number; onHunt: 
     return null;
   }
 
-  // Показываем всех чужих монстров; охота доступна только если starved
   const canHunt = mockMode
     ? (monster.status.status === 'starved' && monster.id !== 1)
     : (monster.status.canHunt ?? false);
@@ -206,7 +217,7 @@ function StarvedMonsterCard({ monsterId, onHunt }: { monsterId: number; onHunt: 
   return (
     <HuntCard
       monster={monster}
-      onHunt={() => onHunt(monsterId)}
+      onHunt={() => onHunt(monsterId, monster.name)}
       canHunt={canHunt}
     />
   );

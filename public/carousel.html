@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1080, initial-scale=1" />
+  <title>MONSTROHUNT — карусель для X</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(160deg, #0d0a08 0%, #1a120d 50%, #0f0a08 100%);
+      min-height: 100vh;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .slide-wrap {
+      width: 1080px;
+      height: 1080px;
+      max-width: 100%;
+      max-height: min(90vh, 90vw);
+      aspect-ratio: 1;
+    }
+    .slide {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 56px 64px;
+      background: linear-gradient(145deg, rgba(139, 69, 19, 0.2) 0%, rgba(60, 30, 20, 0.4) 50%, rgba(30, 15, 10, 0.45) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .slide.hidden { display: none; }
+    .logo {
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: #e8c89a;
+      margin-bottom: 24px;
+    }
+    .slide-num {
+      font-size: 18px;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 28px;
+      font-weight: 600;
+    }
+    .body {
+      font-size: 32px;
+      line-height: 1.45;
+      color: rgba(255,255,255,0.95);
+      text-align: center;
+      max-width: 90%;
+    }
+    .hashtags {
+      margin-top: 32px;
+      font-size: 20px;
+      color: rgba(232, 200, 154, 0.9);
+      font-weight: 600;
+    }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-top: 24px;
+    }
+    .btn {
+      padding: 12px 20px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #e8c89a;
+      background: rgba(139, 69, 19, 0.4);
+      border: 1px solid rgba(232, 200, 154, 0.4);
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    .btn:hover { background: rgba(139, 69, 19, 0.6); }
+    .indicator { font-size: 14px; color: rgba(255,255,255,0.6); min-width: 70px; text-align: center; }
+    .hint { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 16px; text-align: center; max-width: 480px; }
+    @media (max-width: 1100px) {
+      .slide-wrap { width: 100%; }
+      .logo { font-size: clamp(24px, 5vw, 42px); }
+      .body { font-size: clamp(18px, 3vw, 32px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="slide-wrap">
+    <div class="slide" data-slide="0">
+      <div class="logo">MONSTROHUNT</div>
+      <div class="slide-num">1/6</div>
+      <p class="body">MONSTROHUNT — ончейн-игра на Base. Всё в ETH, без токенов и NFT.</p>
+    </div>
+    <div class="slide hidden" data-slide="1">
+      <div class="logo">MONSTROHUNT</div>
+      <div class="slide-num">2/6</div>
+      <p class="body">Один кошелёк = один монстр. Создаёшь за 0.001–0.01 ETH (Scout / Hunter / Leviathan).</p>
+    </div>
+    <div class="slide hidden" data-slide="2">
+      <div class="logo">MONSTROHUNT</div>
+      <div class="slide-num">3/6</div>
+      <p class="body">Раз в 7 дней нужно кормить. Стоимость корма: 5% начального + 5% текущего веса. Всё идёт в вес монстра.</p>
+    </div>
+    <div class="slide hidden" data-slide="3">
+      <div class="logo">MONSTROHUNT</div>
+      <div class="slide-num">4/6</div>
+      <p class="body">Забыл покормить — монстр «голодный». Любой может прийти и снять его: 30% веса охотнику, 65% — живым монстрам по весу, 5% — протоколу.</p>
+    </div>
+    <div class="slide hidden" data-slide="4">
+      <div class="logo">MONSTROHUNT</div>
+      <div class="slide-num">5/6</div>
+      <p class="body">Охота: кулдаун 20 мин после каждой попытки. Можно продать монстра (99% веса тебе, 1% протоколу), если он не голодный.</p>
+    </div>
+    <div class="slide hidden" data-slide="5">
+      <div class="logo">MONSTROHUNT</div>
+      <div class="slide-num">6/6</div>
+      <p class="body">Кормишь вовремя — не теряешь. Вся прибыль — из чужих ошибок. Играй в Base App 👇</p>
+      <div class="hashtags">#Base #MonstroHunt</div>
+    </div>
+  </div>
+  <div class="controls">
+    <button type="button" class="btn" id="prev">← Назад</button>
+    <span class="indicator" id="indicator">1 / 6</span>
+    <button type="button" class="btn" id="next">Вперёд →</button>
+  </div>
+  <p class="hint">Для карусели в X: открой страницу на ширине 1080px, переключай слайды и делай скриншот каждого (или экспортируй в PNG).</p>
+
+  <script>
+    var index = 0;
+    var slides = document.querySelectorAll('.slide');
+    var total = slides.length;
+    function show(i) {
+      index = (i + total) % total;
+      slides.forEach(function (s, j) {
+        s.classList.toggle('hidden', j !== index);
+      });
+      document.getElementById('indicator').textContent = (index + 1) + ' / ' + total;
+    }
+    document.getElementById('prev').onclick = function () { show(index - 1); };
+    document.getElementById('next').onclick = function () { show(index + 1); };
+    show(0);
+  </script>
+</body>
+</html>

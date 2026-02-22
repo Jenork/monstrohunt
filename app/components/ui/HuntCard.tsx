@@ -38,7 +38,7 @@ export function HuntCard({ monster, onHunt, canHunt }: HuntCardProps) {
           <div className={styles.tier}>Tier: {TIER_NAMES[monster.tier]}</div>
           <div className={styles.owner}><AddressProfile address={monster.owner} size="small" nameOnly /></div>
         </div>
-        <StatusDisplay status={monster.status} />
+        <StatusDisplay status={monster.status} hideHint compact />
         <div className={styles.weightSection}>
           <div className={styles.weightLabel}>Weight</div>
           <div className={styles.weight}>{formatETH(monster.weight)} ETH</div>

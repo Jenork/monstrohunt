@@ -7,6 +7,8 @@ import { usePlayerAddress } from './hooks/usePlayerAddress';
 import { PanelTabs } from './components/ui/PanelTabs';
 import { SocialLinks } from './components/ui/SocialLinks';
 import { WalletCorner } from './components/ui/WalletCorner';
+import { HistoryButton } from './components/ui/HistoryButton';
+import { AddressProfile } from './components/ui/AddressProfile';
 import { ToastContainer } from './components/ui/ToastContainer';
 import { BackgroundMusic } from './components/ui/BackgroundMusic';
 import { HomeScreen } from './components/screens';
@@ -44,7 +46,7 @@ function getStoredScreen(): Screen {
 
 export default function Home() {
   const [currentScreen, setCurrentScreenState] = useState<Screen>(getStoredScreen);
-  const { isConnected } = usePlayerAddress();
+  const { isConnected, address } = usePlayerAddress();
   const chainId = useChainId();
   const { switchChainAsync } = useSwitchChain();
   const [autoSwitchAttempted, setAutoSwitchAttempted] = useState(false);
@@ -78,8 +80,12 @@ export default function Home() {
           Contract address is not configured. Set NEXT_PUBLIC_CONTRACT_ADDRESS and redeploy.
         </div>
         <div className={styles.topBar}>
-          <SocialLinks />
-          <WalletCorner />
+          <div className={styles.topBarLeft}><SocialLinks /></div>
+          <div className={styles.topBarCenter} />
+          <div className={styles.topBarRight}>
+            <HistoryButton />
+            <WalletCorner showProfile={false} />
+          </div>
         </div>
       </main>
     );
@@ -91,8 +97,14 @@ export default function Home() {
       <BackgroundMusic />
 
       <div className={styles.topBar}>
-        <SocialLinks />
-        <WalletCorner />
+        <div className={styles.topBarLeft}><SocialLinks /></div>
+        <div className={styles.topBarCenter}>
+          {isConnected && address ? <AddressProfile address={address} /> : null}
+        </div>
+        <div className={styles.topBarRight}>
+          <HistoryButton />
+          <WalletCorner showProfile={false} />
+        </div>
       </div>
 
       {currentScreen === 'home' ? (

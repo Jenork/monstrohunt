@@ -30,6 +30,12 @@
   line-height: 1;
 }
 
+.iconSvg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
 @media (max-width: 480px) {
   .link {
     width: 36px;
@@ -37,5 +43,9 @@
   }
   .icon {
     font-size: 16px;
+  }
+  .iconSvg {
+    width: 16px;
+    height: 16px;
   }
 }

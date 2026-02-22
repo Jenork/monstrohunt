@@ -8,13 +8,33 @@
 }
 
 .topBar {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 6px;
   flex-shrink: 0;
   padding: 4px 0;
+}
+
+.topBarLeft {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.topBarCenter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+.topBarRight {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 .content {

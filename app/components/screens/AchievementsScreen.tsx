@@ -57,8 +57,8 @@ export function AchievementsScreen() {
                 <Image
                   src={a.image}
                   alt={a.name}
-                  width={120}
-                  height={120}
+                  width={440}
+                  height={440}
                   className={styles.badgeImage}
                 />
               </div>

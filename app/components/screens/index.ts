@@ -3,3 +3,4 @@ export { CreateScreen } from './CreateScreen';
 export { ManageScreen } from './ManageScreen';
 export { HuntScreen } from './HuntScreen';
 export { FAQScreen } from './FAQScreen';
+export { AchievementsScreen } from './AchievementsScreen';

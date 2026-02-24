@@ -14,6 +14,7 @@ export function PanelTabs({ currentScreen, onScreenChange }: PanelTabsProps) {
     { screen: 'create', label: 'Create' },
     { screen: 'manage', label: 'Manage' },
     { screen: 'hunt', label: 'Hunt' },
+    { screen: 'achievements', label: 'Achievements' },
     { screen: 'faq', label: 'FAQ' },
   ];
 

@@ -31,6 +31,10 @@ const FAQScreen = dynamic(() => import('./components/screens').then(mod => ({ de
   ssr: false,
   loading: () => <div style={{ color: '#fff', textAlign: 'center', padding: '20px' }}>Loading...</div>
 });
+const AchievementsScreen = dynamic(() => import('./components/screens').then(mod => ({ default: mod.AchievementsScreen })), { 
+  ssr: false,
+  loading: () => <div style={{ color: '#fff', textAlign: 'center', padding: '20px' }}>Loading...</div>
+});
 import { Screen } from './types/screen';
 import { isContractAddressValid } from './utils/contract';
 import styles from './page.module.css';
@@ -40,7 +44,7 @@ const STORAGE_KEY = 'monstro-screen';
 function getStoredScreen(): Screen {
   if (typeof window === 'undefined') return 'home';
   const stored = sessionStorage.getItem(STORAGE_KEY);
-  if (stored === 'home' || stored === 'create' || stored === 'manage' || stored === 'hunt' || stored === 'faq') return stored;
+  if (stored === 'home' || stored === 'create' || stored === 'manage' || stored === 'hunt' || stored === 'achievements' || stored === 'faq') return stored;
   return 'home';
 }
 
@@ -127,6 +131,7 @@ export default function Home() {
                 )}
                 {currentScreen === 'manage' && <ManageScreen />}
                 {currentScreen === 'hunt' && <HuntScreen />}
+                {currentScreen === 'achievements' && <AchievementsScreen />}
                 {currentScreen === 'faq' && <FAQScreen />}
               </div>
             </div>

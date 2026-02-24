@@ -1,0 +1,178 @@
+.container {
+  padding: 24px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: white;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.75);
+  text-align: center;
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.25s ease;
+}
+
+.card.unlocked {
+  border-color: rgba(139, 69, 19, 0.4);
+  background: rgba(139, 69, 19, 0.08);
+}
+
+.card.claimed {
+  border-color: rgba(76, 175, 80, 0.45);
+  background: rgba(76, 175, 80, 0.06);
+}
+
+.card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.card.unlocked:hover {
+  border-color: rgba(139, 69, 19, 0.55);
+}
+
+.icon {
+  font-size: 40px;
+  line-height: 1;
+  margin-bottom: 12px;
+  filter: grayscale(0.4);
+}
+
+.card.unlocked .icon,
+.card.claimed .icon {
+  filter: none;
+}
+
+.card:not(.unlocked):not(.claimed) .icon {
+  opacity: 0.85;
+}
+
+.name {
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  margin: 0 0 6px 0;
+}
+
+.description {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0 0 10px 0;
+  line-height: 1.4;
+}
+
+.condition {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0 0 14px 0;
+  line-height: 1.4;
+}
+
+.claimBtn {
+  margin-top: auto;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.9) 0%, rgba(101, 50, 50, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.claimBtn:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(160, 82, 45, 0.95) 0%, rgba(120, 60, 60, 1) 100%);
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.35);
+}
+
+.claimBtn:disabled {
+  opacity: 0.85;
+  cursor: default;
+}
+
+.claimBtn.claimBtnClaimed {
+  background: rgba(76, 175, 80, 0.35);
+  border-color: rgba(76, 175, 80, 0.5);
+  cursor: default;
+}
+
+.claimBtn:disabled:not(.claimBtnClaimed) {
+  cursor: wait;
+}
+
+.lockedLabel {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: auto;
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 16px 12px;
+  }
+  .title {
+    font-size: 24px;
+    margin-bottom: 6px;
+  }
+  .subtitle {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .card {
+    padding: 18px;
+  }
+  .icon {
+    font-size: 36px;
+    margin-bottom: 10px;
+  }
+  .name {
+    font-size: 17px;
+  }
+  .description {
+    font-size: 13px;
+  }
+  .condition {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 380px) {
+  .container {
+    padding: 12px 10px;
+  }
+  .title {
+    font-size: 20px;
+  }
+}

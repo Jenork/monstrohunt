@@ -1,1 +1,1 @@
-export type Screen = 'home' | 'create' | 'manage' | 'hunt' | 'faq';
+export type Screen = 'home' | 'create' | 'manage' | 'hunt' | 'achievements' | 'faq';

@@ -58,20 +58,26 @@
   border-color: rgba(139, 69, 19, 0.55);
 }
 
-.icon {
-  font-size: 40px;
-  line-height: 1;
+.imageWrap {
+  width: 120px;
+  height: 120px;
   margin-bottom: 12px;
-  filter: grayscale(0.4);
+  flex-shrink: 0;
+  position: relative;
 }
 
-.card.unlocked .icon,
-.card.claimed .icon {
+.badgeImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: grayscale(0.6);
+  opacity: 0.9;
+}
+
+.card.unlocked .badgeImage,
+.card.claimed .badgeImage {
   filter: none;
-}
-
-.card:not(.unlocked):not(.claimed) .icon {
-  opacity: 0.85;
+  opacity: 1;
 }
 
 .name {
@@ -153,8 +159,9 @@
   .card {
     padding: 18px;
   }
-  .icon {
-    font-size: 36px;
+  .imageWrap {
+    width: 100px;
+    height: 100px;
     margin-bottom: 10px;
   }
   .name {

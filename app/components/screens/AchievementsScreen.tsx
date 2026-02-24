@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { ACHIEVEMENTS } from '../../constants/achievements';
 import styles from './AchievementsScreen.module.css';
 
@@ -36,7 +37,7 @@ export function AchievementsScreen() {
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>Achievements</h2>
+      <h2 className={styles.title}>Badges</h2>
       <p className={styles.subtitle}>
         Collect NFT badges (ERC‑1155) for your progress. Swamp is free when you enter the app.
       </p>
@@ -52,7 +53,15 @@ export function AchievementsScreen() {
               key={a.id}
               className={`${styles.card} ${unlocked ? styles.unlocked : ''} ${claimed ? styles.claimed : ''}`}
             >
-              <div className={styles.icon}>{a.icon}</div>
+              <div className={styles.imageWrap}>
+                <Image
+                  src={a.image}
+                  alt={a.name}
+                  width={120}
+                  height={120}
+                  className={styles.badgeImage}
+                />
+              </div>
               <h3 className={styles.name}>{a.name}</h3>
               <p className={styles.description}>{a.description}</p>
               <p className={styles.condition}>{a.condition}</p>

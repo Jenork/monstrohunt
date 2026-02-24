@@ -20,8 +20,8 @@ export interface AchievementMeta {
   condition: string;
   /** Swamp is free on app entry, no on-chain condition */
   free: boolean;
-  /** Emoji or short label for the badge */
-  icon: string;
+  /** Monster image path (from /monsters/) */
+  image: string;
 }
 
 export const ACHIEVEMENTS: AchievementMeta[] = [
@@ -31,7 +31,7 @@ export const ACHIEVEMENTS: AchievementMeta[] = [
     description: 'You entered the game.',
     condition: 'Free — claim when you open the app.',
     free: true,
-    icon: '🌿',
+    image: '/monsters/swamp.png',
   },
   {
     id: 'goblin',
@@ -39,7 +39,7 @@ export const ACHIEVEMENTS: AchievementMeta[] = [
     description: 'You created a monster.',
     condition: 'Create a monster in the Create tab.',
     free: false,
-    icon: '👺',
+    image: '/monsters/goblin.png',
   },
   {
     id: 'zombie',
@@ -47,7 +47,7 @@ export const ACHIEVEMENTS: AchievementMeta[] = [
     description: 'You fed your monster at least once.',
     condition: 'Feed your monster in the Manage tab.',
     free: false,
-    icon: '🧟',
+    image: '/monsters/zombie.png',
   },
   {
     id: 'ice',
@@ -55,7 +55,7 @@ export const ACHIEVEMENTS: AchievementMeta[] = [
     description: 'You completed your first successful hunt.',
     condition: 'Hunt a starved monster in the Hunt tab.',
     free: false,
-    icon: '❄️',
+    image: '/monsters/ice.png',
   },
   {
     id: 'demon',
@@ -63,7 +63,7 @@ export const ACHIEVEMENTS: AchievementMeta[] = [
     description: "Your monster was killed by another player's hunt.",
     condition: 'Your monster gets hunted while starved.',
     free: false,
-    icon: '👹',
+    image: '/monsters/demon.png',
   },
   {
     id: 'cthulhu',
@@ -71,6 +71,6 @@ export const ACHIEVEMENTS: AchievementMeta[] = [
     description: 'You collected all previous achievement NFTs.',
     condition: 'Own Swamp, Goblin, Zombie, Ice, and Demon.',
     free: false,
-    icon: '🐙',
+    image: '/monsters/ktulhu.png',
   },
 ];

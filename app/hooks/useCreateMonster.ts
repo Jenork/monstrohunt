@@ -8,8 +8,12 @@ import {
   useChainId,
   useSwitchChain,
   useConnect,
+  useWalletClient,
 } from 'wagmi';
 import { base } from 'wagmi/chains';
+import { encodeFunctionData } from 'viem';
+import { eip5792Actions } from 'viem/experimental';
+import type { Address } from 'viem';
 import { CONTRACT_ADDRESS, isContractAddressValid, monstroHuntABI } from '../utils/contract';
 import { getErrorMessage } from '../utils/error';
 import { TIER_PRICES } from '../constants/game';
@@ -19,10 +23,11 @@ import { usePlayerAddress } from './usePlayerAddress';
 
 export function useCreateMonster() {
   const { addToast } = useToast();
-  const { isConnected } = usePlayerAddress();
+  const { isConnected, address } = usePlayerAddress();
   const chainId = useChainId();
   const { switchChainAsync, isPending: isSwitchingChain } = useSwitchChain();
   const { connectAsync, connectors } = useConnect();
+  const { data: walletClient } = useWalletClient();
   const queryClient = useQueryClient();
   const { writeContractAsync, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
@@ -88,7 +93,32 @@ export function useCreateMonster() {
         if (chainId !== base.id) {
           await switchChainAsync({ chainId: base.id });
         }
-        // Explicit chainId and gasLimit for Base App / embedded wallet (avoids wallet gas estimation errors)
+
+        // Base App / smart wallets often need EIP-5792 wallet_sendCalls; try that first
+        if (walletClient && address) {
+          try {
+            const eip5792 = walletClient.extend(eip5792Actions());
+            const caps = await eip5792.getCapabilities({ account: address as Address });
+            if (caps?.wallet_sendCalls) {
+              const data = encodeFunctionData({
+                abi: monstroHuntABI,
+                functionName: 'createMonster',
+                args: [nameBytes32, avatarId, tier],
+              });
+              await eip5792.sendCalls({
+                account: address as Address,
+                calls: [{ to: CONTRACT_ADDRESS, data, value: tierPrice }],
+              });
+              queryClient.invalidateQueries({ queryKey: ['readContract'] });
+              addToast('Monster created successfully!', 'success');
+              return;
+            }
+          } catch {
+            // Fall through to writeContract (rejection or other error)
+          }
+        }
+
+        // Fallback: classic writeContract (works in browser and when sendCalls fails/rejected)
         await writeContractAsync({
           address: CONTRACT_ADDRESS as `0x${string}`,
           abi: monstroHuntABI,

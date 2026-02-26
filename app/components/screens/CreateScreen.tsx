@@ -2,6 +2,8 @@
 
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
+import { useChainId } from 'wagmi';
+import { base } from 'wagmi/chains';
 import { AVATARS, AvatarId } from '../../constants/avatars';
 import { TIER_PRICES, TIER_NAMES, Tier } from '../../constants/game';
 import { useCreateMonster } from '../../hooks/useCreateMonster';
@@ -20,9 +22,11 @@ export function CreateScreen({ onCreated }: CreateScreenProps) {
   const [selectedAvatar, setSelectedAvatar] = useState<AvatarId>(0);
   const [selectedTier, setSelectedTier] = useState<Tier>(1); // Hunter by default
   
-  const { address } = usePlayerAddress();
+  const { address, isConnected } = usePlayerAddress();
+  const chainId = useChainId();
   const { createMonster, isPending, isSuccess } = useCreateMonster();
   const { addToast } = useToast();
+  const isWrongNetwork = isConnected && chainId !== base.id;
 
   useEffect(() => {
     if (!isSuccess || !address) return;
@@ -68,7 +72,13 @@ export function CreateScreen({ onCreated }: CreateScreenProps) {
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>Create Your Monster</h2>
-      
+
+      {isWrongNetwork && (
+        <div className={styles.networkWarning}>
+          Switch to <strong>Base</strong> network in your wallet. Creation works only on Base.
+        </div>
+      )}
+
       <div className={styles.form}>
         <div className={styles.section}>
           <div className={styles.avatarSelector}>
@@ -153,14 +163,14 @@ export function CreateScreen({ onCreated }: CreateScreenProps) {
             <span className={styles.summaryValue}>{formatETH(selectedTierPrice)} ETH</span>
           </div>
           <div className={styles.summaryHint}>
-            No protocol fees on creation. You can only have one monster per wallet.
+            No protocol fees on creation. One monster per wallet. Need Base network and tier amount + gas in ETH.
           </div>
         </div>
 
         <button
           className={styles.createButton}
           onClick={handleCreate}
-          disabled={isPending || !name.trim()}
+          disabled={isPending || !name.trim() || isWrongNetwork}
         >
           {isPending ? 'Creating...' : `Create ${TIER_NAMES[selectedTier]} Monster`}
         </button>

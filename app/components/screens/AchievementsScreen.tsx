@@ -1,39 +1,59 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
+import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { ACHIEVEMENTS } from '../../constants/achievements';
+import { BADGES_CONTRACT_ADDRESS, isBadgesAddressValid } from '../../utils/contract';
+import { monstroHuntBadgesABI, BADGES_TOKEN_IDS } from '../../contracts/monstroHuntBadges';
 import styles from './AchievementsScreen.module.css';
 
-const SWAMP_CLAIMED_KEY = 'monstro-achievement-swamp-claimed';
-
 export function AchievementsScreen() {
-  const [swampClaimed, setSwampClaimed] = useState(false);
+  const { address } = useAccount();
   const [claiming, setClaiming] = useState(false);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      setSwampClaimed(localStorage.getItem(SWAMP_CLAIMED_KEY) === '1');
-    } catch {
-      // ignore
-    }
-  }, []);
+  const { data: swampBalance, refetch: refetchBalance } = useReadContract({
+    address: BADGES_CONTRACT_ADDRESS,
+    abi: monstroHuntBadgesABI,
+    functionName: 'balanceOf',
+    args: address ? [address, BigInt(BADGES_TOKEN_IDS.swamp)] : undefined,
+    query: { enabled: !!address && isBadgesAddressValid },
+  });
+  const { data: hasClaimed } = useReadContract({
+    address: BADGES_CONTRACT_ADDRESS,
+    abi: monstroHuntBadgesABI,
+    functionName: 'hasClaimedSwamp',
+    args: address ? [address] : undefined,
+    query: { enabled: !!address && isBadgesAddressValid },
+  });
+
+  const swampClaimed = (swampBalance !== undefined && swampBalance > 0n) || (hasClaimed === true);
+
+  const { writeContract: writeClaimSwamp, data: hash, isPending: isWritePending } = useWriteContract();
+  const { isLoading: isConfirming } = useWaitForTransactionReceipt({
+    hash,
+    onSuccess: () => refetchBalance(),
+  });
 
   const handleClaimSwamp = () => {
-    if (claiming || swampClaimed) return;
+    if (claiming || swampClaimed || !isBadgesAddressValid) return;
     setClaiming(true);
-    // TODO: call ERC-1155 mint when contract is deployed
-    setTimeout(() => {
-      try {
-        localStorage.setItem(SWAMP_CLAIMED_KEY, '1');
-      } catch {
-        // ignore
+    writeClaimSwamp(
+      {
+        address: BADGES_CONTRACT_ADDRESS,
+        abi: monstroHuntBadgesABI,
+        functionName: 'claimSwamp',
+      },
+      {
+        onSettled: () => {
+          setClaiming(false);
+          refetchBalance();
+        },
       }
-      setSwampClaimed(true);
-      setClaiming(false);
-    }, 600);
+    );
   };
+
+  const isClaiming = claiming || isWritePending || isConfirming;
 
   return (
     <div className={styles.container}>
@@ -70,9 +90,17 @@ export function AchievementsScreen() {
                   type="button"
                   className={`${styles.claimBtn} ${swampClaimed ? styles.claimBtnClaimed : ''}`}
                   onClick={handleClaimSwamp}
-                  disabled={claiming || swampClaimed}
+                  disabled={isClaiming || swampClaimed || !address || !isBadgesAddressValid}
                 >
-                  {claiming ? '…' : swampClaimed ? 'Claimed' : 'Claim free'}
+                  {!isBadgesAddressValid
+                    ? 'Badges soon'
+                    : isClaiming
+                      ? '…'
+                      : swampClaimed
+                        ? 'Claimed'
+                        : !address
+                          ? 'Connect wallet'
+                          : 'Claim free'}
                 </button>
               )}
               {!isSwamp && <span className={styles.lockedLabel}>Unlock in game</span>}

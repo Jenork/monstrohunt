@@ -88,12 +88,15 @@ export function useCreateMonster() {
         if (chainId !== base.id) {
           await switchChainAsync({ chainId: base.id });
         }
+        // Explicit chainId and gasLimit for Base App / embedded wallet (avoids wallet gas estimation errors)
         await writeContractAsync({
-          address: CONTRACT_ADDRESS,
+          address: CONTRACT_ADDRESS as `0x${string}`,
           abi: monstroHuntABI,
           functionName: 'createMonster',
           args: [nameBytes32, avatarId, tier],
           value: tierPrice,
+          chainId: base.id,
+          gas: 400000n,
         });
       } catch (e: unknown) {
         addToast(getErrorMessage(e, 'Transaction was cancelled or failed'), 'error');

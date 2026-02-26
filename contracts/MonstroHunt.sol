@@ -100,7 +100,7 @@ contract MonstroHunt {
     
     /**
      * @notice Constructor sets hunger duration and treasury for protocol fees
-     * @param hungerDuration Hunger window in seconds (testnet: 1 day, mainnet: 7 days)
+     * @param hungerDuration Hunger window in seconds (testnet: 1 day, mainnet: 3 days)
      * @param treasury Address that receives 5% on hunt death and 1% on sell
      */
     constructor(uint256 hungerDuration, address treasury) {
@@ -209,12 +209,13 @@ contract MonstroHunt {
         require(isStarved(targetMonsterId), "Target not starved");
         require(target.owner != msg.sender, "Cannot hunt your own");
         
-        // Check hunter has a monster
+        // Check hunter has a monster and it is alive
         uint256 hunterMonsterId = ownerToMonsterId[msg.sender];
         require(hunterMonsterId > 0, "Hunter must have a monster");
+        Monster storage hunter = monsters[hunterMonsterId - 1];
+        require(hunter.alive, "Hunter monster is dead");
         
         // Check cooldown (per monster, not per address)
-        Monster storage hunter = monsters[hunterMonsterId - 1];
         require(
             block.timestamp >= hunter.lastHuntAttemptAt + HUNT_COOLDOWN,
             "Hunt cooldown active"
@@ -222,6 +223,8 @@ contract MonstroHunt {
         
         // Update cooldown immediately (applies on any attempt)
         hunter.lastHuntAttemptAt = block.timestamp;
+        // Reset hunter's hunger: successful kill grants a full new hunger period (e.g. 3 days)
+        hunter.hungerDeadline = block.timestamp + HUNGER_DURATION;
         
         // Update rewards for hunter before state change
         _updateMonsterRewards(hunterMonsterId);
@@ -240,26 +243,34 @@ contract MonstroHunt {
         uint256 distributedToAlive = (weight * ALIVE_SHARE_BP) / 10000;
         uint256 protocolFee = (weight * PROTOCOL_SHARE_BP) / 10000;
         
-        // Remove monster from alive pool
+        // Remove monster from alive pool and free victim's slot so they can create again
         totalAliveWeight -= weight;
         target.alive = false;
         monsterExists[targetMonsterId] = false;
+        ownerToMonsterId[target.owner] = 0;
         
-        // Distribute rewards
+        // Distribute rewards: 30% hunter wallet, 65% to alive monsters' owners' wallets, 5% protocol
         payable(msg.sender).transfer(hunterReward);
         
-        // Send protocol fee directly to treasury (auto-withdraw)
-        if (protocolFee > 0) {
-            (bool ok,) = payable(protocolTreasury).call{value: protocolFee}("");
-            // If transfer fails, accumulate (fallback for edge cases)
-            if (!ok) {
-                protocolBalance += protocolFee;
+        // 65% to owners of all alive monsters (by weight); sent as ETH to their wallets (O(n) in monster count)
+        if (totalAliveWeight > 0 && distributedToAlive > 0) {
+            for (uint256 id = 1; id <= monsters.length; id++) {
+                if (!monsterExists[id]) continue;
+                Monster storage m = monsters[id - 1];
+                if (!m.alive || m.weight == 0) continue;
+                uint256 share = (distributedToAlive * m.weight) / totalAliveWeight;
+                if (share > 0) {
+                    payable(m.owner).transfer(share);
+                }
             }
         }
         
-        // Distribute to alive monsters proportionally (O(1) via global index)
-        if (totalAliveWeight > 0) {
-            globalRewardIndex += (distributedToAlive * 1e18) / totalAliveWeight;
+        // 5% to protocol treasury
+        if (protocolFee > 0) {
+            (bool ok,) = payable(protocolTreasury).call{value: protocolFee}("");
+            if (!ok) {
+                protocolBalance += protocolFee;
+            }
         }
         
         emit MonsterHunted(
@@ -395,6 +406,7 @@ contract MonstroHunt {
         if (hunterMonsterId == 0) return false;
         
         Monster memory hunterMonster = monsters[hunterMonsterId - 1];
+        if (!hunterMonster.alive) return false;
         if (block.timestamp < hunterMonster.lastHuntAttemptAt + HUNT_COOLDOWN) {
             return false;
         }

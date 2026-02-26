@@ -1,6 +1,6 @@
 // Base Mainnet - Economy LOCKED
-// NEXT_PUBLIC_HUNGER_DAYS=7 (mainnet). For testnet use 1.
-export const HUNGER_DAYS = Number(process.env.NEXT_PUBLIC_HUNGER_DAYS || 7);
+// NEXT_PUBLIC_HUNGER_DAYS=3 (mainnet). For testnet use 1.
+export const HUNGER_DAYS = Number(process.env.NEXT_PUBLIC_HUNGER_DAYS || 3);
 
 export type Tier = 0 | 1 | 2; // Scout, Hunter, Leviathan
 

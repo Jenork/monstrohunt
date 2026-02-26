@@ -2,9 +2,9 @@ const hre = require("hardhat");
 
 // Hunger duration in seconds
 // Testnet (Base Sepolia): 1 day = 86400 seconds
-// Mainnet: 7 days = 604800 seconds
+// Mainnet: 3 days = 259200 seconds
 const HUNGER_DURATION_TESTNET = 86400;   // 1 day
-const HUNGER_DURATION_MAINNET = 604800;  // 7 days
+const HUNGER_DURATION_MAINNET = 259200;  // 3 days
 
 async function main() {
   const [deployer] = await hre.ethers.getSigners();

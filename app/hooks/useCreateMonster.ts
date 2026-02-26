@@ -107,14 +107,18 @@ export function useCreateMonster() {
               });
               await eip5792.sendCalls({
                 account: address as Address,
+                chain: base,
                 calls: [{ to: CONTRACT_ADDRESS, data, value: tierPrice }],
+                experimental_fallback: true,
               });
               queryClient.invalidateQueries({ queryKey: ['readContract'] });
               addToast('Monster created successfully!', 'success');
               return;
             }
-          } catch {
-            // Fall through to writeContract (rejection or other error)
+          } catch (sendCallsErr: unknown) {
+            if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
+              console.warn('[useCreateMonster] sendCalls failed, falling back to writeContract', sendCallsErr);
+            }
           }
         }
 
@@ -129,7 +133,11 @@ export function useCreateMonster() {
           gas: 400000n,
         });
       } catch (e: unknown) {
-        addToast(getErrorMessage(e, 'Transaction was cancelled or failed'), 'error');
+        const msg = getErrorMessage(e, 'Transaction was cancelled or failed');
+        if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development' && e) {
+          console.warn('[useCreateMonster] writeContract error', e);
+        }
+        addToast(msg, 'error');
       }
     })();
   };

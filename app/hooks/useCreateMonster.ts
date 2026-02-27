@@ -9,6 +9,7 @@ import {
   useSwitchChain,
   useConnect,
   useWalletClient,
+  usePublicClient,
 } from 'wagmi';
 import { base } from 'wagmi/chains';
 import { encodeFunctionData } from 'viem';
@@ -28,6 +29,7 @@ export function useCreateMonster() {
   const { switchChainAsync, isPending: isSwitchingChain } = useSwitchChain();
   const { connectAsync, connectors } = useConnect();
   const { data: walletClient } = useWalletClient();
+  const publicClient = usePublicClient({ chainId: base.id });
   const queryClient = useQueryClient();
   const { writeContractAsync, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
@@ -89,22 +91,23 @@ export function useCreateMonster() {
       return;
     }
     (async () => {
+      const data = encodeFunctionData({
+        abi: monstroHuntABI,
+        functionName: 'createMonster',
+        args: [nameBytes32, avatarId, tier],
+      });
+
       try {
         if (chainId !== base.id) {
           await switchChainAsync({ chainId: base.id });
         }
 
-        // Base App / smart wallets often need EIP-5792 wallet_sendCalls; try that first
+        // 1) Base App / smart wallets: EIP-5792 wallet_sendCalls
         if (walletClient && address) {
           try {
             const eip5792 = walletClient.extend(eip5792Actions());
             const caps = await eip5792.getCapabilities({ account: address as Address });
             if (caps?.wallet_sendCalls) {
-              const data = encodeFunctionData({
-                abi: monstroHuntABI,
-                functionName: 'createMonster',
-                args: [nameBytes32, avatarId, tier],
-              });
               await eip5792.sendCalls({
                 account: address as Address,
                 chain: base,
@@ -117,12 +120,34 @@ export function useCreateMonster() {
             }
           } catch (sendCallsErr: unknown) {
             if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
-              console.warn('[useCreateMonster] sendCalls failed, falling back to writeContract', sendCallsErr);
+              console.warn('[useCreateMonster] sendCalls failed', sendCallsErr);
             }
           }
         }
 
-        // Fallback: classic writeContract (works in browser and when sendCalls fails/rejected)
+        // 2) Prepared tx: RPC builds the tx (gas, nonce), wallet only signs (avoids "transaction generation" in wallet)
+        if (publicClient && walletClient && address) {
+          try {
+            const request = await walletClient.prepareTransactionRequest({
+              account: address as Address,
+              to: CONTRACT_ADDRESS,
+              data,
+              value: tierPrice,
+              chain: base,
+            });
+            const txHash = await walletClient.sendTransaction(request);
+            await publicClient.waitForTransactionReceipt({ hash: txHash });
+            queryClient.invalidateQueries({ queryKey: ['readContract'] });
+            addToast('Monster created successfully!', 'success');
+            return;
+          } catch (preparedErr: unknown) {
+            if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
+              console.warn('[useCreateMonster] prepared sendTransaction failed', preparedErr);
+            }
+          }
+        }
+
+        // 3) Fallback: writeContract (browser / default)
         await writeContractAsync({
           address: CONTRACT_ADDRESS as `0x${string}`,
           abi: monstroHuntABI,
@@ -135,7 +160,7 @@ export function useCreateMonster() {
       } catch (e: unknown) {
         const msg = getErrorMessage(e, 'Transaction was cancelled or failed');
         if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development' && e) {
-          console.warn('[useCreateMonster] writeContract error', e);
+          console.warn('[useCreateMonster] error', e);
         }
         addToast(msg, 'error');
       }

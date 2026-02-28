@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { useChainId } from 'wagmi';
+import { useChainId, useBalance } from 'wagmi';
 import { base } from 'wagmi/chains';
 import { AVATARS, AvatarId } from '../../constants/avatars';
 import { TIER_PRICES, TIER_NAMES, Tier } from '../../constants/game';
@@ -24,6 +24,7 @@ export function CreateScreen({ onCreated }: CreateScreenProps) {
   
   const { address, isConnected } = usePlayerAddress();
   const chainId = useChainId();
+  const { data: balance } = useBalance({ address: address ?? undefined, chainId: base.id });
   const { createMonster, isPending, isSuccess } = useCreateMonster();
   const { addToast } = useToast();
   const isWrongNetwork = isConnected && chainId !== base.id;
@@ -68,6 +69,9 @@ export function CreateScreen({ onCreated }: CreateScreenProps) {
   };
 
   const selectedTierPrice = TIER_PRICES[selectedTier];
+  const estimatedGas = 0.0005n * BigInt(1e18); // ~0.0005 ETH for gas
+  const requiredTotal = selectedTierPrice + estimatedGas;
+  const hasInsufficientBalance = balance && balance.value < requiredTotal;
 
   return (
     <div className={styles.container}>
@@ -76,6 +80,12 @@ export function CreateScreen({ onCreated }: CreateScreenProps) {
       {isWrongNetwork && (
         <div className={styles.networkWarning}>
           Switch to <strong>Base</strong> network in your wallet. Creation works only on Base.
+        </div>
+      )}
+
+      {hasInsufficientBalance && isConnected && (
+        <div className={styles.networkWarning}>
+          Insufficient balance. You need ~{formatETH(requiredTotal)} ETH (tier + gas). Your balance: {balance ? formatETH(balance.value) : '—'} ETH.
         </div>
       )}
 
@@ -162,15 +172,21 @@ export function CreateScreen({ onCreated }: CreateScreenProps) {
             <span className={styles.summaryLabel}>Total Cost:</span>
             <span className={styles.summaryValue}>{formatETH(selectedTierPrice)} ETH</span>
           </div>
+          {isConnected && balance && (
+            <div className={styles.summaryItem}>
+              <span className={styles.summaryLabel}>Your balance:</span>
+              <span className={styles.summaryValue}>{formatETH(balance.value)} ETH</span>
+            </div>
+          )}
           <div className={styles.summaryHint}>
-            No protocol fees on creation. One monster per wallet. Need Base network and tier amount + gas in ETH.
+            No protocol fees on creation. One monster per wallet. Need tier amount + gas (~0.0005 ETH) in Base.
           </div>
         </div>
 
         <button
           className={styles.createButton}
           onClick={handleCreate}
-          disabled={isPending || !name.trim() || isWrongNetwork}
+          disabled={isPending || !name.trim() || isWrongNetwork || !!hasInsufficientBalance}
         >
           {isPending ? 'Creating...' : `Create ${TIER_NAMES[selectedTier]} Monster`}
         </button>

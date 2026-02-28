@@ -69,7 +69,7 @@ export function CreateScreen({ onCreated }: CreateScreenProps) {
   };
 
   const selectedTierPrice = TIER_PRICES[selectedTier];
-  const estimatedGas = 500000000000000n; // ~0.0005 ETH in wei
+  const estimatedGas = 50000000000000n; // ~0.00005 ETH (Base gas is cheap)
   const requiredTotal = selectedTierPrice + estimatedGas;
   const hasInsufficientBalance = balance && balance.value < requiredTotal;
 
@@ -179,7 +179,7 @@ export function CreateScreen({ onCreated }: CreateScreenProps) {
             </div>
           )}
           <div className={styles.summaryHint}>
-            No protocol fees on creation. One monster per wallet. Need tier amount + gas (~0.0005 ETH) in Base.
+            No protocol fees on creation. One monster per wallet. Need tier amount + gas (~0.00005 ETH) in Base.
           </div>
         </div>
 

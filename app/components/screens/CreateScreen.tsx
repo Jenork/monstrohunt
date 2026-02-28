@@ -69,7 +69,7 @@ export function CreateScreen({ onCreated }: CreateScreenProps) {
   };
 
   const selectedTierPrice = TIER_PRICES[selectedTier];
-  const estimatedGas = 0.0005n * BigInt(1e18); // ~0.0005 ETH for gas
+  const estimatedGas = 500000000000000n; // ~0.0005 ETH in wei
   const requiredTotal = selectedTierPrice + estimatedGas;
   const hasInsufficientBalance = balance && balance.value < requiredTotal;
 

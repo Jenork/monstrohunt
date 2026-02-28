@@ -73,6 +73,7 @@ export function useFeedMonster() {
         functionName: 'feedMonster',
         args: [BigInt(monsterId)],
         value: feedCost,
+        chainId: base.id,
       });
     } catch (e: unknown) {
       addToast(getErrorMessage(e, 'Switch to Base or try again'), 'error');

@@ -1,13 +1,13 @@
 'use client';
 
 /**
- * Base App only: uses MiniApp SDK provider via injected connector.
- * Browser WalletConnect is removed.
+ * Base App only: uses farcasterMiniApp connector for proper Base Account integration.
+ * Uses sdk.wallet.getEthereumProvider() — required for transaction generation in Base App.
  */
 import { useState, useMemo, useEffect } from 'react';
 import { WagmiProvider, useAccount, createConfig, http, useConnect } from 'wagmi';
 import { base } from 'wagmi/chains';
-import { injected } from 'wagmi/connectors';
+import { farcasterMiniApp } from '@farcaster/miniapp-wagmi-connector';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import sdk from '@farcaster/miniapp-sdk';
 import { PlayerAddressProvider } from './contexts/PlayerAddressContext';
@@ -15,7 +15,7 @@ import { BaseAppUserProvider } from './contexts/BaseAppUserContext';
 
 const config = createConfig({
   chains: [base],
-  connectors: [injected()],
+  connectors: [farcasterMiniApp()],
   transports: {
     [base.id]: http(),
   },

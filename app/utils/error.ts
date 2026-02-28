@@ -13,6 +13,11 @@ export function getErrorMessage(e: unknown, fallback: string): string {
     return 'Transaction was rejected';
   }
 
+  // Base App / wallet transaction generation failure (often when wrong connector or gas estimation)
+  if (/ошибка генерации транзакции|transaction generation|failed to generate|generation error/i.test(msg)) {
+    return 'Transaction generation failed. Try again or check wallet balance.';
+  }
+
   // Contract revert: viem often puts reason in "Contract call reverted with reason: ..." or "Error: ..."
   const revertMatch = msg.match(/reverted with reason[:\s]+["']?([^"'\n.]+)["']?/i)
     ?? msg.match(/reason[:\s]+["']?([^"'\n.]+)["']?/i)

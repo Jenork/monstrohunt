@@ -61,6 +61,7 @@ export function useHuntMonster() {
         abi: monstroHuntABI,
         functionName: 'huntMonster',
         args: [BigInt(monsterId)],
+        chainId: base.id,
       });
     } catch (e: unknown) {
       addToast(getErrorMessage(e, 'Switch to Base or try again'), 'error');

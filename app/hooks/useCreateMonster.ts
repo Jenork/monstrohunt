@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   useWriteContract,
@@ -31,6 +31,7 @@ export function useCreateMonster() {
   const { data: walletClient } = useWalletClient();
   const publicClient = usePublicClient({ chainId: base.id });
   const queryClient = useQueryClient();
+  const [isCreating, setIsCreating] = useState(false);
   const { writeContractAsync, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,
@@ -91,6 +92,7 @@ export function useCreateMonster() {
       return;
     }
     (async () => {
+      setIsCreating(true);
       const data = encodeFunctionData({
         abi: monstroHuntABI,
         functionName: 'createMonster',
@@ -125,7 +127,7 @@ export function useCreateMonster() {
           }
         }
 
-        // 2) Prepared tx: RPC builds the tx (gas, nonce), wallet only signs (avoids "transaction generation" in wallet)
+        // 2) Prepared tx: RPC builds the tx (gas, nonce), wallet only signs
         if (publicClient && walletClient && address) {
           try {
             const request = await walletClient.prepareTransactionRequest({
@@ -147,7 +149,7 @@ export function useCreateMonster() {
           }
         }
 
-        // 3) Fallback: writeContract (browser / default)
+        // 3) Fallback: writeContract
         await writeContractAsync({
           address: CONTRACT_ADDRESS as `0x${string}`,
           abi: monstroHuntABI,
@@ -163,13 +165,15 @@ export function useCreateMonster() {
           console.warn('[useCreateMonster] error', e);
         }
         addToast(msg, 'error');
+      } finally {
+        setIsCreating(false);
       }
     })();
   };
 
   return {
     createMonster,
-    isPending: isSwitchingChain || isPending || isConfirming,
+    isPending: isCreating || isSwitchingChain || isPending || isConfirming,
     isSuccess,
     error,
     hash,

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { base } from 'wagmi/chains';
 import { ACHIEVEMENTS } from '../../constants/achievements';
 import { BADGES_CONTRACT_ADDRESS, isBadgesAddressValid } from '../../utils/contract';
 import { monstroHuntBadgesABI, BADGES_TOKEN_IDS } from '../../contracts/monstroHuntBadges';
@@ -43,6 +44,7 @@ export function AchievementsScreen() {
         address: BADGES_CONTRACT_ADDRESS,
         abi: monstroHuntBadgesABI,
         functionName: 'claimSwamp',
+        chainId: base.id,
       },
       {
         onSettled: () => {

@@ -18,6 +18,8 @@
   "dependencies": {
     "@coinbase/onchainkit": "^1.1.2",
     "@farcaster/miniapp-sdk": "^0.2.3",
+    "@farcaster/miniapp-wagmi-connector": "^1.1.1",
+    "@farcaster/miniapp-wagmi-connector": "^1.1.1",
     "@openzeppelin/contracts": "^5.4.0",
     "@tanstack/react-query": "^5.81.5",
     "next": "15.3.8",

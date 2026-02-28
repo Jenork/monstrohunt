@@ -75,6 +75,7 @@ export function useBatchTransactions() {
       // Send batch using EIP-5792
       const result = await eip5792Client.sendCalls({
         account: address as Address,
+        chain: base,
         calls: calls.map(call => ({
           to: call.to,
           data: call.data,

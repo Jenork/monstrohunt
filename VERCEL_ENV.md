@@ -30,6 +30,8 @@
 | `NEXT_PUBLIC_TELEGRAM_URL` | `https://t.me/monstrohunt` | Ссылка в футере (по умолчанию уже стоит в коде). |
 | `NEXT_PUBLIC_TWITTER_URL` | `https://x.com/super_jenork` | Ссылка в футере (по умолчанию уже стоит в коде). |
 | `NEXT_PUBLIC_ONCHAINKIT_API_KEY` | Ключ OnchainKit (если используешь) | Для расширенных фич OnchainKit; приложение может работать и без него. |
+| `BADGES_OWNER_PRIVATE_KEY` | `0x...` (приватный ключ владельца контракта бейджей) | Нужен для клейма бейджей через API (Goblin, Zombie, Ice, Demon, Cthulhu). Без него кнопки «Claim» будут возвращать 503. |
+| `GAME_CONTRACT_DEPLOY_BLOCK` | Номер блока деплоя игрового контракта (опционально) | Ускоряет проверку событий для Zombie/Demon; без него сканирование с блока 0. |
 
 ---
 
@@ -40,13 +42,14 @@
 1. `NEXT_PUBLIC_CONTRACT_ADDRESS` = `0x3A52Fd151Aa9501c7BDB50C0247caA8607B18711`
 2. `NEXT_PUBLIC_HUNGER_DAYS` = `3`
 
-**Чтобы работали бейджи (Claim free Swamp):**
+**Чтобы работали бейджи (Swamp «Claim free» + клейм всех остальных через API):**
 
 3. `NEXT_PUBLIC_BADGES_CONTRACT_ADDRESS` = `0x44065694ac7bbb0e672f8Eb0317DAB8fF5995456`
+4. `BADGES_OWNER_PRIVATE_KEY` = приватный ключ **владельца** контракта бейджей (для API `/api/claim-badge`: минт Goblin, Zombie, Ice, Demon, Cthulhu при выполнении условий). **Только на сервере**, не добавляй в «NEXT_PUBLIC».
 
 **Чтобы Base App / Farcaster auth работал стабильно:**
 
-4. `NEXT_PUBLIC_URL` = твой прод-URL (например `https://твой-проект.vercel.app`).
+5. `NEXT_PUBLIC_URL` = твой прод-URL (например `https://твой-проект.vercel.app`).
 
 После добавления или изменения переменных: **Deployments** → у последнего деплоя **…** → **Redeploy**.
 

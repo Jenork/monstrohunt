@@ -26,7 +26,7 @@ export function useBadgeBalances(): Record<number, bigint> {
     [address]
   );
 
-  const { data } = useReadContracts({
+  const { data, refetch } = useReadContracts({
     contracts,
     query: { enabled },
   });
@@ -40,5 +40,5 @@ export function useBadgeBalances(): Record<number, bigint> {
   } else {
     TOKEN_IDS.forEach((id) => { balances[id] = 0n; });
   }
-  return balances;
+  return { balances, refetch };
 }

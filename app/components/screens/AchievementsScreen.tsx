@@ -8,6 +8,7 @@ import { ACHIEVEMENTS, ACHIEVEMENT_IDS } from '../../constants/achievements';
 import { BADGES_CONTRACT_ADDRESS, isBadgesAddressValid } from '../../utils/contract';
 import { monstroHuntBadgesABI, BADGES_TOKEN_IDS } from '../../contracts/monstroHuntBadges';
 import { useBadgeBalances } from '../../hooks/useBadgeBalances';
+import { useToast } from '../../hooks/useToast';
 import styles from './AchievementsScreen.module.css';
 
 const OPENSEA_BADGES_URL = `https://opensea.io/assets/base/${BADGES_CONTRACT_ADDRESS}`;
@@ -15,7 +16,9 @@ const OPENSEA_BADGES_URL = `https://opensea.io/assets/base/${BADGES_CONTRACT_ADD
 export function AchievementsScreen() {
   const { address } = useAccount();
   const [claiming, setClaiming] = useState(false);
-  const balances = useBadgeBalances();
+  const [claimingTokenId, setClaimingTokenId] = useState<number | null>(null);
+  const { balances, refetch: refetchBalances } = useBadgeBalances();
+  const { addToast } = useToast();
 
   const { data: hasClaimedSwamp, refetch: refetchHasClaimed } = useReadContract({
     address: BADGES_CONTRACT_ADDRESS,
@@ -26,6 +29,32 @@ export function AchievementsScreen() {
   });
 
   const swampClaimed = (balances[BADGES_TOKEN_IDS.swamp] !== undefined && balances[BADGES_TOKEN_IDS.swamp] > 0n) || (hasClaimedSwamp === true);
+
+  const CLAIMABLE_IDS = ['goblin', 'zombie', 'ice', 'demon', 'cthulhu'] as const;
+
+  const handleClaimApi = async (tokenId: number) => {
+    if (!address || claimingTokenId !== null) return;
+    if ((balances[tokenId] ?? 0n) > 0n) return;
+    setClaimingTokenId(tokenId);
+    try {
+      const res = await fetch('/api/claim-badge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address, tokenId }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        addToast(data.error || 'Claim failed', 'error');
+        return;
+      }
+      addToast('Badge claimed!', 'success');
+      refetchBalances();
+    } catch (e) {
+      addToast('Claim failed', 'error');
+    } finally {
+      setClaimingTokenId(null);
+    }
+  };
 
   const { writeContract: writeClaimSwamp, data: hash, isPending: isWritePending } = useWriteContract();
   const { isLoading: isConfirming } = useWaitForTransactionReceipt({
@@ -55,6 +84,7 @@ export function AchievementsScreen() {
   };
 
   const isClaiming = claiming || isWritePending || isConfirming;
+  const isClaimableViaApi = (id: string) => CLAIMABLE_IDS.includes(id as (typeof CLAIMABLE_IDS)[number]);
 
   return (
     <div className={styles.container}>
@@ -116,6 +146,15 @@ export function AchievementsScreen() {
               {!isSwamp && (
                 claimed ? (
                   <span className={styles.claimedLabel}>You have this NFT</span>
+                ) : isClaimableViaApi(a.id) ? (
+                  <button
+                    type="button"
+                    className={styles.claimBtn}
+                    onClick={() => tokenId !== undefined && handleClaimApi(tokenId)}
+                    disabled={!address || claimingTokenId !== null}
+                  >
+                    {claimingTokenId === tokenId ? '…' : !address ? 'Connect wallet' : 'Claim'}
+                  </button>
                 ) : (
                   <span className={styles.lockedLabel}>Unlock in game</span>
                 )

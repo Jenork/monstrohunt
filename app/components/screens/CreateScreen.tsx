@@ -7,6 +7,7 @@ import { base } from 'wagmi/chains';
 import { AVATARS, AvatarId } from '../../constants/avatars';
 import { TIER_PRICES, TIER_NAMES, Tier } from '../../constants/game';
 import { useCreateMonster } from '../../hooks/useCreateMonster';
+import { useMyMonsters } from '../../hooks/useMyMonsters';
 import { useToast } from '../../hooks/useToast';
 import { usePlayerAddress } from '../../hooks/usePlayerAddress';
 import { addHistoryEntry } from '../../utils/historyStore';
@@ -25,9 +26,11 @@ export function CreateScreen({ onCreated }: CreateScreenProps) {
   const { address, isConnected } = usePlayerAddress();
   const chainId = useChainId();
   const { data: balance } = useBalance({ address: address ?? undefined, chainId: base.id });
+  const { monsterIds, isLoading: isLoadingMonsters } = useMyMonsters();
   const { createMonster, isPending, isSuccess } = useCreateMonster();
   const { addToast } = useToast();
   const isWrongNetwork = isConnected && chainId !== base.id;
+  const alreadyHasMonster = monsterIds.length > 0;
 
   useEffect(() => {
     if (!isSuccess || !address) return;
@@ -86,6 +89,12 @@ export function CreateScreen({ onCreated }: CreateScreenProps) {
       {hasInsufficientBalance && isConnected && (
         <div className={styles.networkWarning}>
           Insufficient balance. You need ~{formatETH(requiredTotal)} ETH (tier + gas). Your balance: {balance ? formatETH(balance.value) : '—'} ETH.
+        </div>
+      )}
+
+      {alreadyHasMonster && isConnected && !isLoadingMonsters && (
+        <div className={styles.networkWarning}>
+          You already have a monster. Go to <strong>Manage</strong> to feed or sell it. One monster per wallet.
         </div>
       )}
 
@@ -186,7 +195,7 @@ export function CreateScreen({ onCreated }: CreateScreenProps) {
         <button
           className={styles.createButton}
           onClick={handleCreate}
-          disabled={isPending || !name.trim() || isWrongNetwork || !!hasInsufficientBalance}
+          disabled={isPending || !name.trim() || isWrongNetwork || !!hasInsufficientBalance || alreadyHasMonster}
         >
           {isPending ? 'Creating...' : `Create ${TIER_NAMES[selectedTier]} Monster`}
         </button>

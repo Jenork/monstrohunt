@@ -149,7 +149,7 @@ export function useCreateMonster() {
           }
         }
 
-        // 3) Fallback: writeContract
+        // 3) Fallback: writeContract (no gas override — let wallet/RPC estimate for Base App)
         await writeContractAsync({
           address: CONTRACT_ADDRESS as `0x${string}`,
           abi: monstroHuntABI,
@@ -157,7 +157,6 @@ export function useCreateMonster() {
           args: [nameBytes32, avatarId, tier],
           value: tierPrice,
           chainId: base.id,
-          gas: 400000n,
         });
       } catch (e: unknown) {
         const msg = getErrorMessage(e, 'Transaction was cancelled or failed');

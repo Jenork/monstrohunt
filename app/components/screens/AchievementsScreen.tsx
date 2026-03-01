@@ -4,23 +4,20 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { base } from 'wagmi/chains';
-import { ACHIEVEMENTS } from '../../constants/achievements';
+import { ACHIEVEMENTS, ACHIEVEMENT_IDS } from '../../constants/achievements';
 import { BADGES_CONTRACT_ADDRESS, isBadgesAddressValid } from '../../utils/contract';
 import { monstroHuntBadgesABI, BADGES_TOKEN_IDS } from '../../contracts/monstroHuntBadges';
+import { useBadgeBalances } from '../../hooks/useBadgeBalances';
 import styles from './AchievementsScreen.module.css';
+
+const OPENSEA_BADGES_URL = `https://opensea.io/assets/base/${BADGES_CONTRACT_ADDRESS}`;
 
 export function AchievementsScreen() {
   const { address } = useAccount();
   const [claiming, setClaiming] = useState(false);
+  const balances = useBadgeBalances();
 
-  const { data: swampBalance, refetch: refetchBalance } = useReadContract({
-    address: BADGES_CONTRACT_ADDRESS,
-    abi: monstroHuntBadgesABI,
-    functionName: 'balanceOf',
-    args: address ? [address, BigInt(BADGES_TOKEN_IDS.swamp)] : undefined,
-    query: { enabled: !!address && isBadgesAddressValid },
-  });
-  const { data: hasClaimed } = useReadContract({
+  const { data: hasClaimedSwamp, refetch: refetchHasClaimed } = useReadContract({
     address: BADGES_CONTRACT_ADDRESS,
     abi: monstroHuntBadgesABI,
     functionName: 'hasClaimedSwamp',
@@ -28,12 +25,14 @@ export function AchievementsScreen() {
     query: { enabled: !!address && isBadgesAddressValid },
   });
 
-  const swampClaimed = (swampBalance !== undefined && swampBalance > 0n) || (hasClaimed === true);
+  const swampClaimed = (balances[BADGES_TOKEN_IDS.swamp] !== undefined && balances[BADGES_TOKEN_IDS.swamp] > 0n) || (hasClaimedSwamp === true);
 
   const { writeContract: writeClaimSwamp, data: hash, isPending: isWritePending } = useWriteContract();
   const { isLoading: isConfirming } = useWaitForTransactionReceipt({
     hash,
-    onSuccess: () => refetchBalance(),
+    onSuccess: () => {
+      refetchHasClaimed();
+    },
   });
 
   const handleClaimSwamp = () => {
@@ -49,7 +48,7 @@ export function AchievementsScreen() {
       {
         onSettled: () => {
           setClaiming(false);
-          refetchBalance();
+          refetchHasClaimed();
         },
       }
     );
@@ -63,12 +62,21 @@ export function AchievementsScreen() {
       <p className={styles.subtitle}>
         Collect NFT badges (ERC‑1155) for your progress. Swamp is free when you enter the app.
       </p>
+      {isBadgesAddressValid && (
+        <p className={styles.nftLink}>
+          <a href={OPENSEA_BADGES_URL} target="_blank" rel="noopener noreferrer" className={styles.nftLinkA}>
+            View on OpenSea
+          </a>
+        </p>
+      )}
 
       <div className={styles.grid}>
         {ACHIEVEMENTS.map((a) => {
           const isSwamp = a.id === 'swamp';
-          const unlocked = isSwamp; // Swamp is always "unlockable" (free), others will come from contract
-          const claimed = isSwamp && swampClaimed;
+          const tokenId = ACHIEVEMENT_IDS[a.id];
+          const balance = tokenId !== undefined ? (balances[tokenId] ?? 0n) : 0n;
+          const claimed = balance > 0n;
+          const unlocked = isSwamp;
 
           return (
             <div
@@ -105,7 +113,13 @@ export function AchievementsScreen() {
                           : 'Claim free'}
                 </button>
               )}
-              {!isSwamp && <span className={styles.lockedLabel}>Unlock in game</span>}
+              {!isSwamp && (
+                claimed ? (
+                  <span className={styles.claimedLabel}>You have this NFT</span>
+                ) : (
+                  <span className={styles.lockedLabel}>Unlock in game</span>
+                )
+              )}
             </div>
           );
         })}

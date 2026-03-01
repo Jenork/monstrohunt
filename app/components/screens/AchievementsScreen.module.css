@@ -16,8 +16,23 @@
   font-size: 15px;
   color: rgba(255, 255, 255, 0.75);
   text-align: center;
-  margin-bottom: 28px;
+  margin-bottom: 12px;
   line-height: 1.5;
+}
+
+.nftLink {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.nftLinkA {
+  font-size: 13px;
+  color: #4CAF50;
+  text-decoration: none;
+}
+
+.nftLinkA:hover {
+  text-decoration: underline;
 }
 
 .grid {
@@ -141,6 +156,12 @@
 .lockedLabel {
   font-size: 10px;
   color: rgba(255, 255, 255, 0.45);
+  margin-top: auto;
+}
+
+.claimedLabel {
+  font-size: 11px;
+  color: rgba(76, 175, 80, 0.95);
   margin-top: auto;
 }
 

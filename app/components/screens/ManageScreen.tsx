@@ -13,7 +13,7 @@ import { useChainId } from 'wagmi';
 import { base } from 'wagmi/chains';
 import { StatusDisplay } from '../ui/StatusDisplay';
 import { AVATARS } from '../../constants/avatars';
-import { TIER_NAMES } from '../../constants/game';
+import { TIER_NAMES, HUNGER_DAYS } from '../../constants/game';
 import { formatETH } from '../../utils/format';
 import { getErrorMessage } from '../../utils/error';
 import { getSellAmount } from '../../utils/monster';
@@ -185,6 +185,7 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
           <div className={styles.cardTier}>Tier: {TIER_NAMES[monster.tier]}</div>
           <div className={styles.cardWeight}>{formatETH(monster.weight)} ETH</div>
           <StatusDisplay status={monster.status} />
+          <div className={styles.hungerPeriodHint}>Feed within {HUNGER_DAYS} days</div>
           {monster.pendingRewards > 0 && (
             <div className={styles.cardRewards}>+{formatETH(monster.pendingRewards)} ETH</div>
           )}

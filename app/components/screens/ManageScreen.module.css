@@ -85,6 +85,12 @@
   color: #FFC107;
 }
 
+.hungerPeriodHint {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 2px;
+}
+
 .cardFeedRow,
 .cardSellRow {
   display: flex;

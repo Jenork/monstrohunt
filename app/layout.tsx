@@ -31,6 +31,7 @@ export const metadata: Metadata = {
     'base:app_id': '696b8f1dc0ab25addaaaf26b',
     'fc:frame': JSON.stringify(frameEmbed),
     'fc:miniapp': JSON.stringify(frameEmbed),
+    'talentapp:project_verification': '2a07dd8369de522b4996a98ac28d75b65d36ea14f5258ff354792b2241e550e016f49c4e22dc8e84b9ab572f46b47c7668883bc3f53a50002ba9f2f7fdd238bf',
   },
 };
 

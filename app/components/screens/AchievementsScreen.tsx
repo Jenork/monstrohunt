@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { base } from 'wagmi/chains';
@@ -17,8 +17,16 @@ export function AchievementsScreen() {
   const { address } = useAccount();
   const [claiming, setClaiming] = useState(false);
   const [claimingTokenId, setClaimingTokenId] = useState<number | null>(null);
+  const [claimApiConfigured, setClaimApiConfigured] = useState<boolean | null>(null);
   const { balances, refetch: refetchBalances } = useBadgeBalances();
   const { addToast } = useToast();
+
+  useEffect(() => {
+    fetch('/api/claim-badge')
+      .then((r) => r.json())
+      .then((d) => setClaimApiConfigured(d.configured === true))
+      .catch(() => setClaimApiConfigured(false));
+  }, []);
 
   const { data: hasClaimedSwamp, refetch: refetchHasClaimed } = useReadContract({
     address: BADGES_CONTRACT_ADDRESS,
@@ -93,11 +101,18 @@ export function AchievementsScreen() {
         Collect NFT badges (ERC‑1155) for your progress. Swamp is free when you enter the app.
       </p>
       {isBadgesAddressValid && (
-        <p className={styles.nftLink}>
-          <a href={OPENSEA_BADGES_URL} target="_blank" rel="noopener noreferrer" className={styles.nftLinkA}>
-            View on OpenSea
-          </a>
-        </p>
+        <>
+          <p className={styles.nftLink}>
+            <a href={OPENSEA_BADGES_URL} target="_blank" rel="noopener noreferrer" className={styles.nftLinkA}>
+              View on OpenSea
+            </a>
+          </p>
+          {claimApiConfigured === false && (
+            <p className={styles.claimHint}>
+              Claim (Goblin–Cthulhu) requires BADGES_OWNER_PRIVATE_KEY in Vercel. Check GET /api/claim-badge for status.
+            </p>
+          )}
+        </>
       )}
 
       <div className={styles.grid}>

@@ -11,10 +11,19 @@ import {
 } from '../../utils/contract';
 import { monstroHuntBadgesABI, BADGES_TOKEN_IDS } from '../../contracts/monstroHuntBadges';
 
-const BADGES_OWNER_KEY = process.env.BADGES_OWNER_PRIVATE_KEY;
+function getBadgesOwnerKey(): `0x${string}` | null {
+  const raw = process.env.BADGES_OWNER_PRIVATE_KEY?.trim();
+  if (!raw) return null;
+  const key = raw.startsWith('0x') ? raw : `0x${raw}`;
+  if (key.length !== 66 || !/^0x[0-9a-fA-F]{64}$/.test(key)) return null;
+  return key as `0x${string}`;
+}
+
 const GAME_DEPLOY_BLOCK = process.env.GAME_CONTRACT_DEPLOY_BLOCK
   ? BigInt(process.env.GAME_CONTRACT_DEPLOY_BLOCK)
   : 0n;
+
+const BASE_RPC = process.env.BASE_MAINNET_RPC_URL || process.env.NEXT_PUBLIC_BASE_RPC_URL || undefined;
 
 const CLAIMABLE_TOKEN_IDS = [
   BADGES_TOKEN_IDS.goblin,
@@ -30,10 +39,32 @@ const CLAIMABLE_TOKEN_IDS = [
  * Verifies game condition for the badge and mints from badges contract (owner only).
  * Supported: 2=Goblin, 3=Zombie, 4=Ice, 5=Demon, 6=Cthulhu.
  */
+/** GET: check if claim API is configured (for debugging) */
+export async function GET() {
+  const key = getBadgesOwnerKey();
+  const hasContract = isBadgesAddressValid;
+  const configured = !!(key && hasContract);
+  return NextResponse.json({
+    configured,
+    hasKey: !!key,
+    hasBadgesContract: hasContract,
+    error: configured ? undefined : !hasContract
+      ? 'NEXT_PUBLIC_BADGES_CONTRACT_ADDRESS not set'
+      : !key
+        ? 'BADGES_OWNER_PRIVATE_KEY not set or invalid (need 0x + 64 hex)'
+        : undefined,
+  });
+}
+
 export async function POST(request: NextRequest) {
+  const BADGES_OWNER_KEY = getBadgesOwnerKey();
   if (!BADGES_OWNER_KEY || !isBadgesAddressValid) {
     return NextResponse.json(
-      { error: 'Claim not configured (missing BADGES_OWNER_PRIVATE_KEY or contract)' },
+      {
+        error: !isBadgesAddressValid
+          ? 'Badges contract not configured (NEXT_PUBLIC_BADGES_CONTRACT_ADDRESS)'
+          : 'Claim not configured: set BADGES_OWNER_PRIVATE_KEY in Vercel (owner wallet private key, 0x + 64 hex)',
+      },
       { status: 503 }
     );
   }
@@ -64,9 +95,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const transport = BASE_RPC ? http(BASE_RPC) : http();
   const publicClient = createPublicClient({
     chain: base,
-    transport: http(),
+    transport,
   });
 
   const balance = await publicClient.readContract({
@@ -183,11 +215,11 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const account = privateKeyToAccount(BADGES_OWNER_KEY as `0x${string}`);
+  const account = privateKeyToAccount(BADGES_OWNER_KEY);
   const walletClient = createWalletClient({
     account,
     chain: base,
-    transport: http(),
+    transport,
   });
 
   try {
@@ -200,7 +232,11 @@ export async function POST(request: NextRequest) {
     await publicClient.waitForTransactionReceipt({ hash });
     return NextResponse.json({ success: true, hash });
   } catch (e) {
-    const message = e instanceof Error ? e.message : 'Mint failed';
-    return NextResponse.json({ error: message }, { status: 500 });
+    const err = e as Error & { shortMessage?: string; cause?: unknown };
+    const message = err.shortMessage || err.message || 'Mint failed';
+    return NextResponse.json(
+      { error: message, details: process.env.NODE_ENV === 'development' ? String(e) : undefined },
+      { status: 500 }
+    );
   }
 }

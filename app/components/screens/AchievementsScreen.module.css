@@ -35,6 +35,14 @@
   text-decoration: underline;
 }
 
+.claimHint {
+  font-size: 12px;
+  color: rgba(255, 200, 100, 0.95);
+  text-align: center;
+  margin: -8px 0 16px 0;
+  line-height: 1.4;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));

@@ -1,10 +1,10 @@
 'use client';
 
-import { useToast } from '../../hooks/useToast';
+import { useToastContext } from '../../contexts/ToastContext';
 import styles from './ToastContainer.module.css';
 
 export function ToastContainer() {
-  const { toasts, removeToast } = useToast();
+  const { toasts, removeToast } = useToastContext();
 
   return (
     <div className={styles.container}>

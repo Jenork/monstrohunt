@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createPublicClient, createWalletClient, http, parseAddress } from 'viem';
+import { createPublicClient, createWalletClient, getAddress, http } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { base } from 'viem/chains';
 import {
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
 
   let address: `0x${string}`;
   try {
-    address = parseAddress(rawAddress);
+    address = getAddress(rawAddress) as `0x${string}`;
   } catch {
     return NextResponse.json({ error: 'Invalid address' }, { status: 400 });
   }

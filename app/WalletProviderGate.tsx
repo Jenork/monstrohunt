@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import sdk from '@farcaster/miniapp-sdk';
 import { isBaseApp } from './lib/isBaseApp';
 import { BaseAppProvider } from './browserWalletProvider';
+import { ToastProvider } from './contexts/ToastContext';
 
 export function WalletProviderGate({ children }: { children: React.ReactNode }) {
   const [mode, setMode] = useState<'unknown' | 'baseapp' | 'browser'>('unknown');
@@ -71,5 +72,9 @@ export function WalletProviderGate({ children }: { children: React.ReactNode }) 
     );
   }
 
-  return <BaseAppProvider>{children}</BaseAppProvider>;
+  return (
+    <BaseAppProvider>
+      <ToastProvider>{children}</ToastProvider>
+    </BaseAppProvider>
+  );
 }

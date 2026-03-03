@@ -2,20 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-import { base } from 'wagmi/chains';
 import { ACHIEVEMENTS, ACHIEVEMENT_IDS } from '../../constants/achievements';
 import { BADGES_CONTRACT_ADDRESS, isBadgesAddressValid } from '../../utils/contract';
 import { monstroHuntBadgesABI, BADGES_TOKEN_IDS } from '../../contracts/monstroHuntBadges';
 import { useBadgeBalances } from '../../hooks/useBadgeBalances';
 import { useToast } from '../../hooks/useToast';
+import { usePlayerAddress } from '../../hooks/usePlayerAddress';
 import styles from './AchievementsScreen.module.css';
 
 const OPENSEA_BADGES_URL = `https://opensea.io/assets/base/${BADGES_CONTRACT_ADDRESS}`;
 
 export function AchievementsScreen() {
-  const { address } = useAccount();
-  const [claiming, setClaiming] = useState(false);
+  const { address } = usePlayerAddress();
   const [claimingTokenId, setClaimingTokenId] = useState<number | null>(null);
   const [claimApiConfigured, setClaimApiConfigured] = useState<boolean | null>(null);
   const { balances, refetch: refetchBalances } = useBadgeBalances();
@@ -27,16 +25,6 @@ export function AchievementsScreen() {
       .then((d) => setClaimApiConfigured(d.configured === true))
       .catch(() => setClaimApiConfigured(false));
   }, []);
-
-  const { data: hasClaimedSwamp, refetch: refetchHasClaimed } = useReadContract({
-    address: BADGES_CONTRACT_ADDRESS,
-    abi: monstroHuntBadgesABI,
-    functionName: 'hasClaimedSwamp',
-    args: address ? [address] : undefined,
-    query: { enabled: !!address && isBadgesAddressValid },
-  });
-
-  const swampClaimed = (balances[BADGES_TOKEN_IDS.swamp] !== undefined && balances[BADGES_TOKEN_IDS.swamp] > 0n) || (hasClaimedSwamp === true);
 
   const CLAIMABLE_IDS = ['goblin', 'zombie', 'ice', 'demon', 'cthulhu'] as const;
 
@@ -64,34 +52,6 @@ export function AchievementsScreen() {
     }
   };
 
-  const { writeContract: writeClaimSwamp, data: hash, isPending: isWritePending } = useWriteContract();
-  const { isLoading: isConfirming } = useWaitForTransactionReceipt({
-    hash,
-    onSuccess: () => {
-      refetchHasClaimed();
-    },
-  });
-
-  const handleClaimSwamp = () => {
-    if (claiming || swampClaimed || !isBadgesAddressValid) return;
-    setClaiming(true);
-    writeClaimSwamp(
-      {
-        address: BADGES_CONTRACT_ADDRESS,
-        abi: monstroHuntBadgesABI,
-        functionName: 'claimSwamp',
-        chainId: base.id,
-      },
-      {
-        onSettled: () => {
-          setClaiming(false);
-          refetchHasClaimed();
-        },
-      }
-    );
-  };
-
-  const isClaiming = claiming || isWritePending || isConfirming;
   const isClaimableViaApi = (id: string) => CLAIMABLE_IDS.includes(id as (typeof CLAIMABLE_IDS)[number]);
 
   return (
@@ -141,22 +101,7 @@ export function AchievementsScreen() {
               <p className={styles.description}>{a.description}</p>
               <p className={styles.condition}>{a.condition}</p>
               {isSwamp && (
-                <button
-                  type="button"
-                  className={`${styles.claimBtn} ${swampClaimed ? styles.claimBtnClaimed : ''}`}
-                  onClick={handleClaimSwamp}
-                  disabled={isClaiming || swampClaimed || !address || !isBadgesAddressValid}
-                >
-                  {!isBadgesAddressValid
-                    ? 'Badges soon'
-                    : isClaiming
-                      ? '…'
-                      : swampClaimed
-                        ? 'Claimed'
-                        : !address
-                          ? 'Connect wallet'
-                          : 'Claim free'}
-                </button>
+                <span className={styles.badgesSoon}>Badges soon</span>
               )}
               {!isSwamp && (
                 claimed ? (

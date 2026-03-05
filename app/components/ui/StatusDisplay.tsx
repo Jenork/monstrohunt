@@ -10,13 +10,21 @@ interface StatusDisplayProps {
   hideHint?: boolean;
   /** Narrower width (70%) - used in Hunt cards */
   compact?: boolean;
+  /** Show empty bar even for starved monsters (used on Hunt cards) */
+  showForStarved?: boolean;
 }
 
-export function StatusDisplay({ status, hideHint = false, compact = false }: StatusDisplayProps) {
+export function StatusDisplay({
+  status,
+  hideHint = false,
+  compact = false,
+  showForStarved = false,
+}: StatusDisplayProps) {
   const color = STATUS_COLORS[status.status];
   const totalTime = HUNGER_WINDOW;
   const remaining = Number(status.timeToStarve);
-  const progress = Math.max(0, Math.min(100, (remaining / totalTime) * 100));
+  const progress =
+    totalTime > 0 ? Math.max(0, Math.min(100, (remaining / totalTime) * 100)) : 0;
   
   const labels: Record<string, { label: string; hint: string }> = {
     calm: { label: 'Calm', hint: 'Well fed' },
@@ -35,7 +43,7 @@ export function StatusDisplay({ status, hideHint = false, compact = false }: Sta
         </div>
         {!hideHint && <div className={styles.time}>{hint}</div>}
       </div>
-      {status.status !== 'starved' && (
+      {(showForStarved || status.status !== 'starved') && (
         <div className={styles.progressBar}>
           <div 
             className={styles.progressFill} 

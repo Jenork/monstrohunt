@@ -127,13 +127,7 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
       addToast('Unable to calculate feed cost', 'error');
       return;
     }
-    
-    if (monster.status.status === 'starved') {
-      if (!confirm('Your monster is starved! Feeding now will save it. Continue?')) {
-        return;
-      }
-    }
-    
+
     try {
       await feedMonster(monsterId, monster.feedCost);
       refetch();

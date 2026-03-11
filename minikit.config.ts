@@ -28,10 +28,10 @@ export const minikitConfig = {
     webhookUrl: `${ROOT_URL}/api/webhook`,
     primaryCategory: "games",
     tags: ["game", "gaming", "base", "onchain"],
-    heroImageUrl: `${ROOT_URL}/splash.png`,
+    heroImageUrl: `${ROOT_URL}/og.png`,
     tagline: "",
     ogTitle: "Monstro Hunt - Onchain Monster Game on Base",
     ogDescription: "Create, feed, and hunt monsters on Base Network. Pure ETH game with no tokens or NFTs.",
-    ogImageUrl: `${ROOT_URL}/splash.png`,
+    ogImageUrl: `${ROOT_URL}/og.png`,
   },
 } as const;

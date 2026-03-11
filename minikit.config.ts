@@ -11,9 +11,9 @@ const ROOT_URL =
  */
 export const minikitConfig = {
   accountAssociation: {
-    header: "",
-    payload: "",
-    signature: ""
+    header: "eyJmaWQiOjE0MjU4MzAsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHg1RTE2MzQyZDQwRTg2RWFCZDI5NWY2ODg1NzMyYjZiNzhjREY3MEI1In0",
+    payload: "eyJkb21haW4iOiJtb25zdHJvaHVudC0zNnN3LnZlcmNlbC5hcHAifQ",
+    signature: "WvI9mb2HLaV4f+iVhXw1e64PE3C9ys7vak6x8knraYJ/1P73yinB6k1WHKR3CEXlTsU+SSI5yZbCku9zMb3nzxs="
   },
   miniapp: {
     version: "1",
@@ -26,7 +26,7 @@ export const minikitConfig = {
     splashBackgroundColor: "#000000",
     homeUrl: ROOT_URL,
     webhookUrl: `${ROOT_URL}/api/webhook`,
-    primaryCategory: "game",
+    primaryCategory: "games",
     tags: ["game", "gaming", "base", "onchain"],
     heroImageUrl: `${ROOT_URL}/splash.png`,
     tagline: "",

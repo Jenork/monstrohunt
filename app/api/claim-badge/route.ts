@@ -33,6 +33,67 @@ const CLAIMABLE_TOKEN_IDS = [
   BADGES_TOKEN_IDS.cthulhu,
 ] as const;
 
+async function addressEverOwnedMonster(publicClient: any, address: `0x${string}`) {
+  const createdEvents = await publicClient.getContractEvents({
+    address: CONTRACT_ADDRESS,
+    abi: monstroHuntABI,
+    eventName: 'MonsterCreated',
+    args: { owner: address },
+    fromBlock: GAME_DEPLOY_BLOCK,
+  });
+
+  return createdEvents.length > 0;
+}
+
+async function hasFedAtLeastOnce(publicClient: any, address: `0x${string}`) {
+  const fedEvents = await publicClient.getContractEvents({
+    address: CONTRACT_ADDRESS,
+    abi: monstroHuntABI,
+    eventName: 'MonsterFed',
+    fromBlock: GAME_DEPLOY_BLOCK,
+  });
+
+  for (const ev of fedEvents) {
+    const monster = await publicClient.readContract({
+      address: CONTRACT_ADDRESS,
+      abi: monstroHuntABI,
+      functionName: 'getMonster',
+      args: [ev.args.monsterId!],
+      blockNumber: ev.blockNumber,
+    });
+    if (monster && monster[9]?.toLowerCase() === address.toLowerCase()) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+async function wasHuntedAtLeastOnce(publicClient: any, address: `0x${string}`) {
+  const huntEvents = await publicClient.getContractEvents({
+    address: CONTRACT_ADDRESS,
+    abi: monstroHuntABI,
+    eventName: 'MonsterHunted',
+    fromBlock: GAME_DEPLOY_BLOCK,
+  });
+
+  for (const ev of huntEvents) {
+    if (!ev.args.monsterId) continue;
+    const monster = await publicClient.readContract({
+      address: CONTRACT_ADDRESS,
+      abi: monstroHuntABI,
+      functionName: 'getMonster',
+      args: [ev.args.monsterId],
+      blockNumber: ev.blockNumber,
+    });
+    if (monster && monster[9]?.toLowerCase() === address.toLowerCase()) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 /**
  * POST /api/claim-badge
  * Body: { address: string, tokenId: number }
@@ -117,39 +178,15 @@ export async function POST(request: NextRequest) {
 
   // Verify condition for each badge
   if (tokenId === BADGES_TOKEN_IDS.goblin) {
-    const monsterId = await publicClient.readContract({
-      address: CONTRACT_ADDRESS,
-      abi: monstroHuntABI,
-      functionName: 'getOwnerMonsterId',
-      args: [address],
-    });
-    if (monsterId === 0n) {
+    const hasCreatedMonster = await addressEverOwnedMonster(publicClient, address);
+    if (!hasCreatedMonster) {
       return NextResponse.json(
         { error: 'Create a monster first to claim Goblin badge' },
         { status: 400 }
       );
     }
   } else if (tokenId === BADGES_TOKEN_IDS.zombie) {
-    const fedEvents = await publicClient.getContractEvents({
-      address: CONTRACT_ADDRESS,
-      abi: monstroHuntABI,
-      eventName: 'MonsterFed',
-      fromBlock: GAME_DEPLOY_BLOCK,
-    });
-    let hasFed = false;
-    for (const ev of fedEvents.slice(-500)) {
-      const monster = await publicClient.readContract({
-        address: CONTRACT_ADDRESS,
-        abi: monstroHuntABI,
-        functionName: 'getMonster',
-        args: [ev.args.monsterId!],
-        blockNumber: ev.blockNumber,
-      });
-      if (monster && monster[9]?.toLowerCase() === address.toLowerCase()) {
-        hasFed = true;
-        break;
-      }
-    }
+    const hasFed = await hasFedAtLeastOnce(publicClient, address);
     if (!hasFed) {
       return NextResponse.json(
         { error: 'Feed your monster at least once to claim Zombie badge' },
@@ -171,27 +208,7 @@ export async function POST(request: NextRequest) {
       );
     }
   } else if (tokenId === BADGES_TOKEN_IDS.demon) {
-    const huntEvents = await publicClient.getContractEvents({
-      address: CONTRACT_ADDRESS,
-      abi: monstroHuntABI,
-      eventName: 'MonsterHunted',
-      fromBlock: GAME_DEPLOY_BLOCK,
-    });
-    let wasVictim = false;
-    for (const ev of huntEvents.slice(-500)) {
-      if (!ev.args.monsterId) continue;
-      const monster = await publicClient.readContract({
-        address: CONTRACT_ADDRESS,
-        abi: monstroHuntABI,
-        functionName: 'getMonster',
-        args: [ev.args.monsterId],
-        blockNumber: ev.blockNumber,
-      });
-      if (monster && monster[9]?.toLowerCase() === address.toLowerCase()) {
-        wasVictim = true;
-        break;
-      }
-    }
+    const wasVictim = await wasHuntedAtLeastOnce(publicClient, address);
     if (!wasVictim) {
       return NextResponse.json(
         { error: 'Your monster must be hunted while starved to claim Demon badge' },

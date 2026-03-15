@@ -18,7 +18,7 @@
 | Переменная | Значение | Зачем |
 |------------|----------|--------|
 | `NEXT_PUBLIC_BADGES_CONTRACT_ADDRESS` | `0x44065694ac7bbb0e672f8Eb0317DAB8fF5995456` | Контракт NFT-бейджей (ERC-1155). Без него вкладка Badges показывает «Badges soon» и минт Swamp недоступен. |
-| `NEXT_PUBLIC_URL` | Твой production URL, например `https://monstrohunt.vercel.app` | Нужен для auth (Base App / Farcaster) и для success-страницы. Без него возможны проблемы с верификацией в Base App. |
+| `NEXT_PUBLIC_URL` | Твой production URL, например `https://monstrohunt.vercel.app` | Нужен для share/success flow, абсолютных ссылок и корректной production-конфигурации. |
 
 ---
 
@@ -26,7 +26,7 @@
 
 | Переменная | Значение | Зачем |
 |------------|----------|--------|
-| `NEYNAR_API_KEY` | Ключ с [neynar.com](https://neynar.com) | Показ имён профилей Farcaster/Base в карточках Hunt. Без ключа показывается короткий адрес. |
+| `NEYNAR_API_KEY` | Ключ с [neynar.com](https://neynar.com) | Показ имён профилей в карточках Hunt. Без ключа показывается короткий адрес. |
 | `NEXT_PUBLIC_TELEGRAM_URL` | `https://t.me/monstrohunt` | Ссылка в футере (по умолчанию уже стоит в коде). |
 | `NEXT_PUBLIC_TWITTER_URL` | `https://x.com/super_jenork` | Ссылка в футере (по умолчанию уже стоит в коде). |
 | `NEXT_PUBLIC_ONCHAINKIT_API_KEY` | Ключ OnchainKit (если используешь) | Для расширенных фич OnchainKit; приложение может работать и без него. |
@@ -47,7 +47,7 @@
 3. `NEXT_PUBLIC_BADGES_CONTRACT_ADDRESS` = `0x44065694ac7bbb0e672f8Eb0317DAB8fF5995456`
 4. `BADGES_OWNER_PRIVATE_KEY` = приватный ключ **владельца** контракта бейджей (для API `/api/claim-badge`: минт Goblin, Zombie, Ice, Demon, Cthulhu при выполнении условий). **Только на сервере**, не добавляй в «NEXT_PUBLIC».
 
-**Чтобы Base App / Farcaster auth работал стабильно:**
+**Чтобы production URL и share flow работали стабильно:**
 
 5. `NEXT_PUBLIC_URL` = твой прод-URL (например `https://твой-проект.vercel.app`).
 

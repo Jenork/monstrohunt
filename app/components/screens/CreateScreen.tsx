@@ -25,7 +25,7 @@ export function CreateScreen({ onCreated }: CreateScreenProps) {
   
   const { address, isConnected } = usePlayerAddress();
   const chainId = useChainId();
-  const { data: balance } = useBalance({ address: address ?? undefined, chainId: base.id });
+  const { data: balance } = useBalance({ address, chainId: base.id });
   const { monsterIds, isLoading: isLoadingMonsters } = useMyMonsters();
   const { createMonster, isPending, isSuccess } = useCreateMonster();
   const { addToast } = useToast();

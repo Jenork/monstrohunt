@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { getSellAmount, getMonsterStatus, getHuntCooldownRemaining } from './monster';
 import type { Monster } from '../types/monster';
+import { HUNGER_WINDOW } from '../constants/game';
 
 // SELL_FEE_BP = 100 (1%)
 describe('getSellAmount', () => {
@@ -45,9 +46,8 @@ describe('getMonsterStatus', () => {
   });
 
   it('returns calm when >50% time remaining', () => {
-    const hungerWindow = 7 * 24 * 3600;
     const now = BigInt(0);
-    const deadline = BigInt(Math.floor(hungerWindow * 0.8)); // 80% of window left
+    const deadline = BigInt(Math.floor(HUNGER_WINDOW * 0.8)); // 80% of window left
     const m = { ...baseMonster, hungerDeadline: deadline };
     const status = getMonsterStatus(m, now);
     expect(status.status).toBe('calm');
@@ -55,18 +55,16 @@ describe('getMonsterStatus', () => {
   });
 
   it('returns hungry when 25-50% time remaining', () => {
-    const hungerWindow = 7 * 24 * 3600;
     const now = BigInt(0);
-    const deadline = BigInt(Math.floor(hungerWindow * 0.4)); // 40% left
+    const deadline = BigInt(Math.floor(HUNGER_WINDOW * 0.4)); // 40% left
     const m = { ...baseMonster, hungerDeadline: deadline };
     const status = getMonsterStatus(m, now);
     expect(status.status).toBe('hungry');
   });
 
   it('returns critical when <25% time remaining', () => {
-    const hungerWindow = 7 * 24 * 3600;
     const now = BigInt(0);
-    const deadline = BigInt(Math.floor(hungerWindow * 0.2)); // 20% of window left
+    const deadline = BigInt(Math.floor(HUNGER_WINDOW * 0.2)); // 20% of window left
     const m = { ...baseMonster, hungerDeadline: deadline };
     const status = getMonsterStatus(m, now);
     expect(status.status).toBe('critical');

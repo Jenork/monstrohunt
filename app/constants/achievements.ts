@@ -36,8 +36,8 @@ export const ACHIEVEMENTS: AchievementMeta[] = [
   {
     id: 'goblin',
     name: 'Goblin',
-    description: 'You created a monster.',
-    condition: 'Create a monster in the Create tab.',
+    description: 'You created your first monster.',
+    condition: 'Create a monster at least once in the Create tab.',
     free: false,
     image: '/monsters/goblin.png',
   },

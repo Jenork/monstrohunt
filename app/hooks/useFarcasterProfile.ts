@@ -24,7 +24,7 @@ async function fetchProfile(address: string): Promise<FarcasterProfile> {
 }
 
 /**
- * Fetches Farcaster/Base App profile (display name, username) for the given address.
+ * Fetches social profile data (display name, username) for the given address.
  * Uses /api/profile which calls Neynar when NEYNAR_API_KEY is set.
  */
 export function useFarcasterProfile(address: string | undefined) {

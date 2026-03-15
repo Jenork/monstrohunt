@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.24;
 
 /**
  * @title Monstro Hunt
@@ -64,6 +64,8 @@ contract MonstroHunt {
     
     // Protocol balance (5% on deaths + 1% on sells)
     uint256 public protocolBalance;
+    // Failed user payouts can be withdrawn later by recipients.
+    mapping(address => uint256) public pendingWithdrawals;
     
     event MonsterCreated(
         uint256 indexed monsterId,
@@ -97,6 +99,8 @@ contract MonstroHunt {
     );
     
     event ProtocolWithdrawn(address indexed to, uint256 amount);
+    event PendingWithdrawalRecorded(address indexed to, uint256 amount);
+    event PendingWithdrawalClaimed(address indexed to, uint256 amount);
     
     /**
      * @notice Constructor sets hunger duration and treasury for protocol fees
@@ -250,7 +254,7 @@ contract MonstroHunt {
         ownerToMonsterId[target.owner] = 0;
         
         // Distribute rewards: 30% hunter wallet, 65% to alive monsters' owners' wallets, 5% protocol
-        payable(msg.sender).transfer(hunterReward);
+        _sendOrAccrue(payable(msg.sender), hunterReward);
         
         // 65% to owners of all alive monsters (by weight); sent as ETH to their wallets (O(n) in monster count)
         if (totalAliveWeight > 0 && distributedToAlive > 0) {
@@ -260,7 +264,7 @@ contract MonstroHunt {
                 if (!m.alive || m.weight == 0) continue;
                 uint256 share = (distributedToAlive * m.weight) / totalAliveWeight;
                 if (share > 0) {
-                    payable(m.owner).transfer(share);
+                    _sendOrAccrue(payable(m.owner), share);
                 }
             }
         }
@@ -316,7 +320,7 @@ contract MonstroHunt {
             }
         }
         
-        payable(msg.sender).transfer(payout);
+        _sendOrAccrue(payable(msg.sender), payout);
         
         emit MonsterSold(monsterId, msg.sender, payout, protocolFee);
     }
@@ -335,6 +339,16 @@ contract MonstroHunt {
             totalAliveWeight = totalAliveWeight - oldWeight + monster.weight;
         }
         monster.lastRewardIndex = globalRewardIndex;
+    }
+
+    function _sendOrAccrue(address payable recipient, uint256 amount) internal {
+        if (amount == 0) return;
+
+        (bool ok,) = recipient.call{value: amount}("");
+        if (!ok) {
+            pendingWithdrawals[recipient] += amount;
+            emit PendingWithdrawalRecorded(recipient, amount);
+        }
     }
     
     // View functions
@@ -421,6 +435,18 @@ contract MonstroHunt {
     
     function getTotalMonsters() external view returns (uint256) {
         return monsters.length;
+    }
+
+    /**
+     * @notice Withdraw ETH that could not be auto-transferred earlier.
+     */
+    function withdrawPendingWithdrawal() external {
+        uint256 amount = pendingWithdrawals[msg.sender];
+        require(amount > 0, "Nothing to withdraw");
+        pendingWithdrawals[msg.sender] = 0;
+        (bool ok,) = payable(msg.sender).call{value: amount}("");
+        require(ok, "Transfer failed");
+        emit PendingWithdrawalClaimed(msg.sender, amount);
     }
     
     /**

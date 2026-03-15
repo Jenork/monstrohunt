@@ -1,5 +1,6 @@
 'use client';
 
+import type { Address } from 'viem';
 import { useReadContract } from 'wagmi';
 import { usePlayerAddress } from './usePlayerAddress';
 import { CONTRACT_ADDRESS, isContractAddressValid, monstroHuntABI } from '../utils/contract';
@@ -13,7 +14,7 @@ export function useMyMonsters() {
     address: CONTRACT_ADDRESS,
     abi: monstroHuntABI,
     functionName: 'getOwnerMonsterId',
-    args: address ? [address] : undefined,
+    args: address ? [address as Address] : undefined,
     query: {
       enabled: !!address && !mockMode && isContractAddressValid,
     },

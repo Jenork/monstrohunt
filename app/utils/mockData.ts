@@ -1,3 +1,4 @@
+import type { Address } from 'viem';
 import { MonsterInfo } from '../types/monster';
 import { TIER_PRICES, HUNGER_WINDOW } from '../constants/game';
 import { getMonsterStatus } from './monster';
@@ -5,12 +6,12 @@ import { getMonsterStatus } from './monster';
 // Mock player addresses
 const MOCK_OWNERS = [
   '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
-  '0x8ba1f109551bD432803012645Hac136c22C1779',
+  '0x8ba1f109551bD432803012645Ac136ddd64DBA72',
   '0x1234567890123456789012345678901234567890',
   '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd',
   '0xfedcbafedcbafedcbafedcbafedcbafedcbafedc',
   '0x9876543210987654321098765432109876543210',
-];
+] as const satisfies readonly Address[];
 
 // Mock monster names
 const MOCK_NAMES = [

@@ -6,9 +6,10 @@
  * Remove when browser-only testing is removed.
  */
 import { createContext, useContext, type ReactNode } from 'react';
+import type { Address } from 'viem';
 
 export interface PlayerAddressValue {
-  address: string | undefined;
+  address: Address | undefined;
   isConnected: boolean;
   disconnect: (() => void) | null;
 }

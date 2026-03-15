@@ -45,11 +45,11 @@ Fully onchain monster hunting game on Base Network. Players create monsters for 
 - **Blockchain**: Base Network (Mainnet)
 - **Smart Contract**: Solidity 0.8.20
 
-## ✅ Base App only
+## ✅ Standard Web App for Base
 
-This build is designed for **Base App / Farcaster Mini App** only.
-Open the app **inside Base App** to use the встроенный wallet provider.
-Browser WalletConnect / RainbowKit are removed.
+This build now uses a **standard web app + wallet** setup for Base.
+It works in the Base App in-app browser and in a regular mobile/desktop browser.
+Wallet connection and contract calls use `wagmi` + `viem`.
 
 ## 🚀 Quick Start
 
@@ -121,7 +121,7 @@ app/
 
 - [DEPLOYMENT.md](./DEPLOYMENT.md) — деплой контракта и фронтенда.
 - [DEPLOY_TO_BASE.md](./DEPLOY_TO_BASE.md) — деплой в Base (контракт + Vercel).
-- [PUBLISH_MINI_APP_BASE.md](./PUBLISH_MINI_APP_BASE.md) — публикация Mini App в Base App (account association, [base.dev/preview](https://base.dev/preview), пост в Base app). Соответствует [Create a Mini App](https://docs.base.org/mini-apps/quickstart/create-new-miniapp/) (docs.base.org).
+- [PUBLISH_MINI_APP_BASE.md](./PUBLISH_MINI_APP_BASE.md) — исторические заметки по прежней публикации Mini App. Для новых релизов ориентируйтесь на регистрацию проекта в Base.dev и модель standard web app.
 
 ## ⚠️ Important Notes
 

@@ -1,24 +1,22 @@
 "use client";
 
-import sdk from "@farcaster/miniapp-sdk";
-import { minikitConfig } from "../../minikit.config";
 import styles from "./page.module.css";
+
+const APP_NAME = 'MONSTRO HUNT';
 
 export default function Success() {
   const handleShare = async () => {
+    const text = `I just joined ${APP_NAME}.`;
+    const url = process.env.NEXT_PUBLIC_URL || window.location.origin;
+
     try {
-      const text = `Yay! I just joined the waitlist for ${minikitConfig.miniapp.name.toUpperCase()}! `;
-      const result = await sdk.actions.composeCast({
-        text,
-        embeds: process.env.NEXT_PUBLIC_URL ? [process.env.NEXT_PUBLIC_URL] : undefined,
-      });
-      if (result?.cast?.hash) {
-        console.log("Cast created successfully:", result.cast.hash);
-      } else {
-        console.log("User cancelled the cast");
+      if (navigator.share) {
+        await navigator.share({ text, url });
+        return;
       }
+      await navigator.clipboard.writeText(`${text} ${url}`);
     } catch (error) {
-      console.error("Error sharing cast:", error);
+      console.error("Error sharing link:", error);
     }
   };
 
@@ -37,7 +35,7 @@ export default function Success() {
             </div>
           </div>
           
-          <h1 className={styles.title}>Welcome to the {minikitConfig.miniapp.name.toUpperCase()}!</h1>
+          <h1 className={styles.title}>Welcome to {APP_NAME}!</h1>
           
           <p className={styles.subtitle}>
             You&apos;re in! We&apos;ll notify you as soon as we launch.<br />

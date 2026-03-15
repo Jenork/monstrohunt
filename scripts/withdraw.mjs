@@ -5,7 +5,7 @@
  *   NEXT_PUBLIC_CONTRACT_ADDRESS = your MonstroHunt contract address
  * Then run: npx hardhat run scripts/withdraw.js --network baseMainnet
  */
-const hre = require("hardhat");
+import hre from "hardhat";
 
 async function main() {
   const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;

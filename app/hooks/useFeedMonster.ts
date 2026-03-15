@@ -22,7 +22,7 @@ export function useFeedMonster() {
   const { switchChainAsync, isPending: isSwitchingChain } = useSwitchChain();
   const { connectAsync, connectors } = useConnect();
   const { writeContractAsync, data: hash, isPending, error } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+  const { isPending: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,
   });
   const { sendBatch, encodeCall } = useBatchTransactions();

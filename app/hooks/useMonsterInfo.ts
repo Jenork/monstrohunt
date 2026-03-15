@@ -1,5 +1,6 @@
 'use client';
 
+import type { Address } from 'viem';
 import { useReadContract } from 'wagmi';
 import { usePlayerAddress } from './usePlayerAddress';
 import { CONTRACT_ADDRESS, isContractAddressValid, monstroHuntABI } from '../utils/contract';
@@ -55,7 +56,7 @@ export function useMonsterInfo(
     address: CONTRACT_ADDRESS,
     abi: monstroHuntABI,
     functionName: 'canHunt',
-    args: address && monsterId !== undefined ? [address, BigInt(monsterId)] : undefined,
+    args: address && monsterId !== undefined ? [address as Address, BigInt(monsterId)] : undefined,
     query: {
       enabled:
         fetchCanHunt &&
@@ -121,7 +122,7 @@ export function useMonsterInfo(
     boolean,
     bigint,
     bigint,
-    string,
+    Address,
   ];
 
   const monster: MonsterInfo = {
@@ -135,7 +136,7 @@ export function useMonsterInfo(
     alive,
     lastRewardIndex: BigInt(lastRewardIndex),
     lastHuntAttemptAt: BigInt(lastHuntAttemptAt),
-    owner,
+    owner: owner as Address,
     status: getMonsterStatus(
       {
         id: monsterId!,
@@ -148,7 +149,7 @@ export function useMonsterInfo(
         alive,
         lastRewardIndex: BigInt(lastRewardIndex),
         lastHuntAttemptAt: BigInt(lastHuntAttemptAt),
-        owner,
+          owner: owner as Address,
       },
       BigInt(Math.floor(Date.now() / 1000)),
       canHunt as boolean | undefined

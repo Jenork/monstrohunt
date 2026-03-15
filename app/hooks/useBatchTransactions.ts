@@ -59,33 +59,24 @@ export function useBatchTransactions() {
       const eip5792Client = walletClient.extend(eip5792Actions());
 
       // Check if wallet supports EIP-5792
-      let capabilities;
       try {
-        capabilities = await eip5792Client.getCapabilities({ account: address as Address });
-      } catch {
-        capabilities = null;
-      }
+        const result = await eip5792Client.sendCalls({
+          account: address as Address,
+          chain: base,
+          calls: calls.map((call) => ({
+            to: call.to,
+            data: call.data,
+            value: call.value,
+          })),
+          capabilities: options?.atomic ? { atomic: { required: true } } : undefined,
+        });
 
-      if (!capabilities || !capabilities['wallet_sendCalls']) {
-        // Fallback: send transactions sequentially
+        addToast(`Batch transaction sent (${calls.length} calls, 1 signature)`, 'success');
+        return result;
+      } catch {
         addToast('Batch transactions not supported by wallet, sending sequentially', 'info');
         return await sendSequential(calls, walletClient);
       }
-
-      // Send batch using EIP-5792
-      const result = await eip5792Client.sendCalls({
-        account: address as Address,
-        chain: base,
-        calls: calls.map(call => ({
-          to: call.to,
-          data: call.data,
-          value: call.value,
-        })),
-        capabilities: options?.atomic ? { atomic: { required: true } } : undefined,
-      });
-
-      addToast(`Batch transaction sent (${calls.length} calls, 1 signature)`, 'success');
-      return result;
     } catch (error: unknown) {
       addToast(getErrorMessage(error, 'Batch transaction failed'), 'error');
       throw error;
@@ -110,7 +101,7 @@ export function useBatchTransactions() {
           data: call.data,
           value: call.value,
         });
-        results.push(hash);
+        results.push(hash as string);
       } catch (error) {
         throw new Error(`Failed to send transaction: ${getErrorMessage(error, 'Unknown error')}`);
       }
@@ -131,7 +122,7 @@ export function useBatchTransactions() {
     const data = encodeFunctionData({
       abi: monstroHuntABI,
       functionName: functionName as any,
-      args: args as any[],
+        args: args as never,
     });
 
     return {

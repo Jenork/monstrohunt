@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import type { Address } from 'viem';
 import { useReadContract, useReadContracts } from 'wagmi';
 import { usePlayerAddress } from '../../hooks/usePlayerAddress';
 import { CONTRACT_ADDRESS, isContractAddressValid, monstroHuntABI } from '../../utils/contract';
@@ -14,7 +15,6 @@ import { generateMockMonsters, isMockMode } from '../../utils/mockData';
 import styles from './HuntScreen.module.css';
 
 export function HuntScreen() {
-  const [allMonsterIds, setAllMonsterIds] = useState<number[]>([]);
   const [lastHuntedVictimName, setLastHuntedVictimName] = useState<string | null>(null);
   const { addToast } = useToast();
   const { huntMonster, isSuccess } = useHuntMonster();
@@ -27,6 +27,7 @@ export function HuntScreen() {
     functionName: 'getTotalMonsters',
     query: {
       enabled: !mockMode && isContractAddressValid,
+      refetchInterval: 30000,
     },
   });
 
@@ -48,24 +49,30 @@ export function HuntScreen() {
     contracts: existingMonsterContracts,
     query: {
       enabled: !mockMode && isContractAddressValid && existingMonsterContracts.length > 0,
+      refetchInterval: 30000,
     },
   });
 
-  const existingMonsterCount = useMemo(() => {
-    if (!existingResults || !Array.isArray(existingResults)) return 0;
-    return existingResults.filter(
-      (r): r is { result: boolean; status: 'success' } =>
-        r?.status === 'success' && r?.result === true
-    ).length;
+  const existingMonsterIds = useMemo(() => {
+    if (!existingResults || !Array.isArray(existingResults)) return [];
+    return existingResults.flatMap((result, index) =>
+      result?.status === 'success' && result.result === true ? [index + 1] : []
+    );
   }, [existingResults]);
+
+  const allMonsterIds = useMemo(() => {
+    if (mockMode) return generateMockMonsters(8).map((m) => m.id);
+    return existingMonsterIds;
+  }, [mockMode, existingMonsterIds]);
 
   const { data: hunterMonsterId, isError: isErrorHunter } = useReadContract({
     address: CONTRACT_ADDRESS,
     abi: monstroHuntABI,
     functionName: 'getOwnerMonsterId',
-    args: address ? [address] : undefined,
+    args: address ? [address as Address] : undefined,
     query: {
       enabled: !!address && !mockMode && isContractAddressValid,
+      refetchInterval: 30000,
     },
   });
 
@@ -73,53 +80,22 @@ export function HuntScreen() {
     mockMode ? 1 : (hunterMonsterId && hunterMonsterId > 0n ? Number(hunterMonsterId) : undefined)
   );
 
-  const loadAllMonsters = useCallback(() => {
-    if (!totalMonsters) return;
-
-    const total = Number(totalMonsters);
-    const ids: number[] = [];
-
-    // Check monsters starting from ID 1 (0 means no monster)
-    for (let i = 1; i <= total; i++) {
-      ids.push(i);
-    }
-
-    setAllMonsterIds(ids);
-  }, [totalMonsters]);
-
   useEffect(() => {
-    if (isSuccess) {
-      if (address) addHistoryEntry(address, { type: 'hunted', victimName: lastHuntedVictimName ?? undefined });
-      setLastHuntedVictimName(null);
-      addToast('Monster hunted successfully!', 'success');
-      loadAllMonsters();
-    }
-  }, [isSuccess, address, lastHuntedVictimName, addToast, loadAllMonsters]);
-
-  useEffect(() => {
-    if (mockMode) {
-      // В mock режиме показываем 8 монстров
-      const mockMonsters = generateMockMonsters(8);
-      setAllMonsterIds(mockMonsters.map((m) => m.id));
-      return;
-    }
-
-    if (totalMonsters) {
-      loadAllMonsters();
-      const interval = setInterval(loadAllMonsters, 30000);
-      return () => clearInterval(interval);
-    }
-  }, [totalMonsters, mockMode, loadAllMonsters]);
+    if (!isSuccess) return;
+    if (address) addHistoryEntry(address, { type: 'hunted', victimName: lastHuntedVictimName ?? undefined });
+    setLastHuntedVictimName(null);
+    addToast('Monster hunted successfully!', 'success');
+  }, [isSuccess, address, lastHuntedVictimName, addToast]);
 
   const currentTime = BigInt(Math.floor(Date.now() / 1000));
-  const hunterCooldown = hunterMonster 
+  const hunterCooldown = hunterMonster
     ? getHuntCooldownRemaining(hunterMonster.lastHuntAttemptAt, currentTime)
     : BigInt(0);
 
   const starvedCount = useMemo(() => {
-    if (!mockMode) return allMonsterIds.length;
-    return generateMockMonsters(8).filter(m => m.status.status === 'starved').length;
-  }, [mockMode, allMonsterIds.length]);
+    if (!mockMode) return existingMonsterIds.length;
+    return generateMockMonsters(8).filter((m) => m.status.status === 'starved').length;
+  }, [mockMode, existingMonsterIds.length]);
 
   const contractError = !mockMode && (isErrorTotal || isErrorExisting || isErrorHunter);
 
@@ -135,7 +111,7 @@ export function HuntScreen() {
 
       {mockMode && (
         <div className={styles.mockNotice}>
-          <div className={styles.mockIcon}>🎮</div>
+          <div className={styles.mockIcon}>Demo</div>
           <div className={styles.mockContent}>
             <div className={styles.mockTitle}>Demo Mode</div>
             <div className={styles.mockText}>
@@ -147,7 +123,7 @@ export function HuntScreen() {
 
       {hunterCooldown > 0n && (
         <div className={styles.cooldownBox}>
-          <div className={styles.cooldownIcon}>⏱</div>
+          <div className={styles.cooldownIcon}>Wait</div>
           <div className={styles.cooldownContent}>
             <div className={styles.cooldownTitle}>Hunt Cooldown Active</div>
             <div className={styles.cooldownText}>
@@ -161,7 +137,7 @@ export function HuntScreen() {
         <div className={styles.infoItem}>
           <span className={styles.infoLabel}>Monsters now:</span>
           <span className={styles.infoValue}>
-            {mockMode ? `${starvedCount} starved (demo)` : `${existingMonsterCount} created`}
+            {mockMode ? `${starvedCount} starved (demo)` : `${existingMonsterIds.length} created`}
           </span>
         </div>
         <div className={styles.infoItem}>
@@ -219,7 +195,7 @@ function StarvedMonsterCard({
   }
 
   const canHunt = mockMode
-    ? (monster.status.status === 'starved' && monster.id !== 1)
+    ? monster.status.status === 'starved' && monster.id !== 1
     : (monster.status.canHunt ?? false);
 
   return (

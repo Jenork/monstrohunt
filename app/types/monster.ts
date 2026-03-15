@@ -1,4 +1,5 @@
 import type { Tier } from '../constants/game';
+import type { Address } from 'viem';
 
 export type { Tier };
 
@@ -13,7 +14,7 @@ export interface Monster {
   alive: boolean;
   lastRewardIndex: bigint;
   lastHuntAttemptAt: bigint;
-  owner: string;
+  owner: Address;
 }
 
 export interface MonsterStatus {

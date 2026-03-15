@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import type { Address } from 'viem';
 import { base } from 'wagmi/chains';
 import { ACHIEVEMENTS, ACHIEVEMENT_IDS } from '../../constants/achievements';
 import { BADGES_CONTRACT_ADDRESS, isBadgesAddressValid } from '../../utils/contract';
@@ -33,7 +34,7 @@ export function AchievementsScreen() {
     address: BADGES_CONTRACT_ADDRESS,
     abi: monstroHuntBadgesABI,
     functionName: 'hasClaimedSwamp',
-    args: address ? [address] : undefined,
+    args: address ? [address as Address] : undefined,
     query: { enabled: !!address && isBadgesAddressValid },
   });
 
@@ -68,13 +69,15 @@ export function AchievementsScreen() {
   };
 
   const { writeContract: writeClaimSwamp, data: hash, isPending: isWritePending } = useWriteContract();
-  const { isLoading: isConfirming } = useWaitForTransactionReceipt({
+  const { isPending: isConfirming, isSuccess: isSwampClaimed } = useWaitForTransactionReceipt({
     hash,
-    onSuccess: () => {
-      refetchHasClaimed();
-      refetchBalances();
-    },
   });
+
+  useEffect(() => {
+    if (!isSwampClaimed) return;
+    refetchHasClaimed();
+    refetchBalances();
+  }, [isSwampClaimed, refetchHasClaimed, refetchBalances]);
 
   const handleClaimSwamp = () => {
     if (claiming || swampClaimed || !isBadgesAddressValid) return;

@@ -1,10 +1,9 @@
-require("hardhat/config");
-require("dotenv").config();
-require("@nomicfoundation/hardhat-ethers");
-require("@nomicfoundation/hardhat-verify");
+import "dotenv/config";
+import "@nomicfoundation/hardhat-ethers";
+import "@nomicfoundation/hardhat-verify";
 
-/** @type {import('hardhat/config').HardhatUserConfig */
-module.exports = {
+/** @type {import('hardhat/config').HardhatUserConfig} */
+const config = {
   etherscan: {
     // Etherscan API V2: one key for all chains (Base, Ethereum, etc.)
     apiKey: process.env.ETHERSCAN_API_KEY || process.env.BASESCAN_API_KEY || "",
@@ -23,7 +22,7 @@ module.exports = {
     enabled: false,
   },
   solidity: {
-    version: "0.8.20",
+    version: "0.8.24",
     settings: {
       optimizer: {
         enabled: true,
@@ -33,11 +32,13 @@ module.exports = {
   },
   networks: {
     baseSepolia: {
+      type: "http",
       url: process.env.BASE_SEPOLIA_RPC_URL || "https://sepolia.base.org",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 84532,
     },
     baseMainnet: {
+      type: "http",
       url: process.env.BASE_MAINNET_RPC_URL || "https://mainnet.base.org",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 8453,
@@ -50,3 +51,5 @@ module.exports = {
     artifacts: "./artifacts",
   },
 };
+
+export default config;

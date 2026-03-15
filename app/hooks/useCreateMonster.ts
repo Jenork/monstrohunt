@@ -33,7 +33,7 @@ export function useCreateMonster() {
   const queryClient = useQueryClient();
   const [isCreating, setIsCreating] = useState(false);
   const { writeContractAsync, data: hash, isPending, error } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+  const { isPending: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,
   });
 
@@ -108,18 +108,15 @@ export function useCreateMonster() {
         if (walletClient && address) {
           try {
             const eip5792 = walletClient.extend(eip5792Actions());
-            const caps = await eip5792.getCapabilities({ account: address as Address });
-            if (caps?.wallet_sendCalls) {
-              await eip5792.sendCalls({
-                account: address as Address,
-                chain: base,
-                calls: [{ to: CONTRACT_ADDRESS, data, value: tierPrice }],
-                experimental_fallback: true,
-              });
-              queryClient.invalidateQueries({ queryKey: ['readContract'] });
-              addToast('Monster created successfully!', 'success');
-              return;
-            }
+            await eip5792.sendCalls({
+              account: address as Address,
+              chain: base,
+              calls: [{ to: CONTRACT_ADDRESS, data, value: tierPrice }],
+              experimental_fallback: true,
+            });
+            queryClient.invalidateQueries({ queryKey: ['readContract'] });
+            addToast('Monster created successfully!', 'success');
+            return;
           } catch (sendCallsErr: unknown) {
             if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
               console.warn('[useCreateMonster] sendCalls failed', sendCallsErr);

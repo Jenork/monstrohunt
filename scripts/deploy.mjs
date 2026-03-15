@@ -1,4 +1,4 @@
-const hre = require("hardhat");
+import hre from "hardhat";
 
 // Hunger duration in seconds
 // Testnet (Base Sepolia): 1 day = 86400 seconds
@@ -9,9 +9,12 @@ const HUNGER_DURATION_MAINNET = 259200;  // 3 days
 async function main() {
   const [deployer] = await hre.ethers.getSigners();
   console.log("Deploying contracts with the account:", deployer.address);
-  console.log("Account balance:", (await ethers.provider.getBalance(deployer.address)).toString());
+  console.log(
+    "Account balance:",
+    (await hre.ethers.provider.getBalance(deployer.address)).toString()
+  );
 
-  const network = await ethers.provider.getNetwork();
+  const network = await hre.ethers.provider.getNetwork();
   const isMainnet = network.chainId === 8453n; // Base Mainnet
   const hungerDuration = isMainnet ? HUNGER_DURATION_MAINNET : HUNGER_DURATION_TESTNET;
   
@@ -30,7 +33,9 @@ async function main() {
   const receipt = await monstroHunt.waitForDeployment();
 
   const address = await monstroHunt.getAddress();
-  const blockNumber = deployTx ? deployTx.blockNumber : (await hre.ethers.provider.getBlock("latest")).number;
+  const blockNumber = deployTx
+    ? deployTx.blockNumber
+    : (await hre.ethers.provider.getBlock("latest")).number;
 
   console.log("MonstroHunt deployed to:", address);
   console.log("\n---");

@@ -13,12 +13,18 @@ interface HuntCardProps {
   monster: MonsterInfo;
   onHunt: () => void;
   canHunt: boolean;
+  actionLabel?: string;
+  actionHint?: string;
 }
 
-export function HuntCard({ monster, onHunt, canHunt }: HuntCardProps) {
+export function HuntCard({
+  monster,
+  onHunt,
+  canHunt,
+  actionLabel,
+  actionHint,
+}: HuntCardProps) {
   const avatar = AVATARS.find((a) => a.id === monster.avatarId) || AVATARS[0];
-  
-  // Calculate potential reward (HUNTER_SHARE_BP = 30% of weight)
   const potentialReward = (monster.weight * BigInt(HUNTER_SHARE_BP)) / BigInt(10000);
 
   return (
@@ -54,8 +60,9 @@ export function HuntCard({ monster, onHunt, canHunt }: HuntCardProps) {
           onClick={onHunt}
           disabled={!canHunt}
         >
-          {canHunt ? 'Hunt Monster' : 'Cannot Hunt'}
+          {canHunt ? 'Hunt Monster' : actionLabel ?? 'Cannot Hunt'}
         </button>
+        {!canHunt && actionHint && <div className={styles.hint}>{actionHint}</div>}
       </div>
     </div>
   );

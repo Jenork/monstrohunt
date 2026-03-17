@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react';
 import Image from 'next/image';
+import { useChainId } from 'wagmi';
+import { base } from 'wagmi/chains';
 import { usePlayerAddress } from '../../hooks/usePlayerAddress';
 import { useMyMonsters } from '../../hooks/useMyMonsters';
 import { useMonsterInfo } from '../../hooks/useMonsterInfo';
@@ -9,15 +11,12 @@ import { useFeedMonster } from '../../hooks/useFeedMonster';
 import { useSellMonster } from '../../hooks/useSellMonster';
 import { useToast } from '../../hooks/useToast';
 import { addHistoryEntry, addVictimEntry, hasVictimEntryForMonster } from '../../utils/historyStore';
-import { useChainId } from 'wagmi';
-import { base } from 'wagmi/chains';
 import { StatusDisplay } from '../ui/StatusDisplay';
 import { AVATARS } from '../../constants/avatars';
 import { TIER_NAMES, HUNGER_DAYS } from '../../constants/game';
-import { formatETH } from '../../utils/format';
+import { formatETH, formatAddress } from '../../utils/format';
 import { getErrorMessage } from '../../utils/error';
 import { getSellAmount } from '../../utils/monster';
-import { formatAddress } from '../../utils/format';
 import { isMockMode } from '../../utils/mockData';
 import { useHunterOfDeadMonster } from '../../hooks/useHunterOfDeadMonster';
 import styles from './ManageScreen.module.css';
@@ -26,10 +25,9 @@ export function ManageScreen() {
   const { address, isConnected } = usePlayerAddress();
   const { monsterIds, refetch, isLoading: isLoadingList, isError: isListError } = useMyMonsters();
   const { addToast } = useToast();
-  const { feedMonster, isPending: isFeeding, isSuccess: feedSuccess } = useFeedMonster();
-  const { sellMonster, isPending: isSelling, isSuccess: sellSuccess } = useSellMonster();
+  const { isSuccess: feedSuccess } = useFeedMonster();
+  const { isSuccess: sellSuccess } = useSellMonster();
 
-  // Refetch when opening Manage (e.g. right after creating a monster)
   useEffect(() => {
     if (address) refetch();
   }, [address, refetch]);
@@ -46,7 +44,7 @@ export function ManageScreen() {
     return (
       <div className={styles.centerWrap}>
         <div className={styles.container}>
-          <div className={styles.message}>Please connect your wallet</div>
+          <div className={styles.message}>Connect your wallet to manage your monster.</div>
         </div>
       </div>
     );
@@ -62,22 +60,21 @@ export function ManageScreen() {
 
         {mockMode && (
           <div className={styles.mockNotice}>
-            <div className={styles.mockIcon}>🎮</div>
+            <div className={styles.mockIcon}>Demo</div>
             <div className={styles.mockContent}>
               <div className={styles.mockTitle}>Demo Mode</div>
               <div className={styles.mockText}>
-                Showing mock monster data. Connect to a deployed contract to manage your real monster.
+                Showing mock monster data. Connect to a deployed contract to manage your real
+                monster.
               </div>
             </div>
           </div>
         )}
 
         {isLoadingList ? (
-          <div className={styles.message}>Loading...</div>
+          <div className={styles.message}>Loading your monster...</div>
         ) : isListError ? (
-          <div className={styles.message}>
-            Failed to load. Check network (Base) and try again.
-          </div>
+          <div className={styles.message}>Failed to load. Check network (Base) and try again.</div>
         ) : !hasMonsters ? (
           <div className={styles.message}>You don&apos;t have a monster yet. Create one!</div>
         ) : (
@@ -93,7 +90,12 @@ export function ManageScreen() {
 }
 
 function MonsterManager({ monsterId }: { monsterId: number }) {
-  const { monster, refetch, isLoading: isLoadingMonster, isError: isMonsterError } = useMonsterInfo(monsterId, { fetchCanHunt: false });
+  const {
+    monster,
+    refetch,
+    isLoading: isLoadingMonster,
+    isError: isMonsterError,
+  } = useMonsterInfo(monsterId, { fetchCanHunt: false });
   const { address, isConnected } = usePlayerAddress();
   const hunterAddress = useHunterOfDeadMonster(monsterId, !!monster && !monster.alive);
   const { feedMonster, isPending: isFeeding } = useFeedMonster();
@@ -109,12 +111,13 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
   }, [address, monster, hunterAddress, monsterId]);
 
   if (isLoadingMonster) {
-    return <div className={styles.loading}>Loading...</div>;
+    return <div className={styles.loading}>Loading monster...</div>;
   }
+
   if (!monster || isMonsterError) {
     return (
       <div className={styles.loading}>
-        <span>Failed to load monster. </span>
+        <span>Failed to load monster.</span>
         <button type="button" onClick={() => refetch()} className={styles.retryLink}>
           Retry
         </button>
@@ -141,6 +144,7 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
       addToast('Cannot sell a starved monster. Feed it first or wait to be hunted.', 'error');
       return;
     }
+
     try {
       await sellMonster(monsterId);
       refetch();
@@ -150,17 +154,40 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
   };
 
   const canFeed = monster.alive && isConnected && !isWrongNetwork;
-  const canSell =
-    monster.alive && monster.status.status !== 'starved' && isConnected && !isWrongNetwork;
+  const canSell = monster.alive && monster.status.status !== 'starved' && isConnected && !isWrongNetwork;
   const isStarved = monster.status.status === 'starved';
   const actionHint = !isConnected
     ? 'Connect wallet'
     : isWrongNetwork
       ? 'Switch to Base'
-      : isStarved
-        ? 'Feed first to sell'
-        : '';
-  const avatar = AVATARS.find((a) => a.id === monster.avatarId) || AVATARS[0];
+      : !monster.alive
+        ? 'Monster is dead'
+        : isStarved
+          ? 'Feed first to sell'
+          : '';
+  const feedLabel = isFeeding
+    ? 'Feeding...'
+    : !isConnected
+      ? 'Connect Wallet'
+      : isWrongNetwork
+        ? 'Switch to Base'
+        : !monster.alive
+          ? 'Monster Dead'
+          : isStarved
+            ? 'Feed Now'
+            : 'Feed';
+  const sellLabel = isSelling
+    ? 'Selling...'
+    : !isConnected
+      ? 'Connect Wallet'
+      : isWrongNetwork
+        ? 'Switch to Base'
+        : !monster.alive
+          ? 'Monster Dead'
+          : isStarved
+            ? 'Feed First'
+            : 'Sell';
+  const avatar = AVATARS.find((item) => item.id === monster.avatarId) || AVATARS[0];
 
   return (
     <div className={styles.unifiedCard}>
@@ -191,9 +218,7 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
           <span className={styles.cardFeedCost}>
             {monster.feedCost ? formatETH(monster.feedCost) : '...'} ETH
           </span>
-          {!canFeed && actionHint && (
-            <span className={styles.actionHint}>{actionHint}</span>
-          )}
+          {!canFeed && actionHint && <span className={styles.actionHint}>{actionHint}</span>}
         </div>
         <button
           type="button"
@@ -201,7 +226,7 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
           onClick={handleFeed}
           disabled={isFeeding || !canFeed}
         >
-          {isFeeding ? '…' : isStarved ? 'Feed Now' : 'Feed'}
+          {feedLabel}
         </button>
       </div>
       <div className={styles.cardDivider} />
@@ -211,9 +236,7 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
           <span className={styles.cardSellAmount}>
             {monster.weight ? formatETH(getSellAmount(monster.weight)) : '...'} ETH
           </span>
-          {!canSell && actionHint && (
-            <span className={styles.actionHint}>{actionHint}</span>
-          )}
+          {!canSell && actionHint && <span className={styles.actionHint}>{actionHint}</span>}
         </div>
         <button
           type="button"
@@ -221,7 +244,7 @@ function MonsterManager({ monsterId }: { monsterId: number }) {
           onClick={handleSell}
           disabled={isSelling || !canSell}
         >
-          {isSelling ? '…' : 'Sell'}
+          {sellLabel}
         </button>
       </div>
     </div>

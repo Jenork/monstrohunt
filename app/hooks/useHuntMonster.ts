@@ -13,6 +13,7 @@ import { CONTRACT_ADDRESS, isContractAddressValid, monstroHuntABI } from '../uti
 import { getErrorMessage } from '../utils/error';
 import { useToast } from './useToast';
 import { usePlayerAddress } from './usePlayerAddress';
+import { getPreferredConnector } from './getPreferredConnector';
 
 export function useHuntMonster() {
   const { addToast } = useToast();
@@ -33,16 +34,18 @@ export function useHuntMonster() {
 
   const huntMonster = async (monsterId: number) => {
     if (!isConnected) {
-      const connector = connectors[0];
+      const connector = getPreferredConnector(connectors);
       if (!connector) {
         addToast('No wallet connector available', 'error');
         return;
       }
-      addToast('Connecting wallet...', 'info');
-      connectAsync({ connector }).catch((e) => {
+      try {
+        addToast('Connecting wallet...', 'info');
+        await connectAsync({ connector });
+      } catch (e: unknown) {
         addToast(getErrorMessage(e, 'Wallet connection failed'), 'error');
-      });
-      return;
+        return;
+      }
     }
     if (!isContractAddressValid) {
       addToast('Contract address is not configured', 'error');

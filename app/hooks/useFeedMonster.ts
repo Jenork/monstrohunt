@@ -14,6 +14,7 @@ import { getErrorMessage } from '../utils/error';
 import { useToast } from './useToast';
 import { usePlayerAddress } from './usePlayerAddress';
 import { useBatchTransactions } from './useBatchTransactions';
+import { getPreferredConnector } from './getPreferredConnector';
 
 export function useFeedMonster() {
   const { addToast } = useToast();
@@ -33,12 +34,9 @@ export function useFeedMonster() {
     }
   }, [error?.message, addToast]);
 
-  /**
-   * Feed monster (single transaction)
-   */
   const feedMonster = async (monsterId: number, feedCost: bigint) => {
     if (!isConnected) {
-      const connector = connectors[0];
+      const connector = getPreferredConnector(connectors);
       if (!connector) {
         addToast('No wallet connector available', 'error');
         return;
@@ -80,17 +78,9 @@ export function useFeedMonster() {
     }
   };
 
-  /**
-   * Feed monster multiple times in a batch (EIP-5792)
-   * Useful when user wants to feed multiple times with a single signature
-   * 
-   * @param monsterId Monster ID to feed
-   * @param feedCosts Array of feed costs (each feed will use the cost at that moment)
-   * @note Feed costs may change between feeds, so this is best used when costs are similar
-   */
   const feedMonsterBatch = async (monsterId: number, feedCosts: bigint[]) => {
     if (!isConnected) {
-      const connector = connectors[0];
+      const connector = getPreferredConnector(connectors);
       if (!connector) {
         addToast('No wallet connector available', 'error');
         return;
@@ -115,7 +105,7 @@ export function useFeedMonster() {
       addToast('No feed costs provided', 'error');
       return;
     }
-    if (feedCosts.some(cost => cost <= 0n)) {
+    if (feedCosts.some((cost) => cost <= 0n)) {
       addToast('Invalid feed cost', 'error');
       return;
     }
@@ -125,12 +115,11 @@ export function useFeedMonster() {
         await switchChainAsync({ chainId: base.id });
       }
 
-      // Create batch calls for multiple feeds
-      const calls = feedCosts.map(cost => 
+      const calls = feedCosts.map((cost) =>
         encodeCall('feedMonster', [BigInt(monsterId)], cost)
       );
 
-      await sendBatch(calls, { atomic: false }); // Not atomic - each feed can succeed independently
+      await sendBatch(calls, { atomic: false });
     } catch (e: unknown) {
       addToast(getErrorMessage(e, 'Batch feed failed'), 'error');
     }

@@ -21,60 +21,101 @@ interface CreateScreenProps {
 export function CreateScreen({ onCreated }: CreateScreenProps) {
   const [name, setName] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState<AvatarId>(0);
-  const [selectedTier, setSelectedTier] = useState<Tier>(1); // Hunter by default
-  
+  const [selectedTier, setSelectedTier] = useState<Tier>(1);
+
   const { address, isConnected } = usePlayerAddress();
   const chainId = useChainId();
   const { data: balance } = useBalance({ address, chainId: base.id });
   const { monsterIds, isLoading: isLoadingMonsters } = useMyMonsters();
   const { createMonster, isPending, isSuccess } = useCreateMonster();
   const { addToast } = useToast();
+
+  const trimmedName = name.trim();
   const isWrongNetwork = isConnected && chainId !== base.id;
   const alreadyHasMonster = monsterIds.length > 0;
 
   useEffect(() => {
     if (!isSuccess || !address) return;
+
     try {
       addHistoryEntry(address, { type: 'created', monsterName: name });
     } catch {
-      // history store is best-effort; don't block success UX
+      // Best-effort local history only.
     }
+
     addToast('Monster created successfully!', 'success');
     setName('');
-    const t = setTimeout(() => {
+
+    const timeout = setTimeout(() => {
       onCreated?.();
     }, 2500);
-    return () => clearTimeout(t);
+
+    return () => clearTimeout(timeout);
   }, [isSuccess, address, name, addToast, onCreated]);
 
   const handlePreviousAvatar = () => {
-    const currentIndex = AVATARS.findIndex(a => a.id === selectedAvatar);
+    const currentIndex = AVATARS.findIndex((avatar) => avatar.id === selectedAvatar);
     const previousIndex = currentIndex <= 0 ? AVATARS.length - 1 : currentIndex - 1;
     setSelectedAvatar(AVATARS[previousIndex].id);
   };
 
   const handleNextAvatar = () => {
-    const currentIndex = AVATARS.findIndex(a => a.id === selectedAvatar);
+    const currentIndex = AVATARS.findIndex((avatar) => avatar.id === selectedAvatar);
     const nextIndex = currentIndex >= AVATARS.length - 1 ? 0 : currentIndex + 1;
     setSelectedAvatar(AVATARS[nextIndex].id);
   };
 
   const handleCreate = () => {
-    if (!name.trim()) {
+    if (!trimmedName) {
       addToast('Please enter a name', 'error');
       return;
     }
-    if (name.length > 31) {
+
+    if (trimmedName.length > 31) {
       addToast('Name must be 31 characters or less', 'error');
       return;
     }
-    createMonster(name, selectedAvatar, selectedTier);
+
+    createMonster(trimmedName, selectedAvatar, selectedTier);
   };
 
   const selectedTierPrice = TIER_PRICES[selectedTier];
-  const estimatedGas = 50000000000000n; // ~0.00005 ETH (Base gas is cheap)
+  const estimatedGas = 50000000000000n;
   const requiredTotal = selectedTierPrice + estimatedGas;
   const hasInsufficientBalance = balance && balance.value < requiredTotal;
+  const isCreateDisabled =
+    isPending ||
+    isLoadingMonsters ||
+    !trimmedName ||
+    isWrongNetwork ||
+    !!hasInsufficientBalance ||
+    alreadyHasMonster;
+
+  const createButtonLabel = (() => {
+    if (isPending) return 'Creating...';
+    if (!isConnected) return `Connect Wallet to Create ${TIER_NAMES[selectedTier]}`;
+    if (isLoadingMonsters) return 'Checking Existing Monster...';
+    if (isWrongNetwork) return 'Switch to Base to Create';
+    if (alreadyHasMonster) return 'You Already Have a Monster';
+    if (hasInsufficientBalance) return 'Insufficient Balance';
+    if (!trimmedName) return 'Enter Monster Name';
+    return `Create ${TIER_NAMES[selectedTier]} Monster`;
+  })();
+
+  const statusHint = (() => {
+    if (!isConnected) return 'Connect a wallet to create a monster.';
+    if (isLoadingMonsters) return 'Checking whether this wallet already owns a monster.';
+    if (isWrongNetwork) return 'Creation is available only on Base.';
+    if (alreadyHasMonster) return 'One wallet can control only one alive monster at a time.';
+    if (hasInsufficientBalance) {
+      return `Need about ${formatETH(requiredTotal)} ETH including gas.`;
+    }
+    if (!trimmedName) return 'Enter a monster name to unlock creation.';
+    return 'No protocol fee on creation. You only pay tier price plus gas.';
+  })();
+
+  const selectedAvatarData =
+    AVATARS.find((avatar) => avatar.id === selectedAvatar) ?? AVATARS[0];
 
   return (
     <div className={styles.container}>
@@ -88,13 +129,15 @@ export function CreateScreen({ onCreated }: CreateScreenProps) {
 
       {hasInsufficientBalance && isConnected && (
         <div className={styles.networkWarning}>
-          Insufficient balance. You need ~{formatETH(requiredTotal)} ETH (tier + gas). Your balance: {balance ? formatETH(balance.value) : '—'} ETH.
+          Insufficient balance. You need ~{formatETH(requiredTotal)} ETH (tier + gas). Your
+          balance: {balance ? formatETH(balance.value) : '-'} ETH.
         </div>
       )}
 
       {alreadyHasMonster && isConnected && !isLoadingMonsters && (
         <div className={styles.networkWarning}>
-          You already have a monster. Go to <strong>Manage</strong> to feed or sell it. One monster per wallet.
+          You already have a monster. Go to <strong>Manage</strong> to feed or sell it. One
+          monster per wallet.
         </div>
       )}
 
@@ -102,30 +145,30 @@ export function CreateScreen({ onCreated }: CreateScreenProps) {
         <div className={styles.section}>
           <div className={styles.avatarSelector}>
             <button
+              type="button"
               className={styles.arrowButton}
               onClick={handlePreviousAvatar}
               aria-label="Previous avatar"
             >
-              ‹
+              &#8249;
             </button>
             <div className={styles.avatarDisplay}>
               <Image
-                src={AVATARS.find(a => a.id === selectedAvatar)?.image || AVATARS[0].image}
-                alt={AVATARS.find(a => a.id === selectedAvatar)?.name || AVATARS[0].name}
+                src={selectedAvatarData.image}
+                alt={selectedAvatarData.name}
                 width={1728}
                 height={1728}
                 className={styles.avatarImg}
               />
-              <div className={styles.avatarName}>
-                {AVATARS.find(a => a.id === selectedAvatar)?.name || AVATARS[0].name}
-              </div>
+              <div className={styles.avatarName}>{selectedAvatarData.name}</div>
             </div>
             <button
+              type="button"
               className={styles.arrowButton}
               onClick={handleNextAvatar}
               aria-label="Next avatar"
             >
-              ›
+              &#8250;
             </button>
           </div>
         </div>
@@ -136,7 +179,7 @@ export function CreateScreen({ onCreated }: CreateScreenProps) {
             type="text"
             className={styles.input}
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(event) => setName(event.target.value)}
             maxLength={31}
             placeholder="Enter monster name"
           />
@@ -147,7 +190,7 @@ export function CreateScreen({ onCreated }: CreateScreenProps) {
             {([0, 1, 2] as Tier[]).map((tier) => {
               const tierPrice = TIER_PRICES[tier];
               const isSelected = selectedTier === tier;
-              
+
               return (
                 <label
                   key={tier}
@@ -188,16 +231,18 @@ export function CreateScreen({ onCreated }: CreateScreenProps) {
             </div>
           )}
           <div className={styles.summaryHint}>
-            No protocol fees on creation. One monster per wallet. Need tier amount + gas (~0.00005 ETH) in Base.
+            No protocol fees on creation. One monster per wallet. Need tier amount + gas
+            (~0.00005 ETH) in Base.
           </div>
+          <div className={styles.actionHint}>{statusHint}</div>
         </div>
 
         <button
           className={styles.createButton}
           onClick={handleCreate}
-          disabled={isPending || !name.trim() || isWrongNetwork || !!hasInsufficientBalance || alreadyHasMonster}
+          disabled={isCreateDisabled}
         >
-          {isPending ? 'Creating...' : `Create ${TIER_NAMES[selectedTier]} Monster`}
+          {createButtonLabel}
         </button>
       </div>
     </div>

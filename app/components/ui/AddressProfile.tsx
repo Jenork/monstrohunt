@@ -3,7 +3,6 @@
 import type { Address } from 'viem';
 import { formatAddress } from '../../utils/format';
 import { usePlayerAddress } from '../../hooks/usePlayerAddress';
-import { useFarcasterProfile } from '../../hooks/useFarcasterProfile';
 import styles from './AddressProfile.module.css';
 
 interface AddressProfileProps {
@@ -20,15 +19,10 @@ export function AddressProfile({
   className,
 }: AddressProfileProps) {
   const { address: playerAddress } = usePlayerAddress();
-  const profile = useFarcasterProfile(address);
   const short = formatAddress(address);
   const initials = address.slice(2, 4).toUpperCase();
   const isCurrentUser = !!(playerAddress && address.toLowerCase() === playerAddress.toLowerCase());
-  const displayName =
-    (isCurrentUser && profile.displayName) ||
-    profile.displayName ||
-    profile.username ||
-    short;
+  const displayName = isCurrentUser ? `You (${short})` : short;
 
   if (nameOnly) {
     return (

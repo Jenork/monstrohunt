@@ -26,7 +26,6 @@
 
 | Переменная | Значение | Зачем |
 |------------|----------|--------|
-| `NEYNAR_API_KEY` | Ключ с [neynar.com](https://neynar.com) | Показ имён профилей в карточках Hunt. Без ключа показывается короткий адрес. |
 | `NEXT_PUBLIC_TELEGRAM_URL` | `https://t.me/monstrohunt` | Ссылка в футере (по умолчанию уже стоит в коде). |
 | `NEXT_PUBLIC_TWITTER_URL` | `https://x.com/super_jenork` | Ссылка в футере (по умолчанию уже стоит в коде). |
 | `NEXT_PUBLIC_ONCHAINKIT_API_KEY` | Ключ OnchainKit (если используешь) | Для расширенных фич OnchainKit; приложение может работать и без него. |
